@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>System routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">System routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_install_system">al_install_system</a></li>
+<li><a href="#al_init">al_init</a></li>
+<li><a href="#al_uninstall_system">al_uninstall_system</a></li>
+<li><a href="#al_is_system_installed">al_is_system_installed</a></li>
+<li><a href="#al_get_allegro_version">al_get_allegro_version</a></li>
+<li><a href="#al_get_standard_path">al_get_standard_path</a></li>
+<li><a href="#al_set_exe_name">al_set_exe_name</a></li>
+<li><a href="#al_set_app_name">al_set_app_name</a></li>
+<li><a href="#al_set_org_name">al_set_org_name</a></li>
+<li><a href="#al_get_app_name">al_get_app_name</a></li>
+<li><a href="#al_get_org_name">al_get_org_name</a></li>
+<li><a href="#al_get_system_config">al_get_system_config</a></li>
+<li><a href="#al_register_assert_handler">al_register_assert_handler</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="al_install_system"><a href="#TOC">al_install_system</a></h1>
+<pre><code>bool al_install_system(int version, int (*atexit_ptr)(void (*)(void)))
+</code></pre>
+<p>Initialize the Allegro system. No other Allegro functions can be called before this (with one or two exceptions).</p>
+<p>The version field should always be set to ALLEGRO_VERSION_INT.</p>
+<p>If atexit_ptr is non-NULL, and if hasn't been done already, <a href="system.html#al_uninstall_system">al_uninstall_system</a> will be registered as an atexit function.</p>
+<p>Returns true if Allegro was successfully initialized by this function call (or already was initialized previously), false if Allegro cannot be used.</p>
+<p>See also: <a href="system.html#al_init">al_init</a></p>
+<h1 id="al_init"><a href="#TOC">al_init</a></h1>
+<pre><code>#define al_init()    (al_install_system(ALLEGRO_VERSION_INT, atexit))
+</code></pre>
+<p>Like <a href="system.html#al_install_system">al_install_system</a>, but automatically passes in the version and uses the atexit function visible in the current compilation unit.</p>
+<p>See also: <a href="system.html#al_install_system">al_install_system</a></p>
+<h1 id="al_uninstall_system"><a href="#TOC">al_uninstall_system</a></h1>
+<pre><code>void al_uninstall_system(void)
+</code></pre>
+<p>Closes down the Allegro system.</p>
+<blockquote>
+<p>Note: al_uninstall_system() can be called without a corresponding <a href="system.html#al_install_system">al_install_system</a> call, e.g. from atexit().</p>
+</blockquote>
+<h1 id="al_is_system_installed"><a href="#TOC">al_is_system_installed</a></h1>
+<pre><code>bool al_is_system_installed(void)
+</code></pre>
+<p>Returns true if Allegro is initialized, otherwise returns false.</p>
+<h1 id="al_get_allegro_version"><a href="#TOC">al_get_allegro_version</a></h1>
+<pre><code>uint32_t al_get_allegro_version(void)
+</code></pre>
+<p>Returns the (compiled) version of the Allegro library, packed into a single integer as groups of 8 bits in the form <code>(major &lt;&lt; 24) | (minor &lt;&lt; 16) | (revision &lt;&lt; 8) | release</code>.</p>
+<p>You can use code like this to extract them:</p>
+<pre><code>uint32_t version = al_get_allegro_version();
+int major = version &gt;&gt; 24;
+int minor = (version &gt;&gt; 16) &amp; 255;
+int revision = (version &gt;&gt; 8) &amp; 255;
+int release = version &amp; 255;
+</code></pre>
+<p>The <code>release</code> number is 0 for an unofficial version and 1 or greater for an official release. For example &quot;5.0.2[1]&quot; would be the (first) official 5.0.2 release while &quot;5.0.2[0]&quot; would be a compile of a version from the &quot;5.0.2&quot; branch before the official release.</p>
+<h1 id="al_get_standard_path"><a href="#TOC">al_get_standard_path</a></h1>
+<pre><code>ALLEGRO_PATH *al_get_standard_path(int id)
+</code></pre>
+<p>Gets a system path, depending on the <code>id</code> parameter. Some of these paths may be affected by the organization and application name, so be sure to set those before calling this function.</p>
+<p>The paths are not guaranteed to be unique (e.g., SETTINGS and DATA may be the same on some platforms), so you should be sure your filenames are unique if you need to avoid naming collisions. Also, a returned path may not actually exist on the file system.</p>
+<dl>
+<dt>ALLEGRO_RESOURCES_PATH</dt>
+<dd><p>If you bundle data in a location relative to your executable, then you should use this path to locate that data. On most platforms, this is the directory that contains the executable file.</p>
+<p>If ran from an OS X app bundle, then this will point to the internal resource directory (<bundle.app>/Contents/Resources). To maintain consistency, if you put your resources into a directory called &quot;data&quot; beneath the executable on some other platform (like Windows), then you should also create a directory called &quot;data&quot; under the OS X app bundle's resource folder.</p>
+<p>You should not try to write to this path, as it is very likely read-only.</p>
+<p>If you install your resources in some other system directory (e.g., in /usr/share or C:\ProgramData), then you are responsible for keeping track of that yourself.</p>
+</dd>
+<dt>ALLEGRO_TEMP_PATH</dt>
+<dd><p>Path to the directory for temporary files.</p>
+</dd>
+<dt>ALLEGRO_USER_HOME_PATH</dt>
+<dd><p>This is the user's home directory. You should not normally write files into this directory directly, or create any sub folders in it, without explicit permission from the user. One practical application of this path would be to use it as the starting place of a file selector in a GUI.</p>
+</dd>
+<dt>ALLEGRO_USER_DOCUMENTS_PATH</dt>
+<dd><p>This location is easily accessible by the user, and is the place to store documents and files that the user might want to later open with an external program or transfer to another place.</p>
+<p>You should not save files here unless the user expects it, usually by explicit permission.</p>
+</dd>
+<dt>ALLEGRO_USER_DATA_PATH</dt>
+<dd><p>If your program saves any data that the user doesn't need to access externally, then you should place it here. This is generally the least intrusive place to store data.</p>
+</dd>
+<dt>ALLEGRO_USER_SETTINGS_PATH</dt>
+<dd><p>If you are saving configuration files (especially if the user may want to edit them outside of your program), then you should place them here.</p>
+</dd>
+<dt>ALLEGRO_EXENAME_PATH</dt>
+<dd><p>The full path to the executable.</p>
+</dd>
+</dl>
+<p>Returns NULL on failure. The returned path should be freed with <a href="path.html#al_destroy_path">al_destroy_path</a>.</p>
+<p>See also: <a href="system.html#al_set_app_name">al_set_app_name</a>, <a href="system.html#al_set_org_name">al_set_org_name</a>, <a href="path.html#al_destroy_path">al_destroy_path</a>, <a href="system.html#al_set_exe_name">al_set_exe_name</a></p>
+<h1 id="al_set_exe_name"><a href="#TOC">al_set_exe_name</a></h1>
+<pre><code>void al_set_exe_name(char const *path)
+</code></pre>
+<p>This override the executable name used by <a href="system.html#al_get_standard_path">al_get_standard_path</a> for ALLEGRO_EXENAME_PATH and ALLEGRO_RESOURCES_PATH.</p>
+<p>One possibility where changing this can be useful is if you use the Python wrapper. Allegro would then by default think that the system's Python executable is the current executable - but you can set it to the .py file being executed instead.</p>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="system.html#al_get_standard_path">al_get_standard_path</a></p>
+<h1 id="al_set_app_name"><a href="#TOC">al_set_app_name</a></h1>
+<pre><code>void al_set_app_name(const char *app_name)
+</code></pre>
+<p>Sets the global application name.</p>
+<p>The application name is used by <a href="system.html#al_get_standard_path">al_get_standard_path</a> to build the full path to an application's files.</p>
+<p>This function may be called before <a href="system.html#al_init">al_init</a> or <a href="system.html#al_install_system">al_install_system</a>.</p>
+<p>See also: <a href="system.html#al_get_app_name">al_get_app_name</a>, <a href="system.html#al_set_org_name">al_set_org_name</a></p>
+<h1 id="al_set_org_name"><a href="#TOC">al_set_org_name</a></h1>
+<pre><code>void al_set_org_name(const char *org_name)
+</code></pre>
+<p>Sets the global organization name.</p>
+<p>The organization name is used by <a href="system.html#al_get_standard_path">al_get_standard_path</a> to build the full path to an application's files.</p>
+<p>This function may be called before <a href="system.html#al_init">al_init</a> or <a href="system.html#al_install_system">al_install_system</a>.</p>
+<p>See also: <a href="system.html#al_get_org_name">al_get_org_name</a>, <a href="system.html#al_set_app_name">al_set_app_name</a></p>
+<h1 id="al_get_app_name"><a href="#TOC">al_get_app_name</a></h1>
+<pre><code>const char *al_get_app_name(void)
+</code></pre>
+<p>Returns the global application name string.</p>
+<p>See also: <a href="system.html#al_set_app_name">al_set_app_name</a></p>
+<h1 id="al_get_org_name"><a href="#TOC">al_get_org_name</a></h1>
+<pre><code>const char *al_get_org_name(void)
+</code></pre>
+<p>Returns the global organization name string.</p>
+<p>See also: <a href="system.html#al_set_org_name">al_set_org_name</a></p>
+<h1 id="al_get_system_config"><a href="#TOC">al_get_system_config</a></h1>
+<pre><code>ALLEGRO_CONFIG *al_get_system_config(void)
+</code></pre>
+<p>Returns the current system configuration structure, or NULL if there is no active system driver. This is mainly used for configuring Allegro and its addons.</p>
+<h1 id="al_register_assert_handler"><a href="#TOC">al_register_assert_handler</a></h1>
+<pre><code>void al_register_assert_handler(void (*handler)(char const *expr,
+   char const *file, int line, char const *func))
+</code></pre>
+<p>Register a function to be called when an internal Allegro assertion fails. Pass NULL to reset to the default behaviour, which is to do whatever the standard <code>assert()</code> macro does.</p>
+<p>Since: 5.0.6, 5.1.0</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

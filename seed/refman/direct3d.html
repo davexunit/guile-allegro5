@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Direct3D integration</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Direct3D integration</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_get_d3d_device">al_get_d3d_device</a></li>
+<li><a href="#al_get_d3d_system_texture">al_get_d3d_system_texture</a></li>
+<li><a href="#al_get_d3d_video_texture">al_get_d3d_video_texture</a></li>
+<li><a href="#al_have_d3d_non_pow2_texture_support">al_have_d3d_non_pow2_texture_support</a></li>
+<li><a href="#al_have_d3d_non_square_texture_support">al_have_d3d_non_square_texture_support</a></li>
+<li><a href="#al_get_d3d_texture_position">al_get_d3d_texture_position</a></li>
+<li><a href="#al_is_d3d_device_lost">al_is_d3d_device_lost</a></li>
+</ul>
+</div>
+<p>These functions are declared in the following header file:</p>
+<pre><code>#include &lt;allegro5/allegro_direct3d.h&gt;
+</code></pre>
+<h1 id="al_get_d3d_device"><a href="#TOC">al_get_d3d_device</a></h1>
+<pre><code>LPDIRECT3DDEVICE9 al_get_d3d_device(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Returns the Direct3D device of the display. The return value is undefined if the display was not created with the Direct3D flag.</p>
+<p><em>Returns:</em> A pointer to the Direct3D device.</p>
+<h1 id="al_get_d3d_system_texture"><a href="#TOC">al_get_d3d_system_texture</a></h1>
+<pre><code>LPDIRECT3DTEXTURE9 al_get_d3d_system_texture(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the system texture (stored with the D3DPOOL_SYSTEMMEM flags). This texture is used for the render-to-texture feature set.</p>
+<p><em>Returns:</em> A pointer to the Direct3D system texture.</p>
+<h1 id="al_get_d3d_video_texture"><a href="#TOC">al_get_d3d_video_texture</a></h1>
+<pre><code>LPDIRECT3DTEXTURE9 al_get_d3d_video_texture(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the video texture (stored with the D3DPOOL_DEFAULT or D3DPOOL_MANAGED flags depending on whether render-to-texture is enabled or disabled respectively).</p>
+<p><em>Returns:</em> A pointer to the Direct3D video texture.</p>
+<h1 id="al_have_d3d_non_pow2_texture_support"><a href="#TOC">al_have_d3d_non_pow2_texture_support</a></h1>
+<pre><code>bool al_have_d3d_non_pow2_texture_support(void)
+</code></pre>
+<p>Returns whether the Direct3D device supports textures whose dimensions are not powers of two.</p>
+<p><em>Returns:</em> True if device suports NPOT textures, false otherwise.</p>
+<h1 id="al_have_d3d_non_square_texture_support"><a href="#TOC">al_have_d3d_non_square_texture_support</a></h1>
+<pre><code>bool al_have_d3d_non_square_texture_support(void)
+</code></pre>
+<p>Returns whether the Direct3D device supports textures that are not square.</p>
+<p><em>Returns:</em> True if the Direct3D device suports non-square textures, false otherwise.</p>
+<h1 id="al_get_d3d_texture_position"><a href="#TOC">al_get_d3d_texture_position</a></h1>
+<pre><code>void al_get_d3d_texture_position(ALLEGRO_BITMAP *bitmap, int *u, int *v)
+</code></pre>
+<p>Returns the u/v coordinates for the top/left corner of the bitmap within the used texture, in pixels.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>bitmap - ALLEGRO_BITMAP to examine</li>
+<li>u - Will hold the returned u coordinate</li>
+<li>v - Will hold the returned v coordinate</li>
+</ul>
+<h1 id="al_is_d3d_device_lost"><a href="#TOC">al_is_d3d_device_lost</a></h1>
+<pre><code>bool al_is_d3d_device_lost(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Returns a boolean indicating whether or not the Direct3D device belonging to the given display is in a lost state.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>display - The display that the device you wish to check is attached to</li>
+</ul>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

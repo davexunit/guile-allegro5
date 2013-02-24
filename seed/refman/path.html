@@ -1,0 +1,253 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Path structures</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Path structures</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_create_path">al_create_path</a></li>
+<li><a href="#al_create_path_for_directory">al_create_path_for_directory</a></li>
+<li><a href="#al_destroy_path">al_destroy_path</a></li>
+<li><a href="#al_clone_path">al_clone_path</a></li>
+<li><a href="#al_join_paths">al_join_paths</a></li>
+<li><a href="#al_rebase_path">al_rebase_path</a></li>
+<li><a href="#al_get_path_drive">al_get_path_drive</a></li>
+<li><a href="#al_get_path_num_components">al_get_path_num_components</a></li>
+<li><a href="#al_get_path_component">al_get_path_component</a></li>
+<li><a href="#al_get_path_tail">al_get_path_tail</a></li>
+<li><a href="#al_get_path_filename">al_get_path_filename</a></li>
+<li><a href="#al_get_path_basename">al_get_path_basename</a></li>
+<li><a href="#al_get_path_extension">al_get_path_extension</a></li>
+<li><a href="#al_set_path_drive">al_set_path_drive</a></li>
+<li><a href="#al_append_path_component">al_append_path_component</a></li>
+<li><a href="#al_insert_path_component">al_insert_path_component</a></li>
+<li><a href="#al_replace_path_component">al_replace_path_component</a></li>
+<li><a href="#al_remove_path_component">al_remove_path_component</a></li>
+<li><a href="#al_drop_path_tail">al_drop_path_tail</a></li>
+<li><a href="#al_set_path_filename">al_set_path_filename</a></li>
+<li><a href="#al_set_path_extension">al_set_path_extension</a></li>
+<li><a href="#al_path_cstr">al_path_cstr</a></li>
+<li><a href="#al_make_path_canonical">al_make_path_canonical</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<p>We define a path as an optional <em>drive</em>, followed by zero or more <em>directory components</em>, followed by an optional <em>filename</em>. The filename may be broken up into a <em>basename</em> and an <em>extension</em>, where the basename includes the start of the filename up to, but not including, the last dot (.) character. If no dot character exists the basename is the whole filename. The extension is everything from the last dot character to the end of the filename.</p>
+<h1 id="al_create_path"><a href="#TOC">al_create_path</a></h1>
+<pre><code>ALLEGRO_PATH *al_create_path(const char *str)
+</code></pre>
+<p>Create a path structure from a string. The last component, if it is followed by a directory separator and is neither &quot;.&quot; nor &quot;..&quot;, is treated as the last directory name in the path. Otherwise the last component is treated as the filename. The string may be NULL for an empty path.</p>
+<p>See also: <a href="path.html#al_create_path">al_create_path</a>, <a href="path.html#al_destroy_path">al_destroy_path</a></p>
+<h1 id="al_create_path_for_directory"><a href="#TOC">al_create_path_for_directory</a></h1>
+<pre><code>ALLEGRO_PATH *al_create_path_for_directory(const char *str)
+</code></pre>
+<p>This is the same as <a href="path.html#al_create_path">al_create_path</a>, but interprets the passed string as a directory path. The filename component of the returned path will always be empty.</p>
+<p>See also: <a href="path.html#al_create_path">al_create_path</a>, <a href="path.html#al_destroy_path">al_destroy_path</a></p>
+<h1 id="al_destroy_path"><a href="#TOC">al_destroy_path</a></h1>
+<pre><code>void al_destroy_path(ALLEGRO_PATH *path)
+</code></pre>
+<p>Free a path structure. Does nothing if passed NULL.</p>
+<p>See also: <a href="path.html#al_create_path">al_create_path</a>, <a href="path.html#al_create_path_for_directory">al_create_path_for_directory</a></p>
+<h1 id="al_clone_path"><a href="#TOC">al_clone_path</a></h1>
+<pre><code>ALLEGRO_PATH *al_clone_path(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Clones an ALLEGRO_PATH structure. Returns NULL on failure.</p>
+<p>See also: <a href="path.html#al_destroy_path">al_destroy_path</a></p>
+<h1 id="al_join_paths"><a href="#TOC">al_join_paths</a></h1>
+<pre><code>bool al_join_paths(ALLEGRO_PATH *path, const ALLEGRO_PATH *tail)
+</code></pre>
+<p>Concatenate two path structures. The first path structure is modified. If 'tail' is an absolute path, this function does nothing.</p>
+<p>If 'tail' is a relative path, all of its directory components will be appended to 'path'. tail's filename will also overwrite path's filename, even if it is just the empty string.</p>
+<p>Tail's drive is ignored.</p>
+<p>Returns true if 'tail' was a relative path and so concatenated to 'path', otherwise returns false.</p>
+<p>See also: <a href="path.html#al_rebase_path">al_rebase_path</a></p>
+<h1 id="al_rebase_path"><a href="#TOC">al_rebase_path</a></h1>
+<pre><code>bool al_rebase_path(const ALLEGRO_PATH *head, ALLEGRO_PATH *tail)
+</code></pre>
+<p>Concatenate two path structures, modifying the second path structure. If <em>tail</em> is an absolute path, this function does nothing. Otherwise, the drive and path components in <em>head</em> are inserted at the start of <em>tail</em>.</p>
+<p>For example, if <em>head</em> is &quot;/anchor/&quot; and <em>tail</em> is &quot;data/file.ext&quot;, then after the call <em>tail</em> becomes &quot;/anchor/data/file.ext&quot;.</p>
+<p>See also: <a href="path.html#al_join_paths">al_join_paths</a></p>
+<h1 id="al_get_path_drive"><a href="#TOC">al_get_path_drive</a></h1>
+<pre><code>const char *al_get_path_drive(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Return the drive letter on a path, or the empty string if there is none.</p>
+<p>The &quot;drive letter&quot; is only used on Windows, and is usually a string like &quot;c:&quot;, but may be something like &quot;\\Computer Name&quot; in the case of UNC (Uniform Naming Convention) syntax.</p>
+<h1 id="al_get_path_num_components"><a href="#TOC">al_get_path_num_components</a></h1>
+<pre><code>int al_get_path_num_components(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Return the number of directory components in a path.</p>
+<p>The directory components do not include the final part of a path (the filename).</p>
+<p>See also: <a href="path.html#al_get_path_component">al_get_path_component</a></p>
+<h1 id="al_get_path_component"><a href="#TOC">al_get_path_component</a></h1>
+<pre><code>const char *al_get_path_component(const ALLEGRO_PATH *path, int i)
+</code></pre>
+<p>Return the i'th directory component of a path, counting from zero. If the index is negative then count from the right, i.e. -1 refers to the last path component. It is an error to pass an index which is out of bounds.</p>
+<p>See also: <a href="path.html#al_get_path_num_components">al_get_path_num_components</a>, <a href="path.html#al_get_path_tail">al_get_path_tail</a></p>
+<h1 id="al_get_path_tail"><a href="#TOC">al_get_path_tail</a></h1>
+<pre><code>const char *al_get_path_tail(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Returns the last directory component, or NULL if there are no directory components.</p>
+<h1 id="al_get_path_filename"><a href="#TOC">al_get_path_filename</a></h1>
+<pre><code>const char *al_get_path_filename(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Return the filename part of the path, or the empty string if there is none.</p>
+<p>The returned pointer is valid only until the filename part of the path is modified in any way, or until the path is destroyed.</p>
+<p>See also: <a href="path.html#al_get_path_basename">al_get_path_basename</a>, <a href="path.html#al_get_path_extension">al_get_path_extension</a>, <a href="path.html#al_get_path_component">al_get_path_component</a></p>
+<h1 id="al_get_path_basename"><a href="#TOC">al_get_path_basename</a></h1>
+<pre><code>const char *al_get_path_basename(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Return the basename, i.e. filename with the extension removed. If the filename doesn't have an extension, the whole filename is the basename. If there is no filename part then the empty string is returned.</p>
+<p>The returned pointer is valid only until the filename part of the path is modified in any way, or until the path is destroyed.</p>
+<p>See also: <a href="path.html#al_get_path_filename">al_get_path_filename</a>, <a href="path.html#al_get_path_extension">al_get_path_extension</a></p>
+<h1 id="al_get_path_extension"><a href="#TOC">al_get_path_extension</a></h1>
+<pre><code>const char *al_get_path_extension(const ALLEGRO_PATH *path)
+</code></pre>
+<p>Return a pointer to the start of the extension of the filename, i.e. everything from the final dot ('.') character onwards. If no dot exists, returns an empty string.</p>
+<p>The returned pointer is valid only until the filename part of the path is modified in any way, or until the path is destroyed.</p>
+<p>See also: <a href="path.html#al_get_path_filename">al_get_path_filename</a>, <a href="path.html#al_get_path_basename">al_get_path_basename</a></p>
+<h1 id="al_set_path_drive"><a href="#TOC">al_set_path_drive</a></h1>
+<pre><code>void al_set_path_drive(ALLEGRO_PATH *path, const char *drive)
+</code></pre>
+<p>Set the drive string on a path. The drive may be NULL, which is equivalent to setting the drive string to the empty string.</p>
+<p>See also: <a href="path.html#al_get_path_drive">al_get_path_drive</a></p>
+<h1 id="al_append_path_component"><a href="#TOC">al_append_path_component</a></h1>
+<pre><code>void al_append_path_component(ALLEGRO_PATH *path, const char *s)
+</code></pre>
+<p>Append a directory component.</p>
+<p>See also: <a href="path.html#al_insert_path_component">al_insert_path_component</a></p>
+<h1 id="al_insert_path_component"><a href="#TOC">al_insert_path_component</a></h1>
+<pre><code>void al_insert_path_component(ALLEGRO_PATH *path, int i, const char *s)
+</code></pre>
+<p>Insert a directory component at index i. If the index is negative then count from the right, i.e. -1 refers to the last path component.</p>
+<p>It is an error to pass an index i which is not within these bounds: 0 &lt;= i &lt;= al_get_path_num_components(path).</p>
+<p>See also: <a href="path.html#al_append_path_component">al_append_path_component</a>, <a href="path.html#al_replace_path_component">al_replace_path_component</a>, <a href="path.html#al_remove_path_component">al_remove_path_component</a></p>
+<h1 id="al_replace_path_component"><a href="#TOC">al_replace_path_component</a></h1>
+<pre><code>void al_replace_path_component(ALLEGRO_PATH *path, int i, const char *s)
+</code></pre>
+<p>Replace the i'th directory component by another string. If the index is negative then count from the right, i.e. -1 refers to the last path component. It is an error to pass an index which is out of bounds.</p>
+<p>See also: <a href="path.html#al_insert_path_component">al_insert_path_component</a>, <a href="path.html#al_remove_path_component">al_remove_path_component</a></p>
+<h1 id="al_remove_path_component"><a href="#TOC">al_remove_path_component</a></h1>
+<pre><code>void al_remove_path_component(ALLEGRO_PATH *path, int i)
+</code></pre>
+<p>Delete the i'th directory component. If the index is negative then count from the right, i.e. -1 refers to the last path component. It is an error to pass an index which is out of bounds.</p>
+<p>See also: <a href="path.html#al_insert_path_component">al_insert_path_component</a>, <a href="path.html#al_replace_path_component">al_replace_path_component</a>, <a href="path.html#al_drop_path_tail">al_drop_path_tail</a></p>
+<h1 id="al_drop_path_tail"><a href="#TOC">al_drop_path_tail</a></h1>
+<pre><code>void al_drop_path_tail(ALLEGRO_PATH *path)
+</code></pre>
+<p>Remove the last directory component, if any.</p>
+<p>See also: <a href="path.html#al_remove_path_component">al_remove_path_component</a></p>
+<h1 id="al_set_path_filename"><a href="#TOC">al_set_path_filename</a></h1>
+<pre><code>void al_set_path_filename(ALLEGRO_PATH *path, const char *filename)
+</code></pre>
+<p>Set the optional filename part of the path. The filename may be NULL, which is equivalent to setting the filename to the empty string.</p>
+<p>See also: <a href="path.html#al_set_path_extension">al_set_path_extension</a>, <a href="path.html#al_get_path_filename">al_get_path_filename</a></p>
+<h1 id="al_set_path_extension"><a href="#TOC">al_set_path_extension</a></h1>
+<pre><code>bool al_set_path_extension(ALLEGRO_PATH *path, char const *extension)
+</code></pre>
+<p>Replaces the extension of the path with the given one, i.e. replaces everything from the final dot ('.') character onwards, including the dot. If the filename of the path has no extension, the given one is appended. Usually the new extension you supply should include a leading dot.</p>
+<p>Returns false if the path contains no filename part, i.e. the filename part is the empty string.</p>
+<p>See also: <a href="path.html#al_set_path_filename">al_set_path_filename</a>, <a href="path.html#al_get_path_extension">al_get_path_extension</a></p>
+<h1 id="al_path_cstr"><a href="#TOC">al_path_cstr</a></h1>
+<pre><code>const char *al_path_cstr(const ALLEGRO_PATH *path, char delim)
+</code></pre>
+<p>Convert a path to its string representation, i.e. optional drive, followed by directory components separated by 'delim', followed by an optional filename.</p>
+<p>To use the current native path separator, use ALLEGRO_NATIVE_PATH_SEP for 'delim'.</p>
+<p>The returned pointer is valid only until the path is modified in any way, or until the path is destroyed.</p>
+<h1 id="al_make_path_canonical"><a href="#TOC">al_make_path_canonical</a></h1>
+<pre><code>bool al_make_path_canonical(ALLEGRO_PATH *path)
+</code></pre>
+<p>Removes any leading '..' directory components in absolute paths. Removes all '.' directory components.</p>
+<p>Note that this does <em>not</em> collapse &quot;x/../y&quot; sections into &quot;y&quot;. This is by design. If &quot;/foo&quot; on your system is a symlink to &quot;/bar/baz&quot;, then &quot;/foo/../quux&quot; is actually &quot;/bar/quux&quot;, not &quot;/quux&quot; as a naive removal of &quot;..&quot; components would give you.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

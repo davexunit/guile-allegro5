@@ -1,0 +1,637 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>UTF-8 string routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">UTF-8 string routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#about-utf-8-string-routines">About UTF-8 string routines</a></li>
+<li><a href="#utf-8-string-types">UTF-8 string types</a><ul>
+<li><a href="#allegro_ustr">ALLEGRO_USTR</a></li>
+<li><a href="#allegro_ustr_info">ALLEGRO_USTR_INFO</a></li>
+</ul></li>
+<li><a href="#creating-and-destroying-strings">Creating and destroying strings</a><ul>
+<li><a href="#al_ustr_new">al_ustr_new</a></li>
+<li><a href="#al_ustr_new_from_buffer">al_ustr_new_from_buffer</a></li>
+<li><a href="#al_ustr_newf">al_ustr_newf</a></li>
+<li><a href="#al_ustr_free">al_ustr_free</a></li>
+<li><a href="#al_cstr">al_cstr</a></li>
+<li><a href="#al_ustr_to_buffer">al_ustr_to_buffer</a></li>
+<li><a href="#al_cstr_dup">al_cstr_dup</a></li>
+<li><a href="#al_ustr_dup">al_ustr_dup</a></li>
+<li><a href="#al_ustr_dup_substr">al_ustr_dup_substr</a></li>
+</ul></li>
+<li><a href="#predefined-strings">Predefined strings</a><ul>
+<li><a href="#al_ustr_empty_string">al_ustr_empty_string</a></li>
+</ul></li>
+<li><a href="#creating-strings-by-referencing-other-data">Creating strings by referencing other data</a><ul>
+<li><a href="#al_ref_cstr">al_ref_cstr</a></li>
+<li><a href="#al_ref_buffer">al_ref_buffer</a></li>
+<li><a href="#al_ref_ustr">al_ref_ustr</a></li>
+</ul></li>
+<li><a href="#sizes-and-offsets">Sizes and offsets</a><ul>
+<li><a href="#al_ustr_size">al_ustr_size</a></li>
+<li><a href="#al_ustr_length">al_ustr_length</a></li>
+<li><a href="#al_ustr_offset">al_ustr_offset</a></li>
+<li><a href="#al_ustr_next">al_ustr_next</a></li>
+<li><a href="#al_ustr_prev">al_ustr_prev</a></li>
+</ul></li>
+<li><a href="#getting-code-points">Getting code points</a><ul>
+<li><a href="#al_ustr_get">al_ustr_get</a></li>
+<li><a href="#al_ustr_get_next">al_ustr_get_next</a></li>
+<li><a href="#al_ustr_prev_get">al_ustr_prev_get</a></li>
+</ul></li>
+<li><a href="#inserting-into-strings">Inserting into strings</a><ul>
+<li><a href="#al_ustr_insert">al_ustr_insert</a></li>
+<li><a href="#al_ustr_insert_cstr">al_ustr_insert_cstr</a></li>
+<li><a href="#al_ustr_insert_chr">al_ustr_insert_chr</a></li>
+</ul></li>
+<li><a href="#appending-to-strings">Appending to strings</a><ul>
+<li><a href="#al_ustr_append">al_ustr_append</a></li>
+<li><a href="#al_ustr_append_cstr">al_ustr_append_cstr</a></li>
+<li><a href="#al_ustr_append_chr">al_ustr_append_chr</a></li>
+<li><a href="#al_ustr_appendf">al_ustr_appendf</a></li>
+<li><a href="#al_ustr_vappendf">al_ustr_vappendf</a></li>
+</ul></li>
+<li><a href="#removing-parts-of-strings">Removing parts of strings</a><ul>
+<li><a href="#al_ustr_remove_chr">al_ustr_remove_chr</a></li>
+<li><a href="#al_ustr_remove_range">al_ustr_remove_range</a></li>
+<li><a href="#al_ustr_truncate">al_ustr_truncate</a></li>
+<li><a href="#al_ustr_ltrim_ws">al_ustr_ltrim_ws</a></li>
+<li><a href="#al_ustr_rtrim_ws">al_ustr_rtrim_ws</a></li>
+<li><a href="#al_ustr_trim_ws">al_ustr_trim_ws</a></li>
+</ul></li>
+<li><a href="#assigning-one-string-to-another">Assigning one string to another</a><ul>
+<li><a href="#al_ustr_assign">al_ustr_assign</a></li>
+<li><a href="#al_ustr_assign_substr">al_ustr_assign_substr</a></li>
+<li><a href="#al_ustr_assign_cstr">al_ustr_assign_cstr</a></li>
+</ul></li>
+<li><a href="#replacing-parts-of-string">Replacing parts of string</a><ul>
+<li><a href="#al_ustr_set_chr">al_ustr_set_chr</a></li>
+<li><a href="#al_ustr_replace_range">al_ustr_replace_range</a></li>
+</ul></li>
+<li><a href="#searching">Searching</a><ul>
+<li><a href="#al_ustr_find_chr">al_ustr_find_chr</a></li>
+<li><a href="#al_ustr_rfind_chr">al_ustr_rfind_chr</a></li>
+<li><a href="#al_ustr_find_set">al_ustr_find_set</a></li>
+<li><a href="#al_ustr_find_set_cstr">al_ustr_find_set_cstr</a></li>
+<li><a href="#al_ustr_find_cset">al_ustr_find_cset</a></li>
+<li><a href="#al_ustr_find_cset_cstr">al_ustr_find_cset_cstr</a></li>
+<li><a href="#al_ustr_find_str">al_ustr_find_str</a></li>
+<li><a href="#al_ustr_find_cstr">al_ustr_find_cstr</a></li>
+<li><a href="#al_ustr_rfind_str">al_ustr_rfind_str</a></li>
+<li><a href="#al_ustr_rfind_cstr">al_ustr_rfind_cstr</a></li>
+<li><a href="#al_ustr_find_replace">al_ustr_find_replace</a></li>
+<li><a href="#al_ustr_find_replace_cstr">al_ustr_find_replace_cstr</a></li>
+</ul></li>
+<li><a href="#comparing">Comparing</a><ul>
+<li><a href="#al_ustr_equal">al_ustr_equal</a></li>
+<li><a href="#al_ustr_compare">al_ustr_compare</a></li>
+<li><a href="#al_ustr_ncompare">al_ustr_ncompare</a></li>
+<li><a href="#al_ustr_has_prefix">al_ustr_has_prefix</a></li>
+<li><a href="#al_ustr_has_prefix_cstr">al_ustr_has_prefix_cstr</a></li>
+<li><a href="#al_ustr_has_suffix">al_ustr_has_suffix</a></li>
+<li><a href="#al_ustr_has_suffix_cstr">al_ustr_has_suffix_cstr</a></li>
+</ul></li>
+<li><a href="#utf-16-conversion">UTF-16 conversion</a><ul>
+<li><a href="#al_ustr_new_from_utf16">al_ustr_new_from_utf16</a></li>
+<li><a href="#al_ustr_size_utf16">al_ustr_size_utf16</a></li>
+<li><a href="#al_ustr_encode_utf16">al_ustr_encode_utf16</a></li>
+</ul></li>
+<li><a href="#low-level-utf-8-routines">Low-level UTF-8 routines</a><ul>
+<li><a href="#al_utf8_width">al_utf8_width</a></li>
+<li><a href="#al_utf8_encode">al_utf8_encode</a></li>
+</ul></li>
+<li><a href="#low-level-utf-16-routines">Low-level UTF-16 routines</a><ul>
+<li><a href="#al_utf16_width">al_utf16_width</a></li>
+<li><a href="#al_utf16_encode">al_utf16_encode</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="about-utf-8-string-routines"><a href="#TOC">About UTF-8 string routines</a></h1>
+<p>Some parts of the Allegro API, such as the font rountines, expect Unicode strings encoded in UTF-8. These basic routines are provided to help you work with UTF-8 strings, however it does <em>not</em> mean you need to use them. You should consider another library (e.g. ICU) if you require more functionality.</p>
+<p>You should also see elsewhere for a proper introduction to Unicode. Briefly, Unicode is a standard consisting of a large character set of over 100,000 characters, and rules, such as how to sort strings. A <em>code point</em> is the integer value of a character, but not all code points are characters, as some code points have other uses. Clearly it is impossible represent each code point with a 8-bit byte or even a 16-bit integer, so there exist different Unicode Transformation Formats, most importantly UTF-8 and UTF-16.</p>
+<p>UTF-8 has many nice properties, but the main advantages are that it is backwards compatible with C strings, and ASCII characters (code points &lt;= 127) are encoded in UTF-8 exactly as they would be in ASCII.</p>
+<p>Here is a diagram of the representation of the word &quot;ål&quot;, with a NUL terminator, in both UTF-8 and UTF-16.</p>
+<pre><code>                   ---------------- ---------------- --------------
+           String         å                l              NUL
+                   ---------------- ---------------- --------------
+      Code points    U+00E5 (229)     U+006C (108)     U+0000 (0)
+                   ---------------- ---------------- --------------
+   UTF-8 encoding     0xC3, 0xA5          0x6C            0x00
+                   ---------------- ---------------- --------------
+UTF-16LE encoding     0xE5, 0x00       0x6C, 0x00      0x00, 0x00
+                   ---------------- ---------------- --------------
+</code></pre>
+<p>You can see the aforementioned properties of UTF-8. The first character U+00E5 (å) has a value greater than 127, so its encoding takes more than a single byte; it requires two bytes. U+006C (l) and U+0000 (NUL) both exist in the ASCII range, i.e. less than 127, so take exactly one byte each, just as in a pure ASCII string. A zero byte never appears except to represent the NUL character, so many functions which expect C-style strings will work with UTF-8 strings without modification.</p>
+<p>On the other hand, UTF-16 represents each code code by either two or four bytes, so functions expecting C-style strings will not work at all.</p>
+<p>In the following functions, be careful whether a function takes byte offsets or code-point indices. In general, all position parameters are in byte offsets, not code point indices. This may be surprising, but if you think about, is required for good performance. It also means many functions will work even if they do not contain UTF-8, so you may actually store arbitrary data in the strings.</p>
+<p>For actual text processing, where you want to specify positions with code point indices, you should use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte position of a code point.</p>
+<h1 id="utf-8-string-types"><a href="#TOC">UTF-8 string types</a></h1>
+<h2 id="allegro_ustr"><a href="#TOC">ALLEGRO_USTR</a></h2>
+<pre><code>typedef struct _al_tagbstring ALLEGRO_USTR;
+</code></pre>
+<p>An opaque type representing a string. ALLEGRO_USTRs normally contain UTF-8 encoded strings, but they may be used to hold any byte sequences, including NULs.</p>
+<h2 id="allegro_ustr_info"><a href="#TOC">ALLEGRO_USTR_INFO</a></h2>
+<pre><code>typedef struct _al_tagbstring ALLEGRO_USTR_INFO;
+</code></pre>
+<p>A type that holds additional information for an <a href="utf8.html#allegro_ustr">ALLEGRO_USTR</a> that references an external memory buffer. See <a href="utf8.html#al_ref_cstr">al_ref_cstr</a>, <a href="utf8.html#al_ref_buffer">al_ref_buffer</a> and <a href="utf8.html#al_ref_ustr">al_ref_ustr</a>.</p>
+<h1 id="creating-and-destroying-strings"><a href="#TOC">Creating and destroying strings</a></h1>
+<h2 id="al_ustr_new"><a href="#TOC">al_ustr_new</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_new(const char *s)
+</code></pre>
+<p>Create a new string containing a copy of the C-style string <code>s</code>. The string must eventually be freed with <a href="utf8.html#al_ustr_free">al_ustr_free</a>.</p>
+<p>See also: <a href="utf8.html#al_ustr_new_from_buffer">al_ustr_new_from_buffer</a>, <a href="utf8.html#al_ustr_newf">al_ustr_newf</a>, <a href="utf8.html#al_ustr_dup">al_ustr_dup</a>, <a href="utf8.html#al_ustr_new_from_utf16">al_ustr_new_from_utf16</a></p>
+<h2 id="al_ustr_new_from_buffer"><a href="#TOC">al_ustr_new_from_buffer</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_new_from_buffer(const char *s, size_t size)
+</code></pre>
+<p>Create a new string containing a copy of the buffer pointed to by <code>s</code> of the given size. The string must eventually be freed with <a href="utf8.html#al_ustr_free">al_ustr_free</a>.</p>
+<p>See also: <a href="utf8.html#al_ustr_new">al_ustr_new</a></p>
+<h2 id="al_ustr_newf"><a href="#TOC">al_ustr_newf</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_newf(const char *fmt, ...)
+</code></pre>
+<p>Create a new string using a printf-style format string.</p>
+<p><em>Notes:</em></p>
+<p>The &quot;%s&quot; specifier takes C string arguments, not ALLEGRO_USTRs. Therefore to pass an ALLEGRO_USTR as a parameter you must use <a href="utf8.html#al_cstr">al_cstr</a>, and it must be NUL terminated. If the string contains an embedded NUL byte everything from that byte onwards will be ignored.</p>
+<p>The &quot;%c&quot; specifier outputs a single byte, not the UTF-8 encoding of a code point. Therefore it's only usable for ASCII characters (value &lt;= 127) or if you really mean to output byte values from 128--255. To insert the UTF-8 encoding of a code point, encode it into a memory buffer using <a href="utf8.html#al_utf8_encode">al_utf8_encode</a> then use the &quot;%s&quot; specifier. Remember to NUL terminate the buffer.</p>
+<p>See also: <a href="utf8.html#al_ustr_new">al_ustr_new</a>, <a href="utf8.html#al_ustr_appendf">al_ustr_appendf</a></p>
+<h2 id="al_ustr_free"><a href="#TOC">al_ustr_free</a></h2>
+<pre><code>void al_ustr_free(ALLEGRO_USTR *us)
+</code></pre>
+<p>Free a previously allocated string. Does nothing if the argument is NULL.</p>
+<h2 id="al_cstr"><a href="#TOC">al_cstr</a></h2>
+<pre><code>const char *al_cstr(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Get a <code>char *</code> pointer to the data in a string. This pointer will only be valid while the underlying string is not modified and not destroyed. The pointer may be passed to functions expecting C-style strings, with the following caveats:</p>
+<ul>
+<li><p>ALLEGRO_USTRs are allowed to contain embedded NUL ('\0') bytes. That means <code>al_ustr_size(u)</code> and <code>strlen(al_cstr(u))</code> may not agree.</p></li>
+<li><p>An ALLEGRO_USTR may be created in such a way that it is not NUL terminated. A string which is dynamically allocated will always be NUL terminated, but a string which references the middle of another string or region of memory will <em>not</em> be NUL terminated.</p></li>
+<li><p>If the ALLEGRO_USTR references another string, the returned C string will point into the referenced string. Again, no NUL terminator will be added to the referenced string.</p></li>
+</ul>
+<p>See also: <a href="utf8.html#al_ustr_to_buffer">al_ustr_to_buffer</a>, <a href="utf8.html#al_cstr_dup">al_cstr_dup</a></p>
+<h2 id="al_ustr_to_buffer"><a href="#TOC">al_ustr_to_buffer</a></h2>
+<pre><code>void al_ustr_to_buffer(const ALLEGRO_USTR *us, char *buffer, int size)
+</code></pre>
+<p>Write the contents of the string into a pre-allocated buffer of the given size in bytes. The result will always be 0-terminated, so a maximum of <code>size - 1</code> bytes will be copied.</p>
+<p>See also: <a href="utf8.html#al_cstr">al_cstr</a>, <a href="utf8.html#al_cstr_dup">al_cstr_dup</a></p>
+<h2 id="al_cstr_dup"><a href="#TOC">al_cstr_dup</a></h2>
+<pre><code>char *al_cstr_dup(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Create a NUL ('\0') terminated copy of the string. Any embedded NUL bytes will still be presented in the returned string. The new string must eventually be freed with <a href="memory.html#al_free">al_free</a>. If an error occurs NULL is returned.</p>
+<p>See also: <a href="utf8.html#al_cstr">al_cstr</a>, <a href="utf8.html#al_ustr_to_buffer">al_ustr_to_buffer</a></p>
+<h2 id="al_ustr_dup"><a href="#TOC">al_ustr_dup</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_dup(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Return a duplicate copy of a string. The new string will need to be freed with <a href="utf8.html#al_ustr_free">al_ustr_free</a>.</p>
+<p>See also: <a href="utf8.html#al_ustr_dup_substr">al_ustr_dup_substr</a></p>
+<h2 id="al_ustr_dup_substr"><a href="#TOC">al_ustr_dup_substr</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_dup_substr(const ALLEGRO_USTR *us, int start_pos,
+   int end_pos)
+</code></pre>
+<p>Return a new copy of a string, containing its contents in the byte interval [start_pos, end_pos). The new string will be NUL terminated and will need to be freed with <a href="utf8.html#al_ustr_free">al_ustr_free</a>.</p>
+<p>If you need a range of code-points instead of bytes, use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offsets.</p>
+<p>See also: <a href="utf8.html#al_ustr_dup">al_ustr_dup</a></p>
+<h1 id="predefined-strings"><a href="#TOC">Predefined strings</a></h1>
+<h2 id="al_ustr_empty_string"><a href="#TOC">al_ustr_empty_string</a></h2>
+<pre><code>const ALLEGRO_USTR *al_ustr_empty_string(void)
+</code></pre>
+<p>Return a pointer to a static empty string. The string is read only and must not be freed.</p>
+<h1 id="creating-strings-by-referencing-other-data"><a href="#TOC">Creating strings by referencing other data</a></h1>
+<h2 id="al_ref_cstr"><a href="#TOC">al_ref_cstr</a></h2>
+<pre><code>const ALLEGRO_USTR *al_ref_cstr(ALLEGRO_USTR_INFO *info, const char *s)
+</code></pre>
+<p>Create a string that references the storage of a C-style string. The information about the string (e.g. its size) is stored in the structure pointed to by the <code>info</code> parameter. The string will not have any other storage allocated of its own, so if you allocate the <code>info</code> structure on the stack then no explicit &quot;free&quot; operation is required.</p>
+<p>The string is valid until the underlying C string disappears.</p>
+<p>Example:</p>
+<pre><code>ALLEGRO_USTR_INFO info;
+ALLEGRO_USTR *us = al_ref_cstr(&amp;info, &quot;my string&quot;);
+</code></pre>
+<p>See also: <a href="utf8.html#al_ref_buffer">al_ref_buffer</a>, <a href="utf8.html#al_ref_ustr">al_ref_ustr</a></p>
+<h2 id="al_ref_buffer"><a href="#TOC">al_ref_buffer</a></h2>
+<pre><code>const ALLEGRO_USTR *al_ref_buffer(ALLEGRO_USTR_INFO *info, const char *s, size_t size)
+</code></pre>
+<p>Like <a href="utf8.html#al_ref_cstr">al_ref_cstr</a> but the size of the string data is passed in as a parameter. Hence you can use it to reference only part of a string or an arbitrary region of memory.</p>
+<p>The string is valid while the underlying C string is valid.</p>
+<p>See also: <a href="utf8.html#al_ref_cstr">al_ref_cstr</a>, <a href="utf8.html#al_ref_ustr">al_ref_ustr</a></p>
+<h2 id="al_ref_ustr"><a href="#TOC">al_ref_ustr</a></h2>
+<pre><code>const ALLEGRO_USTR *al_ref_ustr(ALLEGRO_USTR_INFO *info, const ALLEGRO_USTR *us,
+   int start_pos, int end_pos)
+</code></pre>
+<p>Create a read-only string that references the storage of another string. The information about the string (e.g. its size) is stored in the structure pointed to by the <code>info</code> parameter. The string will not have any other storage allocated of its own, so if you allocate the <code>info</code> structure on the stack then no explicit &quot;free&quot; operation is required.</p>
+<p>The referenced interval is [start_pos, end_pos).</p>
+<p>The string is valid until the underlying string is modified or destroyed.</p>
+<p>If you need a range of code-points instead of bytes, use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offsets.</p>
+<p>See also: <a href="utf8.html#al_ref_cstr">al_ref_cstr</a>, <a href="utf8.html#al_ref_buffer">al_ref_buffer</a></p>
+<h1 id="sizes-and-offsets"><a href="#TOC">Sizes and offsets</a></h1>
+<h2 id="al_ustr_size"><a href="#TOC">al_ustr_size</a></h2>
+<pre><code>size_t al_ustr_size(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Return the size of the string in bytes. This is equal to the number of code points in the string if the string is empty or contains only 7-bit ASCII characters.</p>
+<p>See also: <a href="utf8.html#al_ustr_length">al_ustr_length</a></p>
+<h2 id="al_ustr_length"><a href="#TOC">al_ustr_length</a></h2>
+<pre><code>size_t al_ustr_length(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Return the number of code points in the string.</p>
+<p>See also: <a href="utf8.html#al_ustr_size">al_ustr_size</a>, <a href="utf8.html#al_ustr_offset">al_ustr_offset</a></p>
+<h2 id="al_ustr_offset"><a href="#TOC">al_ustr_offset</a></h2>
+<pre><code>int al_ustr_offset(const ALLEGRO_USTR *us, int index)
+</code></pre>
+<p>Return the offset (in bytes from the start of the string) of the code point at the specified index in the string. A zero index parameter will return the first character of the string. If index is negative, it counts backward from the end of the string, so an index of -1 will return an offset to the last code point.</p>
+<p>If the index is past the end of the string, returns the offset of the end of the string.</p>
+<p>See also: <a href="utf8.html#al_ustr_length">al_ustr_length</a></p>
+<h2 id="al_ustr_next"><a href="#TOC">al_ustr_next</a></h2>
+<pre><code>bool al_ustr_next(const ALLEGRO_USTR *us, int *pos)
+</code></pre>
+<p>Find the byte offset of the next code point in string, beginning at <code>*pos</code>. <code>*pos</code> does not have to be at the beginning of a code point. Returns true on success, then value pointed to by <code>pos</code> will be updated to the found offset. Otherwise returns false if <code>*pos</code> was already at the end of the string, then <code>*pos</code> is unmodified.</p>
+<p>This function just looks for an appropriate byte; it doesn't check if found offset is the beginning of a valid code point. If you are working with possibly invalid UTF-8 strings then it could skip over some invalid bytes.</p>
+<p>See also: <a href="utf8.html#al_ustr_prev">al_ustr_prev</a></p>
+<h2 id="al_ustr_prev"><a href="#TOC">al_ustr_prev</a></h2>
+<pre><code>bool al_ustr_prev(const ALLEGRO_USTR *us, int *pos)
+</code></pre>
+<p>Find the byte offset of the previous code point in string, before <code>*pos</code>. <code>*pos</code> does not have to be at the beginning of a code point. Returns true on success, then value pointed to by <code>pos</code> will be updated to the found offset. Otherwise returns false if <code>*pos</code> was already at the end of the string, then <code>*pos</code> is unmodified.</p>
+<p>This function just looks for an appropriate byte; it doesn't check if found offset is the beginning of a valid code point. If you are working with possibly invalid UTF-8 strings then it could skip over some invalid bytes.</p>
+<p>See also: <a href="utf8.html#al_ustr_next">al_ustr_next</a></p>
+<h1 id="getting-code-points"><a href="#TOC">Getting code points</a></h1>
+<h2 id="al_ustr_get"><a href="#TOC">al_ustr_get</a></h2>
+<pre><code>int32_t al_ustr_get(const ALLEGRO_USTR *ub, int pos)
+</code></pre>
+<p>Return the code point in <code>us</code> beginning at <code>pos</code>.</p>
+<p>On success returns the code point value. If <code>pos</code> was out of bounds (e.g. past the end of the string), return -1. On an error, such as an invalid byte sequence, return -2.</p>
+<p>See also: <a href="utf8.html#al_ustr_get_next">al_ustr_get_next</a>, <a href="utf8.html#al_ustr_prev_get">al_ustr_prev_get</a></p>
+<h2 id="al_ustr_get_next"><a href="#TOC">al_ustr_get_next</a></h2>
+<pre><code>int32_t al_ustr_get_next(const ALLEGRO_USTR *us, int *pos)
+</code></pre>
+<p>Find the code point in <code>us</code> beginning at <code>*pos</code>, then advance to the next code point.</p>
+<p>On success return the code point value. If <code>pos</code> was out of bounds (e.g. past the end of the string), return -1. On an error, such as an invalid byte sequence, return -2. As with <a href="utf8.html#al_ustr_next">al_ustr_next</a>, invalid byte sequences may be skipped while advancing.</p>
+<p>See also: <a href="utf8.html#al_ustr_get">al_ustr_get</a>, <a href="utf8.html#al_ustr_prev_get">al_ustr_prev_get</a></p>
+<h2 id="al_ustr_prev_get"><a href="#TOC">al_ustr_prev_get</a></h2>
+<pre><code>int32_t al_ustr_prev_get(const ALLEGRO_USTR *us, int *pos)
+</code></pre>
+<p>Find the beginning of a code point before <code>*pos</code>, then return it. Note this performs a <em>pre-increment</em>.</p>
+<p>On success returns the code point value. If <code>pos</code> was out of bounds (e.g. past the end of the string), return -1. On an error, such as an invalid byte sequence, return -2. As with <a href="utf8.html#al_ustr_prev">al_ustr_prev</a>, invalid byte sequences may be skipped while advancing.</p>
+<p>See also: <a href="utf8.html#al_ustr_get_next">al_ustr_get_next</a></p>
+<h1 id="inserting-into-strings"><a href="#TOC">Inserting into strings</a></h1>
+<h2 id="al_ustr_insert"><a href="#TOC">al_ustr_insert</a></h2>
+<pre><code>bool al_ustr_insert(ALLEGRO_USTR *us1, int pos, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Insert <code>us2</code> into <code>us1</code> beginning at <code>pos</code>. <code>pos</code> cannot be less than 0. If <code>pos</code> is past the end of <code>us1</code> then the space between the end of the string and <code>pos</code> will be padded with NUL ('\0') bytes. <code>pos</code> is specified in bytes.</p>
+<p>Use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offset for a code-points offset</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_insert_cstr">al_ustr_insert_cstr</a>, <a href="utf8.html#al_ustr_insert_chr">al_ustr_insert_chr</a>, <a href="utf8.html#al_ustr_append">al_ustr_append</a></p>
+<h2 id="al_ustr_insert_cstr"><a href="#TOC">al_ustr_insert_cstr</a></h2>
+<pre><code>bool al_ustr_insert_cstr(ALLEGRO_USTR *us, int pos, const char *s)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_insert">al_ustr_insert</a> but inserts a C-style string.</p>
+<p>See also: <a href="utf8.html#al_ustr_insert">al_ustr_insert</a>, <a href="utf8.html#al_ustr_insert_chr">al_ustr_insert_chr</a></p>
+<h2 id="al_ustr_insert_chr"><a href="#TOC">al_ustr_insert_chr</a></h2>
+<pre><code>size_t al_ustr_insert_chr(ALLEGRO_USTR *us, int pos, int32_t c)
+</code></pre>
+<p>Insert a code point into <code>us</code> beginning at byte offset <code>pos</code>. <code>pos</code> cannot be less than 0. If <code>pos</code> is past the end of <code>us</code> then the space between the end of the string and <code>pos</code> will be padded with NUL ('\0') bytes.</p>
+<p>Returns the number of bytes inserted, or 0 on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_insert">al_ustr_insert</a>, <a href="utf8.html#al_ustr_insert_cstr">al_ustr_insert_cstr</a></p>
+<h1 id="appending-to-strings"><a href="#TOC">Appending to strings</a></h1>
+<h2 id="al_ustr_append"><a href="#TOC">al_ustr_append</a></h2>
+<pre><code>bool al_ustr_append(ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Append <code>us2</code> to the end of <code>us1</code>.</p>
+<p>Returns true on success, false on error.</p>
+<p>This function can be used to append an arbitrary buffer:</p>
+<pre><code>ALLEGRO_USTR_INFO info;
+al_ustr_append(us, al_ref_buffer(&amp;info, buf, size));
+</code></pre>
+<p>See also: <a href="utf8.html#al_ustr_append_cstr">al_ustr_append_cstr</a>, <a href="utf8.html#al_ustr_append_chr">al_ustr_append_chr</a>, <a href="utf8.html#al_ustr_appendf">al_ustr_appendf</a>, <a href="utf8.html#al_ustr_vappendf">al_ustr_vappendf</a></p>
+<h2 id="al_ustr_append_cstr"><a href="#TOC">al_ustr_append_cstr</a></h2>
+<pre><code>bool al_ustr_append_cstr(ALLEGRO_USTR *us, const char *s)
+</code></pre>
+<p>Append C-style string <code>s</code> to the end of <code>us</code>.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_append">al_ustr_append</a></p>
+<h2 id="al_ustr_append_chr"><a href="#TOC">al_ustr_append_chr</a></h2>
+<pre><code>size_t al_ustr_append_chr(ALLEGRO_USTR *us, int32_t c)
+</code></pre>
+<p>Append a code point to the end of <code>us</code>.</p>
+<p>Returns the number of bytes added, or 0 on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_append">al_ustr_append</a></p>
+<h2 id="al_ustr_appendf"><a href="#TOC">al_ustr_appendf</a></h2>
+<pre><code>bool al_ustr_appendf(ALLEGRO_USTR *us, const char *fmt, ...)
+</code></pre>
+<p>This function appends formatted output to the string <code>us</code>. <code>fmt</code> is a printf-style format string. See <a href="utf8.html#al_ustr_newf">al_ustr_newf</a> about the &quot;%s&quot; and &quot;%c&quot; specifiers.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_vappendf">al_ustr_vappendf</a></p>
+<h2 id="al_ustr_vappendf"><a href="#TOC">al_ustr_vappendf</a></h2>
+<pre><code>bool al_ustr_vappendf(ALLEGRO_USTR *us, const char *fmt, va_list ap)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_appendf">al_ustr_appendf</a> but you pass the variable argument list directly, instead of the arguments themselves. See <a href="utf8.html#al_ustr_newf">al_ustr_newf</a> about the &quot;%s&quot; and &quot;%c&quot; specifiers.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_appendf">al_ustr_appendf</a></p>
+<h1 id="removing-parts-of-strings"><a href="#TOC">Removing parts of strings</a></h1>
+<h2 id="al_ustr_remove_chr"><a href="#TOC">al_ustr_remove_chr</a></h2>
+<pre><code>bool al_ustr_remove_chr(ALLEGRO_USTR *us, int pos)
+</code></pre>
+<p>Remove the code point beginning at byte offset <code>pos</code>. Returns true on success. If <code>pos</code> is out of range or <code>pos</code> is not the beginning of a valid code point, returns false leaving the string unmodified.</p>
+<p>Use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offset for a code-points offset.</p>
+<p>See also: <a href="utf8.html#al_ustr_remove_range">al_ustr_remove_range</a></p>
+<h2 id="al_ustr_remove_range"><a href="#TOC">al_ustr_remove_range</a></h2>
+<pre><code>bool al_ustr_remove_range(ALLEGRO_USTR *us, int start_pos, int end_pos)
+</code></pre>
+<p>Remove the interval [start_pos, end_pos) (in bytes) from a string. <code>start_pos</code> and <code>end_pos</code> may both be past the end of the string but cannot be less than 0 (the start of the string).</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_remove_chr">al_ustr_remove_chr</a>, <a href="utf8.html#al_ustr_truncate">al_ustr_truncate</a></p>
+<h2 id="al_ustr_truncate"><a href="#TOC">al_ustr_truncate</a></h2>
+<pre><code>bool al_ustr_truncate(ALLEGRO_USTR *us, int start_pos)
+</code></pre>
+<p>Truncate a portion of a string at byte offset <code>start_pos</code> onwards. <code>start_pos</code> can be past the end of the string (has no effect) but cannot be less than 0.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_remove_range">al_ustr_remove_range</a>, <a href="utf8.html#al_ustr_ltrim_ws">al_ustr_ltrim_ws</a>, <a href="utf8.html#al_ustr_rtrim_ws">al_ustr_rtrim_ws</a>, <a href="utf8.html#al_ustr_trim_ws">al_ustr_trim_ws</a></p>
+<h2 id="al_ustr_ltrim_ws"><a href="#TOC">al_ustr_ltrim_ws</a></h2>
+<pre><code>bool al_ustr_ltrim_ws(ALLEGRO_USTR *us)
+</code></pre>
+<p>Remove leading whitespace characters from a string, as defined by the C function <code>isspace()</code>.</p>
+<p>Returns true on success, or false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_rtrim_ws">al_ustr_rtrim_ws</a>, <a href="utf8.html#al_ustr_trim_ws">al_ustr_trim_ws</a></p>
+<h2 id="al_ustr_rtrim_ws"><a href="#TOC">al_ustr_rtrim_ws</a></h2>
+<pre><code>bool al_ustr_rtrim_ws(ALLEGRO_USTR *us)
+</code></pre>
+<p>Remove trailing (&quot;right&quot;) whitespace characters from a string, as defined by the C function <code>isspace()</code>.</p>
+<p>Returns true on success, or false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_ltrim_ws">al_ustr_ltrim_ws</a>, <a href="utf8.html#al_ustr_trim_ws">al_ustr_trim_ws</a></p>
+<h2 id="al_ustr_trim_ws"><a href="#TOC">al_ustr_trim_ws</a></h2>
+<pre><code>bool al_ustr_trim_ws(ALLEGRO_USTR *us)
+</code></pre>
+<p>Remove both leading and trailing whitespace characters from a string.</p>
+<p>Returns true on success, or false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_ltrim_ws">al_ustr_ltrim_ws</a>, <a href="utf8.html#al_ustr_rtrim_ws">al_ustr_rtrim_ws</a></p>
+<h1 id="assigning-one-string-to-another"><a href="#TOC">Assigning one string to another</a></h1>
+<h2 id="al_ustr_assign"><a href="#TOC">al_ustr_assign</a></h2>
+<pre><code>bool al_ustr_assign(ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Overwrite the string <code>us1</code> with another string <code>us2</code>. Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_assign_substr">al_ustr_assign_substr</a>, <a href="utf8.html#al_ustr_assign_cstr">al_ustr_assign_cstr</a></p>
+<h2 id="al_ustr_assign_substr"><a href="#TOC">al_ustr_assign_substr</a></h2>
+<pre><code>bool al_ustr_assign_substr(ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2,
+   int start_pos, int end_pos)
+</code></pre>
+<p>Overwrite the string <code>us1</code> with the contents of <code>us2</code> in the byte interval [start_pos, end_pos). The end points will be clamed to the bounds of <code>us2</code>.</p>
+<p>Usually you will first have to use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offsets.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_assign">al_ustr_assign</a>, <a href="utf8.html#al_ustr_assign_cstr">al_ustr_assign_cstr</a></p>
+<h2 id="al_ustr_assign_cstr"><a href="#TOC">al_ustr_assign_cstr</a></h2>
+<pre><code>bool al_ustr_assign_cstr(ALLEGRO_USTR *us1, const char *s)
+</code></pre>
+<p>Overwrite the string <code>us</code> with the contents of the C-style string <code>s</code>. Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_assign_substr">al_ustr_assign_substr</a>, <a href="utf8.html#al_ustr_assign_cstr">al_ustr_assign_cstr</a></p>
+<h1 id="replacing-parts-of-string"><a href="#TOC">Replacing parts of string</a></h1>
+<h2 id="al_ustr_set_chr"><a href="#TOC">al_ustr_set_chr</a></h2>
+<pre><code>size_t al_ustr_set_chr(ALLEGRO_USTR *us, int start_pos, int32_t c)
+</code></pre>
+<p>Replace the code point beginning at byte offset <code>pos</code> with <code>c</code>. <code>pos</code> cannot be less than 0. If <code>pos</code> is past the end of <code>us1</code> then the space between the end of the string and <code>pos</code> will be padded with NUL ('\0') bytes. If <code>pos</code> is not the start of a valid code point, that is an error and the string will be unmodified.</p>
+<p>On success, returns the number of bytes written, i.e. the offset to the following code point. On error, returns 0.</p>
+<p>See also: <a href="utf8.html#al_ustr_replace_range">al_ustr_replace_range</a></p>
+<h2 id="al_ustr_replace_range"><a href="#TOC">al_ustr_replace_range</a></h2>
+<pre><code>bool al_ustr_replace_range(ALLEGRO_USTR *us1, int start_pos1, int end_pos1,
+   const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Replace the part of <code>us1</code> in the byte interval [start_pos, end_pos) with the contents of <code>us2</code>. <code>start_pos</code> cannot be less than 0. If <code>start_pos</code> is past the end of <code>us1</code> then the space between the end of the string and <code>start_pos</code> will be padded with NUL ('\0') bytes.</p>
+<p>Use <a href="utf8.html#al_ustr_offset">al_ustr_offset</a> to find the byte offsets.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_set_chr">al_ustr_set_chr</a></p>
+<h1 id="searching"><a href="#TOC">Searching</a></h1>
+<h2 id="al_ustr_find_chr"><a href="#TOC">al_ustr_find_chr</a></h2>
+<pre><code>int al_ustr_find_chr(const ALLEGRO_USTR *us, int start_pos, int32_t c)
+</code></pre>
+<p>Search for the encoding of code point <code>c</code> in <code>us</code> from byte offset <code>start_pos</code> (inclusive).</p>
+<p>Returns the position where it is found or -1 if it is not found.</p>
+<p>See also: <a href="utf8.html#al_ustr_rfind_chr">al_ustr_rfind_chr</a></p>
+<h2 id="al_ustr_rfind_chr"><a href="#TOC">al_ustr_rfind_chr</a></h2>
+<pre><code>int al_ustr_rfind_chr(const ALLEGRO_USTR *us, int end_pos, int32_t c)
+</code></pre>
+<p>Search for the encoding of code point <code>c</code> in <code>us</code> backwards from byte offset <code>end_pos</code> (exclusive). Returns the position where it is found or -1 if it is not found.</p>
+<p>See also: <a href="utf8.html#al_ustr_find_chr">al_ustr_find_chr</a></p>
+<h2 id="al_ustr_find_set"><a href="#TOC">al_ustr_find_set</a></h2>
+<pre><code>int al_ustr_find_set(const ALLEGRO_USTR *us, int start_pos,
+   const ALLEGRO_USTR *accept)
+</code></pre>
+<p>This function finds the first code point in <code>us</code>, beginning from byte offset <code>start_pos</code>, that matches any code point in <code>accept</code>. Returns the position if a code point was found. Otherwise returns -1.</p>
+<p>See also: <a href="utf8.html#al_ustr_find_set_cstr">al_ustr_find_set_cstr</a>, <a href="utf8.html#al_ustr_find_cset">al_ustr_find_cset</a></p>
+<h2 id="al_ustr_find_set_cstr"><a href="#TOC">al_ustr_find_set_cstr</a></h2>
+<pre><code>int al_ustr_find_set_cstr(const ALLEGRO_USTR *us, int start_pos,
+   const char *accept)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_find_set">al_ustr_find_set</a> but takes a C-style string for <code>accept</code>.</p>
+<h2 id="al_ustr_find_cset"><a href="#TOC">al_ustr_find_cset</a></h2>
+<pre><code>int al_ustr_find_cset(const ALLEGRO_USTR *us, int start_pos,
+   const ALLEGRO_USTR *reject)
+</code></pre>
+<p>This function finds the first code point in <code>us</code>, beginning from byte offset <code>start_pos</code>, that does <em>not</em> match any code point in <code>reject</code>. In other words it finds a code point in the complementary set of <code>reject</code>. Returns the byte position of that code point, if any. Otherwise returns -1.</p>
+<p>See also: <a href="utf8.html#al_ustr_find_cset_cstr">al_ustr_find_cset_cstr</a>, <a href="utf8.html#al_ustr_find_set">al_ustr_find_set</a></p>
+<h2 id="al_ustr_find_cset_cstr"><a href="#TOC">al_ustr_find_cset_cstr</a></h2>
+<pre><code>int al_ustr_find_cset_cstr(const ALLEGRO_USTR *us, int start_pos,
+   const char *reject)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_find_cset">al_ustr_find_cset</a> but takes a C-style string for <code>reject</code>.</p>
+<h2 id="al_ustr_find_str"><a href="#TOC">al_ustr_find_str</a></h2>
+<pre><code>int al_ustr_find_str(const ALLEGRO_USTR *haystack, int start_pos,
+   const ALLEGRO_USTR *needle)
+</code></pre>
+<p>Find the first occurrence of string <code>needle</code> in <code>haystack</code>, beginning from byte offset <code>pos</code> (inclusive). Return the byte offset of the occurrence if it is found, otherwise return -1.</p>
+<p>See also: <a href="utf8.html#al_ustr_find_cstr">al_ustr_find_cstr</a>, <a href="utf8.html#al_ustr_rfind_str">al_ustr_rfind_str</a>, <a href="utf8.html#al_ustr_find_replace">al_ustr_find_replace</a></p>
+<h2 id="al_ustr_find_cstr"><a href="#TOC">al_ustr_find_cstr</a></h2>
+<pre><code>int al_ustr_find_cstr(const ALLEGRO_USTR *haystack, int start_pos,
+   const char *needle)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_find_str">al_ustr_find_str</a> but takes a C-style string for <code>needle</code>.</p>
+<h2 id="al_ustr_rfind_str"><a href="#TOC">al_ustr_rfind_str</a></h2>
+<pre><code>int al_ustr_rfind_str(const ALLEGRO_USTR *haystack, int end_pos,
+   const ALLEGRO_USTR *needle)
+</code></pre>
+<p>Find the last occurrence of string <code>needle</code> in <code>haystack</code> before byte offset <code>end_pos</code> (exclusive). Return the byte offset of the occurrence if it is found, otherwise return -1.</p>
+<p>See also: <a href="utf8.html#al_ustr_rfind_cstr">al_ustr_rfind_cstr</a>, <a href="utf8.html#al_ustr_find_str">al_ustr_find_str</a></p>
+<h2 id="al_ustr_rfind_cstr"><a href="#TOC">al_ustr_rfind_cstr</a></h2>
+<pre><code>int al_ustr_rfind_cstr(const ALLEGRO_USTR *haystack, int end_pos,
+   const char *needle)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_rfind_str">al_ustr_rfind_str</a> but takes a C-style string for <code>needle</code>.</p>
+<h2 id="al_ustr_find_replace"><a href="#TOC">al_ustr_find_replace</a></h2>
+<pre><code>bool al_ustr_find_replace(ALLEGRO_USTR *us, int start_pos,
+   const ALLEGRO_USTR *find, const ALLEGRO_USTR *replace)
+</code></pre>
+<p>Replace all occurrences of <code>find</code> in <code>us</code> with <code>replace</code>, beginning at byte offset <code>start_pos</code>. The <code>find</code> string must be non-empty. Returns true on success, false on error.</p>
+<p>See also: <a href="utf8.html#al_ustr_find_replace_cstr">al_ustr_find_replace_cstr</a></p>
+<h2 id="al_ustr_find_replace_cstr"><a href="#TOC">al_ustr_find_replace_cstr</a></h2>
+<pre><code>bool al_ustr_find_replace_cstr(ALLEGRO_USTR *us, int start_pos,
+   const char *find, const char *replace)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_find_replace">al_ustr_find_replace</a> but takes C-style strings for <code>find</code> and <code>replace</code>.</p>
+<h1 id="comparing"><a href="#TOC">Comparing</a></h1>
+<h2 id="al_ustr_equal"><a href="#TOC">al_ustr_equal</a></h2>
+<pre><code>bool al_ustr_equal(const ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Return true iff the two strings are equal. This function is more efficient than <a href="utf8.html#al_ustr_compare">al_ustr_compare</a> so is preferable if ordering is not important.</p>
+<p>See also: <a href="utf8.html#al_ustr_compare">al_ustr_compare</a></p>
+<h2 id="al_ustr_compare"><a href="#TOC">al_ustr_compare</a></h2>
+<pre><code>int al_ustr_compare(const ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>This function compares <code>us1</code> and <code>us2</code> by code point values. Returns zero if the strings are equal, a positive number if <code>us1</code> comes after <code>us2</code>, else a negative number.</p>
+<p>This does <em>not</em> take into account locale-specific sorting rules. For that you will need to use another library.</p>
+<p>See also: <a href="utf8.html#al_ustr_ncompare">al_ustr_ncompare</a>, <a href="utf8.html#al_ustr_equal">al_ustr_equal</a></p>
+<h2 id="al_ustr_ncompare"><a href="#TOC">al_ustr_ncompare</a></h2>
+<pre><code>int al_ustr_ncompare(const ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2, int n)
+</code></pre>
+<p>Like <a href="utf8.html#al_ustr_compare">al_ustr_compare</a> but only compares up to the first <code>n</code> code points of both strings.</p>
+<p>Returns zero if the strings are equal, a positive number if <code>us1</code> comes after <code>us2</code>, else a negative number.</p>
+<h2 id="al_ustr_has_prefix"><a href="#TOC">al_ustr_has_prefix</a></h2>
+<pre><code>bool al_ustr_has_prefix(const ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Returns true iff <code>us1</code> begins with <code>us2</code>.</p>
+<p>See also: <a href="utf8.html#al_ustr_has_prefix_cstr">al_ustr_has_prefix_cstr</a>, <a href="utf8.html#al_ustr_has_suffix">al_ustr_has_suffix</a></p>
+<h2 id="al_ustr_has_prefix_cstr"><a href="#TOC">al_ustr_has_prefix_cstr</a></h2>
+<pre><code>bool al_ustr_has_prefix_cstr(const ALLEGRO_USTR *us1, const char *s2)
+</code></pre>
+<p>Returns true iff <code>us1</code> begins with <code>s2</code>.</p>
+<p>See also: <a href="utf8.html#al_ustr_has_prefix">al_ustr_has_prefix</a></p>
+<h2 id="al_ustr_has_suffix"><a href="#TOC">al_ustr_has_suffix</a></h2>
+<pre><code>bool al_ustr_has_suffix(const ALLEGRO_USTR *us1, const ALLEGRO_USTR *us2)
+</code></pre>
+<p>Returns true iff <code>us1</code> ends with <code>us2</code>.</p>
+<p>See also: <a href="utf8.html#al_ustr_has_suffix_cstr">al_ustr_has_suffix_cstr</a>, <a href="utf8.html#al_ustr_has_prefix">al_ustr_has_prefix</a></p>
+<h2 id="al_ustr_has_suffix_cstr"><a href="#TOC">al_ustr_has_suffix_cstr</a></h2>
+<pre><code>bool al_ustr_has_suffix_cstr(const ALLEGRO_USTR *us1, const char *s2)
+</code></pre>
+<p>Returns true iff <code>us1</code> ends with <code>s2</code>.</p>
+<p>See also: <a href="utf8.html#al_ustr_has_suffix">al_ustr_has_suffix</a></p>
+<h1 id="utf-16-conversion"><a href="#TOC">UTF-16 conversion</a></h1>
+<h2 id="al_ustr_new_from_utf16"><a href="#TOC">al_ustr_new_from_utf16</a></h2>
+<pre><code>ALLEGRO_USTR *al_ustr_new_from_utf16(uint16_t const *s)
+</code></pre>
+<p>Create a new string containing a copy of the 0-terminated string <code>s</code> which must be encoded as UTF-16. The string must eventually be freed with <a href="utf8.html#al_ustr_free">al_ustr_free</a>.</p>
+<p>See also: <a href="utf8.html#al_ustr_new">al_ustr_new</a></p>
+<h2 id="al_ustr_size_utf16"><a href="#TOC">al_ustr_size_utf16</a></h2>
+<pre><code>size_t al_ustr_size_utf16(const ALLEGRO_USTR *us)
+</code></pre>
+<p>Returns the number of bytes required to encode the string in UTF-16 (including the terminating 0). Usually called before <a href="utf8.html#al_ustr_encode_utf16">al_ustr_encode_utf16</a> to determine the size of the buffer to allocate.</p>
+<p>See also: <a href="utf8.html#al_ustr_size">al_ustr_size</a></p>
+<h2 id="al_ustr_encode_utf16"><a href="#TOC">al_ustr_encode_utf16</a></h2>
+<pre><code>size_t al_ustr_encode_utf16(const ALLEGRO_USTR *us, uint16_t *s,
+   size_t n)
+</code></pre>
+<p>Encode the string into the given buffer, in UTF-16. Returns the number of bytes written. There are never more than <code>n</code> bytes written. The minimum size to encode the complete string can be queried with <a href="utf8.html#al_ustr_size_utf16">al_ustr_size_utf16</a>. If the <code>n</code> parameter is smaller than that, the string will be truncated but still always 0 terminated.</p>
+<p>See also: <a href="utf8.html#al_ustr_size_utf16">al_ustr_size_utf16</a>, <a href="utf8.html#al_utf16_encode">al_utf16_encode</a></p>
+<h1 id="low-level-utf-8-routines"><a href="#TOC">Low-level UTF-8 routines</a></h1>
+<h2 id="al_utf8_width"><a href="#TOC">al_utf8_width</a></h2>
+<pre><code>size_t al_utf8_width(int c)
+</code></pre>
+<p>Returns the number of bytes that would be occupied by the specified code point when encoded in UTF-8. This is between 1 and 4 bytes for legal code point values. Otherwise returns 0.</p>
+<p>See also: <a href="utf8.html#al_utf8_encode">al_utf8_encode</a>, <a href="utf8.html#al_utf16_width">al_utf16_width</a></p>
+<h2 id="al_utf8_encode"><a href="#TOC">al_utf8_encode</a></h2>
+<pre><code>size_t al_utf8_encode(char s[], int32_t c)
+</code></pre>
+<p>Encode the specified code point to UTF-8 into the buffer <code>s</code>. The buffer must have enough space to hold the encoding, which takes between 1 and 4 bytes. This routine will refuse to encode code points above 0x10FFFF.</p>
+<p>Returns the number of bytes written, which is the same as that returned by <a href="utf8.html#al_utf8_width">al_utf8_width</a>.</p>
+<p>See also: <a href="utf8.html#al_utf16_encode">al_utf16_encode</a></p>
+<h1 id="low-level-utf-16-routines"><a href="#TOC">Low-level UTF-16 routines</a></h1>
+<h2 id="al_utf16_width"><a href="#TOC">al_utf16_width</a></h2>
+<pre><code>size_t al_utf16_width(int c)
+</code></pre>
+<p>Returns the number of bytes that would be occupied by the specified code point when encoded in UTF-16. This is either 2 or 4 bytes for legal code point values. Otherwise returns 0.</p>
+<p>See also: <a href="utf8.html#al_utf16_encode">al_utf16_encode</a>, <a href="utf8.html#al_utf8_width">al_utf8_width</a></p>
+<h2 id="al_utf16_encode"><a href="#TOC">al_utf16_encode</a></h2>
+<pre><code>size_t al_utf16_encode(uint16_t s[], int32_t c)
+</code></pre>
+<p>Encode the specified code point to UTF-8 into the buffer <code>s</code>. The buffer must have enough space to hold the encoding, which takes either 2 or 4 bytes. This routine will refuse to encode code points above 0x10FFFF.</p>
+<p>Returns the number of bytes written, which is the same as that returned by <a href="utf8.html#al_utf16_width">al_utf16_width</a>.</p>
+<p>See also: <a href="utf8.html#al_utf8_encode">al_utf8_encode</a>, <a href="utf8.html#al_ustr_encode_utf16">al_ustr_encode_utf16</a></p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

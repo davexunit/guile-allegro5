@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>File I/O</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">File I/O</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_file">ALLEGRO_FILE</a></li>
+<li><a href="#allegro_file_interface">ALLEGRO_FILE_INTERFACE</a></li>
+<li><a href="#allegro_seek">ALLEGRO_SEEK</a></li>
+<li><a href="#al_fopen">al_fopen</a></li>
+<li><a href="#al_fopen_interface">al_fopen_interface</a></li>
+<li><a href="#al_fopen_slice">al_fopen_slice</a></li>
+<li><a href="#al_fclose">al_fclose</a></li>
+<li><a href="#al_fread">al_fread</a></li>
+<li><a href="#al_fwrite">al_fwrite</a></li>
+<li><a href="#al_fflush">al_fflush</a></li>
+<li><a href="#al_ftell">al_ftell</a></li>
+<li><a href="#al_fseek">al_fseek</a></li>
+<li><a href="#al_feof">al_feof</a></li>
+<li><a href="#al_ferror">al_ferror</a></li>
+<li><a href="#al_fclearerr">al_fclearerr</a></li>
+<li><a href="#al_fungetc">al_fungetc</a></li>
+<li><a href="#al_fsize">al_fsize</a></li>
+<li><a href="#al_fgetc">al_fgetc</a></li>
+<li><a href="#al_fputc">al_fputc</a></li>
+<li><a href="#al_fread16le">al_fread16le</a></li>
+<li><a href="#al_fread16be">al_fread16be</a></li>
+<li><a href="#al_fwrite16le">al_fwrite16le</a></li>
+<li><a href="#al_fwrite16be">al_fwrite16be</a></li>
+<li><a href="#al_fread32le">al_fread32le</a></li>
+<li><a href="#al_fread32be">al_fread32be</a></li>
+<li><a href="#al_fwrite32le">al_fwrite32le</a></li>
+<li><a href="#al_fwrite32be">al_fwrite32be</a></li>
+<li><a href="#al_fgets">al_fgets</a></li>
+<li><a href="#al_fget_ustr">al_fget_ustr</a></li>
+<li><a href="#al_fputs">al_fputs</a></li>
+<li><a href="#standard-io-specific-routines">Standard I/O specific routines</a><ul>
+<li><a href="#al_fopen_fd">al_fopen_fd</a></li>
+<li><a href="#al_make_temp_file">al_make_temp_file</a></li>
+</ul></li>
+<li><a href="#alternative-file-streams">Alternative file streams</a><ul>
+<li><a href="#al_set_new_file_interface">al_set_new_file_interface</a></li>
+<li><a href="#al_set_standard_file_interface">al_set_standard_file_interface</a></li>
+<li><a href="#al_get_new_file_interface">al_get_new_file_interface</a></li>
+<li><a href="#al_create_file_handle">al_create_file_handle</a></li>
+<li><a href="#al_get_file_userdata">al_get_file_userdata</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="allegro_file"><a href="#TOC">ALLEGRO_FILE</a></h1>
+<pre><code>typedef struct ALLEGRO_FILE ALLEGRO_FILE;
+</code></pre>
+<p>An opaque object representing an open file. This could be a real file on disk or a virtual file.</p>
+<h1 id="allegro_file_interface"><a href="#TOC">ALLEGRO_FILE_INTERFACE</a></h1>
+<pre><code>typedef struct ALLEGRO_FILE_INTERFACE
+</code></pre>
+<p>A structure containing function pointers to handle a type of &quot;file&quot;, real or virtual. See the full discussion in <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a>.</p>
+<p>The fields are:</p>
+<pre><code>void*         (*fi_fopen)(const char *path, const char *mode);
+void          (*fi_fclose)(ALLEGRO_FILE *f);
+size_t        (*fi_fread)(ALLEGRO_FILE *f, void *ptr, size_t size);
+size_t        (*fi_fwrite)(ALLEGRO_FILE *f, const void *ptr, size_t size);
+bool          (*fi_fflush)(ALLEGRO_FILE *f);
+int64_t       (*fi_ftell)(ALLEGRO_FILE *f);
+bool          (*fi_fseek)(ALLEGRO_FILE *f, int64_t offset, int whence);
+bool          (*fi_feof)(ALLEGRO_FILE *f);
+bool          (*fi_ferror)(ALLEGRO_FILE *f);
+void          (*fi_fclearerr)(ALLEGRO_FILE *f);
+int           (*fi_fungetc)(ALLEGRO_FILE *f, int c);
+off_t         (*fi_fsize)(ALLEGRO_FILE *f);
+</code></pre>
+<p>The fi_open function must allocate memory for whatever userdata structure it needs. The pointer to that memory must be returned; it will then be associated with the file. The other functions can access that data by calling <a href="file.html#al_get_file_userdata">al_get_file_userdata</a> on the file handle. If fi_open returns NULL then <a href="file.html#al_fopen">al_fopen</a> will also return NULL.</p>
+<p>The fi_fclose function must clean up and free the userdata, but Allegro will free the <a href="file.html#allegro_file">ALLEGRO_FILE</a> handle.</p>
+<p>If fi_fungetc is NULL, then Allegro's default implementation of a 16 char long buffer will be used.</p>
+<h1 id="allegro_seek"><a href="#TOC">ALLEGRO_SEEK</a></h1>
+<pre><code>typedef enum ALLEGRO_SEEK
+</code></pre>
+<ul>
+<li>ALLEGRO_SEEK_SET - seek relative to beginning of file</li>
+<li>ALLEGRO_SEEK_CUR - seek relative to current file position</li>
+<li>ALLEGRO_SEEK_END - seek relative to end of file</li>
+</ul>
+<p>See also: <a href="file.html#al_fseek">al_fseek</a></p>
+<h1 id="al_fopen"><a href="#TOC">al_fopen</a></h1>
+<pre><code>ALLEGRO_FILE *al_fopen(const char *path, const char *mode)
+</code></pre>
+<p>Creates and opens a file (real or virtual) given the path and mode. The current file interface is used to open the file.</p>
+<p>Parameters:</p>
+<ul>
+<li>path - path to the file to open</li>
+<li>mode - access mode to open the file in (&quot;r&quot;, &quot;w&quot;, etc.)</li>
+</ul>
+<p>Depending on the stream type and the mode string, files may be opened in &quot;text&quot; mode. The handling of newlines is particularly important. For example, using the default stdio-based streams on DOS and Windows platforms, where the native end-of-line terminators are CR+LF sequences, a call to <a href="file.html#al_fgetc">al_fgetc</a> may return just one character ('\n') where there were two bytes (CR+LF) in the file. When writing out '\n', two bytes would be written instead. (As an aside, '\n' is not defined to be equal to LF either.)</p>
+<p>Newline translations can be useful for text files but is disastrous for binary files. To avoid this behaviour you need to open file streams in binary mode by using a mode argument containing a &quot;b&quot;, e.g. &quot;rb&quot;, &quot;wb&quot;.</p>
+<p>Returns a file handle on success, or NULL on error.</p>
+<p>See also: <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a>, <a href="file.html#al_fclose">al_fclose</a>.</p>
+<h1 id="al_fopen_interface"><a href="#TOC">al_fopen_interface</a></h1>
+<pre><code>ALLEGRO_FILE *al_fopen_interface(const ALLEGRO_FILE_INTERFACE *drv,
+   const char *path, const char *mode)
+</code></pre>
+<p>Opens a file using the specified interface, instead of the interface set with <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a>.</p>
+<p>See also: <a href="file.html#al_fopen">al_fopen</a></p>
+<h1 id="al_fopen_slice"><a href="#TOC">al_fopen_slice</a></h1>
+<pre><code>ALLEGRO_FILE *al_fopen_slice(ALLEGRO_FILE *fp, size_t initial_size, const char *mode)
+</code></pre>
+<p>Opens a slice (subset) of an already open random access file as if it were a stand alone file. While the slice is open, the parent file handle must not be used in any way.</p>
+<p>The slice is opened at the current location of the parent file, up through <code>initial_size</code> bytes. The <code>initial_size</code> may be any non-negative integer that will not exceed the bounds of the parent file.</p>
+<p>Seeking with <code>ALLEGRO_SEEK_SET</code> will be relative to this starting location. <code>ALLEGRO_SEEK_END</code> will be relative to the starting location plus the size of the slice.</p>
+<p>The mode can be any combination of:</p>
+<ul>
+<li>r: read access</li>
+<li>w: write access</li>
+<li>e: expandable</li>
+</ul>
+<p>For example, a mode of &quot;rw&quot; indicates the file can be read and written. (Note that this is slightly different from the stdio modes.) Keep in mind that the parent file must support random access and be open in normal write mode (not append) for the slice to work in a well defined way.</p>
+<p>If the slice is marked as expandable, then reads and writes can happen after the initial end point, and the slice will grow accordingly. Otherwise, all activity is restricted to the initial size of the slice.</p>
+<p>A slice must be closed with <a href="file.html#al_fclose">al_fclose</a>. The parent file will then be positioned immediately after the end of the slice.</p>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="file.html#al_fopen">al_fopen</a></p>
+<h1 id="al_fclose"><a href="#TOC">al_fclose</a></h1>
+<pre><code>void al_fclose(ALLEGRO_FILE *f)
+</code></pre>
+<p>Close the given file, writing any buffered output data (if any).</p>
+<h1 id="al_fread"><a href="#TOC">al_fread</a></h1>
+<pre><code>size_t al_fread(ALLEGRO_FILE *f, void *ptr, size_t size)
+</code></pre>
+<p>Read 'size' bytes into the buffer pointed to by 'ptr', from the given file.</p>
+<p>Returns the number of bytes actually read. If an error occurs, or the end-of-file is reached, the return value is a short byte count (or zero).</p>
+<p>al_fread() does not distinguish between EOF and other errors. Use <a href="file.html#al_feof">al_feof</a> and <a href="file.html#al_ferror">al_ferror</a> to determine which occurred.</p>
+<p>See also: <a href="file.html#al_fgetc">al_fgetc</a>, <a href="file.html#al_fread16be">al_fread16be</a>, <a href="file.html#al_fread16le">al_fread16le</a>, <a href="file.html#al_fread32be">al_fread32be</a>, <a href="file.html#al_fread32le">al_fread32le</a></p>
+<h1 id="al_fwrite"><a href="#TOC">al_fwrite</a></h1>
+<pre><code>size_t al_fwrite(ALLEGRO_FILE *f, const void *ptr, size_t size)
+</code></pre>
+<p>Write 'size' bytes from the buffer pointed to by 'ptr' into the given file.</p>
+<p>Returns the number of bytes actually written. If an error occurs, the return value is a short byte count (or zero).</p>
+<p>See also: <a href="file.html#al_fputc">al_fputc</a>, <a href="file.html#al_fputs">al_fputs</a>, <a href="file.html#al_fwrite16be">al_fwrite16be</a>, <a href="file.html#al_fwrite16le">al_fwrite16le</a>, <a href="file.html#al_fwrite32be">al_fwrite32be</a>, <a href="file.html#al_fwrite32le">al_fwrite32le</a></p>
+<h1 id="al_fflush"><a href="#TOC">al_fflush</a></h1>
+<pre><code>bool al_fflush(ALLEGRO_FILE *f)
+</code></pre>
+<p>Flush any pending writes to the given file.</p>
+<p>Returns true on success, false otherwise. errno is set to indicate the error.</p>
+<p>See also: <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h1 id="al_ftell"><a href="#TOC">al_ftell</a></h1>
+<pre><code>int64_t al_ftell(ALLEGRO_FILE *f)
+</code></pre>
+<p>Returns the current position in the given file, or -1 on error. errno is set to indicate the error.</p>
+<p>On some platforms this function may not support large files.</p>
+<p>See also: <a href="file.html#al_fseek">al_fseek</a>, <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h1 id="al_fseek"><a href="#TOC">al_fseek</a></h1>
+<pre><code>bool al_fseek(ALLEGRO_FILE *f, int64_t offset, int whence)
+</code></pre>
+<p>Set the current position of the given file to a position relative to that specified by 'whence', plus 'offset' number of bytes.</p>
+<p>'whence' can be:</p>
+<ul>
+<li>ALLEGRO_SEEK_SET - seek relative to beginning of file</li>
+<li>ALLEGRO_SEEK_CUR - seek relative to current file position</li>
+<li>ALLEGRO_SEEK_END - seek relative to end of file</li>
+</ul>
+<p>Returns true on success, false on failure. errno is set to indicate the error.</p>
+<p>After a successful seek, the end-of-file indicator is cleared and all pushback bytes are forgotten.</p>
+<p>On some platforms this function may not support large files.</p>
+<p>See also: <a href="file.html#al_ftell">al_ftell</a>, <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h1 id="al_feof"><a href="#TOC">al_feof</a></h1>
+<pre><code>bool al_feof(ALLEGRO_FILE *f)
+</code></pre>
+<p>Returns true if the end-of-file indicator has been set on the file, i.e. we have attempted to read <em>past</em> the end of the file.</p>
+<p>This does <em>not</em> return true if we simply are at the end of the file. The following code correctly reads two bytes, even when the file contains exactly two bytes:</p>
+<pre><code>int b1 = al_fgetc(f);
+int b2 = al_fgetc(f);
+if (al_feof(f)) {
+   /* At least one byte was unsuccessfully read. */
+   report_error();
+}
+</code></pre>
+<p>See also: <a href="file.html#al_ferror">al_ferror</a>, <a href="file.html#al_fclearerr">al_fclearerr</a></p>
+<h1 id="al_ferror"><a href="#TOC">al_ferror</a></h1>
+<pre><code>bool al_ferror(ALLEGRO_FILE *f)
+</code></pre>
+<p>Returns true if the error indicator is set on the given file, i.e. there was some sort of previous error.</p>
+<p>See also: <a href="file.html#al_feof">al_feof</a>, <a href="file.html#al_fclearerr">al_fclearerr</a></p>
+<h1 id="al_fclearerr"><a href="#TOC">al_fclearerr</a></h1>
+<pre><code>void al_fclearerr(ALLEGRO_FILE *f)
+</code></pre>
+<p>Clear the error indicator for the given file.</p>
+<p>The standard I/O backend also clears the end-of-file indicator, and other backends <em>should</em> try to do this. However, they may not if it would require too much effort (e.g. PhysicsFS backend), so your code should not rely on it if you need your code to be portable to other backends.</p>
+<p>See also: <a href="file.html#al_ferror">al_ferror</a>, <a href="file.html#al_feof">al_feof</a></p>
+<h1 id="al_fungetc"><a href="#TOC">al_fungetc</a></h1>
+<pre><code>int al_fungetc(ALLEGRO_FILE *f, int c)
+</code></pre>
+<p>Ungets a single byte from a file. Pushed-back bytes are not written to the file, only made available for subsequent reads, in reverse order.</p>
+<p>The number of pushbacks depends on the backend. The standard I/O backend only guarantees a single pushback; this depends on the libc implementation.</p>
+<p>For backends that follow the standard behavior, the pushback buffer will be cleared after any seeking or writing; also calls to <a href="file.html#al_fseek">al_fseek</a> and <a href="file.html#al_ftell">al_ftell</a> are relative to the number of pushbacks. If a pushback causes the position to become negative, the behavior of <a href="file.html#al_fseek">al_fseek</a> and <a href="file.html#al_ftell">al_ftell</a> are undefined.</p>
+<p>See also: <a href="file.html#al_fgetc">al_fgetc</a>, <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h1 id="al_fsize"><a href="#TOC">al_fsize</a></h1>
+<pre><code>int64_t al_fsize(ALLEGRO_FILE *f)
+</code></pre>
+<p>Return the size of the file, if it can be determined, or -1 otherwise.</p>
+<h1 id="al_fgetc"><a href="#TOC">al_fgetc</a></h1>
+<pre><code>int al_fgetc(ALLEGRO_FILE *f)
+</code></pre>
+<p>Read and return next byte in the given file. Returns EOF on end of file or if an error occurred.</p>
+<p>See also: <a href="file.html#al_fungetc">al_fungetc</a></p>
+<h1 id="al_fputc"><a href="#TOC">al_fputc</a></h1>
+<pre><code>int al_fputc(ALLEGRO_FILE *f, int c)
+</code></pre>
+<p>Write a single byte to the given file.</p>
+<p>Parameters:</p>
+<ul>
+<li>c - byte value to write</li>
+<li>f - file to write to</li>
+</ul>
+<p>Returns c on success, or EOF on error.</p>
+<h1 id="al_fread16le"><a href="#TOC">al_fread16le</a></h1>
+<pre><code>int16_t al_fread16le(ALLEGRO_FILE *f)
+</code></pre>
+<p>Reads a 16-bit word in little-endian format (LSB first).</p>
+<p>On success, returns the 16-bit word. On failure, returns EOF (-1). Since -1 is also a valid return value, use <a href="file.html#al_feof">al_feof</a> to check if the end of the file was reached prematurely, or <a href="file.html#al_ferror">al_ferror</a> to check if an error occurred.</p>
+<p>See also: <a href="file.html#al_fread16be">al_fread16be</a></p>
+<h1 id="al_fread16be"><a href="#TOC">al_fread16be</a></h1>
+<pre><code>int16_t al_fread16be(ALLEGRO_FILE *f)
+</code></pre>
+<p>Reads a 16-bit word in big-endian format (MSB first).</p>
+<p>On success, returns the 16-bit word. On failure, returns EOF (-1). Since -1 is also a valid return value, use <a href="file.html#al_feof">al_feof</a> to check if the end of the file was reached prematurely, or <a href="file.html#al_ferror">al_ferror</a> to check if an error occurred.</p>
+<p>See also: <a href="file.html#al_fread16le">al_fread16le</a></p>
+<h1 id="al_fwrite16le"><a href="#TOC">al_fwrite16le</a></h1>
+<pre><code>size_t al_fwrite16le(ALLEGRO_FILE *f, int16_t w)
+</code></pre>
+<p>Writes a 16-bit word in little-endian format (LSB first).</p>
+<p>Returns the number of bytes written: 2 on success, less than 2 on an error.</p>
+<p>See also: <a href="file.html#al_fwrite16be">al_fwrite16be</a></p>
+<h1 id="al_fwrite16be"><a href="#TOC">al_fwrite16be</a></h1>
+<pre><code>size_t al_fwrite16be(ALLEGRO_FILE *f, int16_t w)
+</code></pre>
+<p>Writes a 16-bit word in big-endian format (MSB first).</p>
+<p>Returns the number of bytes written: 2 on success, less than 2 on an error.</p>
+<p>See also: <a href="file.html#al_fwrite16le">al_fwrite16le</a></p>
+<h1 id="al_fread32le"><a href="#TOC">al_fread32le</a></h1>
+<pre><code>int32_t al_fread32le(ALLEGRO_FILE *f)
+</code></pre>
+<p>Reads a 32-bit word in little-endian format (LSB first).</p>
+<p>On success, returns the 32-bit word. On failure, returns EOF (-1). Since -1 is also a valid return value, use <a href="file.html#al_feof">al_feof</a> to check if the end of the file was reached prematurely, or <a href="file.html#al_ferror">al_ferror</a> to check if an error occurred.</p>
+<p>See also: <a href="file.html#al_fread32be">al_fread32be</a></p>
+<h1 id="al_fread32be"><a href="#TOC">al_fread32be</a></h1>
+<pre><code>int32_t al_fread32be(ALLEGRO_FILE *f)
+</code></pre>
+<p>Read a 32-bit word in big-endian format (MSB first).</p>
+<p>On success, returns the 32-bit word. On failure, returns EOF (-1). Since -1 is also a valid return value, use <a href="file.html#al_feof">al_feof</a> to check if the end of the file was reached prematurely, or <a href="file.html#al_ferror">al_ferror</a> to check if an error occurred.</p>
+<p>See also: <a href="file.html#al_fread32le">al_fread32le</a></p>
+<h1 id="al_fwrite32le"><a href="#TOC">al_fwrite32le</a></h1>
+<pre><code>size_t al_fwrite32le(ALLEGRO_FILE *f, int32_t l)
+</code></pre>
+<p>Writes a 32-bit word in little-endian format (LSB first).</p>
+<p>Returns the number of bytes written: 4 on success, less than 4 on an error.</p>
+<p>See also: <a href="file.html#al_fwrite32be">al_fwrite32be</a></p>
+<h1 id="al_fwrite32be"><a href="#TOC">al_fwrite32be</a></h1>
+<pre><code>size_t al_fwrite32be(ALLEGRO_FILE *f, int32_t l)
+</code></pre>
+<p>Writes a 32-bit word in big-endian format (MSB first).</p>
+<p>Returns the number of bytes written: 4 on success, less than 4 on an error.</p>
+<p>See also: <a href="file.html#al_fwrite32le">al_fwrite32le</a></p>
+<h1 id="al_fgets"><a href="#TOC">al_fgets</a></h1>
+<pre><code>char *al_fgets(ALLEGRO_FILE *f, char * const buf, size_t max)
+</code></pre>
+<p>Read a string of bytes terminated with a newline or end-of-file into the buffer given. The line terminator(s), if any, are included in the returned string. A maximum of max-1 bytes are read, with one byte being reserved for a NUL terminator.</p>
+<p>Parameters:</p>
+<ul>
+<li>f - file to read from</li>
+<li>buf - buffer to fill</li>
+<li>max - maximum size of buffer</li>
+</ul>
+<p>Returns the pointer to buf on success. Returns NULL if an error occurred or if the end of file was reached without reading any bytes.</p>
+<p>See <a href="file.html#al_fopen">al_fopen</a> about translations of end-of-line characters.</p>
+<p>See also: <a href="file.html#al_fget_ustr">al_fget_ustr</a></p>
+<h1 id="al_fget_ustr"><a href="#TOC">al_fget_ustr</a></h1>
+<pre><code>ALLEGRO_USTR *al_fget_ustr(ALLEGRO_FILE *f)
+</code></pre>
+<p>Read a string of bytes terminated with a newline or end-of-file. The line terminator(s), if any, are included in the returned string.</p>
+<p>On success returns a pointer to a new ALLEGRO_USTR structure. This must be freed eventually with <a href="utf8.html#al_ustr_free">al_ustr_free</a>. Returns NULL if an error occurred or if the end of file was reached without reading any bytes.</p>
+<p>See <a href="file.html#al_fopen">al_fopen</a> about translations of end-of-line characters.</p>
+<p>See also: <a href="file.html#al_fgetc">al_fgetc</a>, <a href="file.html#al_fgets">al_fgets</a></p>
+<h1 id="al_fputs"><a href="#TOC">al_fputs</a></h1>
+<pre><code>int al_fputs(ALLEGRO_FILE *f, char const *p)
+</code></pre>
+<p>Writes a string to file. Apart from the return value, this is equivalent to:</p>
+<pre><code>al_fwrite(f, p, strlen(p));
+</code></pre>
+<p>Parameters:</p>
+<ul>
+<li>f - file handle to write to</li>
+<li>p - string to write</li>
+</ul>
+<p>Returns a non-negative integer on success, EOF on error.</p>
+<p>Note: depending on the stream type and the mode passed to <a href="file.html#al_fopen">al_fopen</a>, newline characters in the string may or may not be automatically translated to native end-of-line sequences, e.g. CR/LF instead of LF.</p>
+<p>See also: <a href="file.html#al_fwrite">al_fwrite</a></p>
+<h1 id="standard-io-specific-routines"><a href="#TOC">Standard I/O specific routines</a></h1>
+<h2 id="al_fopen_fd"><a href="#TOC">al_fopen_fd</a></h2>
+<pre><code>ALLEGRO_FILE *al_fopen_fd(int fd, const char *mode)
+</code></pre>
+<p>Create an <a href="file.html#allegro_file">ALLEGRO_FILE</a> object that operates on an open file descriptor using stdio routines. See the documentation of fdopen() for a description of the 'mode' argument.</p>
+<p>Returns an ALLEGRO_FILE object on success or NULL on an error. On an error, the Allegro errno will be set and the file descriptor will not be closed.</p>
+<p>The file descriptor will be closed by <a href="file.html#al_fclose">al_fclose</a> so you should not call close() on it.</p>
+<p>See also: <a href="file.html#al_fopen">al_fopen</a></p>
+<h2 id="al_make_temp_file"><a href="#TOC">al_make_temp_file</a></h2>
+<pre><code>ALLEGRO_FILE *al_make_temp_file(const char *template, ALLEGRO_PATH **ret_path)
+</code></pre>
+<p>Make a temporary randomly named file given a filename 'template'.</p>
+<p>'template' is a string giving the format of the generated filename and should include one or more capital Xs. The Xs are replaced with random alphanumeric characters. There should be no path separators.</p>
+<p>If 'ret_path' is not NULL, the address it points to will be set to point to a new path structure with the name of the temporary file.</p>
+<p>Returns the opened <a href="file.html#allegro_file">ALLEGRO_FILE</a> on success, NULL on failure.</p>
+<h1 id="alternative-file-streams"><a href="#TOC">Alternative file streams</a></h1>
+<p>By default, the Allegro file I/O routines use the C library I/O routines, hence work with files on the local filesystem, but can be overridden so that you can read and write to other streams. For example, you can work with block of memory or sub-files inside .zip files.</p>
+<p>There are two ways to get an <a href="file.html#allegro_file">ALLEGRO_FILE</a> that doesn't use stdio. An addon library may provide a function that returns a new ALLEGRO_FILE directly, after which, all al_f* calls on that object will use overridden functions for that type of stream. Alternatively, <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a> changes which function will handle the following <a href="file.html#al_fopen">al_fopen</a> calls for the current thread.</p>
+<h2 id="al_set_new_file_interface"><a href="#TOC">al_set_new_file_interface</a></h2>
+<pre><code>void al_set_new_file_interface(const ALLEGRO_FILE_INTERFACE *file_interface)
+</code></pre>
+<p>Set the <a href="file.html#allegro_file_interface">ALLEGRO_FILE_INTERFACE</a> table for the calling thread. This will change the handler for later calls to <a href="file.html#al_fopen">al_fopen</a>.</p>
+<p>See also: <a href="file.html#al_set_standard_file_interface">al_set_standard_file_interface</a>, <a href="state.html#al_store_state">al_store_state</a>, <a href="state.html#al_restore_state">al_restore_state</a>.</p>
+<h2 id="al_set_standard_file_interface"><a href="#TOC">al_set_standard_file_interface</a></h2>
+<pre><code>void al_set_standard_file_interface(void)
+</code></pre>
+<p>Set the <a href="file.html#allegro_file_interface">ALLEGRO_FILE_INTERFACE</a> table to the default, for the calling thread. This will change the handler for later calls to <a href="file.html#al_fopen">al_fopen</a>.</p>
+<p>See also: <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a></p>
+<h2 id="al_get_new_file_interface"><a href="#TOC">al_get_new_file_interface</a></h2>
+<pre><code>const ALLEGRO_FILE_INTERFACE *al_get_new_file_interface(void)
+</code></pre>
+<p>Return a pointer to the <a href="file.html#allegro_file_interface">ALLEGRO_FILE_INTERFACE</a> table in effect for the calling thread.</p>
+<p>See also: <a href="state.html#al_store_state">al_store_state</a>, <a href="state.html#al_restore_state">al_restore_state</a>.</p>
+<h2 id="al_create_file_handle"><a href="#TOC">al_create_file_handle</a></h2>
+<pre><code>ALLEGRO_FILE *al_create_file_handle(const ALLEGRO_FILE_INTERFACE *drv,
+   void *userdata)
+</code></pre>
+<p>Creates an empty, opened file handle with some abstract user data. This allows custom interfaces to extend the <a href="file.html#allegro_file">ALLEGRO_FILE</a> struct with their own data. You should close the handle with the standard <a href="file.html#al_fclose">al_fclose</a> function when you are finished with it.</p>
+<p>See also: <a href="file.html#al_fopen">al_fopen</a>, <a href="file.html#al_fclose">al_fclose</a>, <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a></p>
+<h2 id="al_get_file_userdata"><a href="#TOC">al_get_file_userdata</a></h2>
+<pre><code>void *al_get_file_userdata(ALLEGRO_FILE *f)
+</code></pre>
+<p>Returns a pointer to the custom userdata that is attached to the file handle. This is intended to be used by functions that extend <a href="file.html#allegro_file_interface">ALLEGRO_FILE_INTERFACE</a>.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:45 UTC
+</p>
+</div>
+
+
+</body>
+</html>

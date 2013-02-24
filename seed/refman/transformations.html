@@ -1,0 +1,289 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Transformations</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Transformations</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_transform">ALLEGRO_TRANSFORM</a></li>
+<li><a href="#al_copy_transform">al_copy_transform</a></li>
+<li><a href="#al_use_transform">al_use_transform</a></li>
+<li><a href="#al_get_current_transform">al_get_current_transform</a></li>
+<li><a href="#al_invert_transform">al_invert_transform</a></li>
+<li><a href="#al_check_inverse">al_check_inverse</a></li>
+<li><a href="#al_identity_transform">al_identity_transform</a></li>
+<li><a href="#al_build_transform">al_build_transform</a></li>
+<li><a href="#al_translate_transform">al_translate_transform</a></li>
+<li><a href="#al_rotate_transform">al_rotate_transform</a></li>
+<li><a href="#al_scale_transform">al_scale_transform</a></li>
+<li><a href="#al_transform_coordinates">al_transform_coordinates</a></li>
+<li><a href="#al_compose_transform">al_compose_transform</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<p>The transformations are combined in the order of the function invocations. Thus to create a transformation that first rotates a point and then translates it, you would (starting with an identity transformation) call <a href="transformations.html#al_rotate_transform">al_rotate_transform</a> and then <a href="transformations.html#al_translate_transform">al_translate_transform</a>. This approach is opposite of what OpenGL uses but similar to what Direct3D uses.</p>
+<p>For those who known the matrix algebra going behind the scenes, what the transformation functions in Allegro do is &quot;pre-multiply&quot; the successive transformations. So, for example, if you have code that does:</p>
+<pre><code>al_identity_transform(&amp;T);
+
+al_compose_transform(&amp;T, &amp;T1);
+al_compose_transform(&amp;T, &amp;T2);
+al_compose_transform(&amp;T, &amp;T3);
+al_compose_transform(&amp;T, &amp;T4);
+</code></pre>
+<p>The resultant matrix multiplication expression will look like this:</p>
+<pre><code>T4 * T3 * T2 * T1
+</code></pre>
+<p>Since the point coordinate vector term will go on the right of that sequence of factors, the transformation that is called first, will also be applied first.</p>
+<p>This means if you have code like this:</p>
+<pre><code>al_identity_transform(&amp;T1);
+al_scale_transform(&amp;T1, 2, 2);
+al_identity_transform(&amp;T2);
+al_translate_transform(&amp;T2, 100, 0);
+
+al_identity_transform(&amp;T);
+
+al_compose_transform(&amp;T, &amp;T1);
+al_compose_transform(&amp;T, &amp;T2);
+
+al_use_transform(T);
+</code></pre>
+<p>it does exactly the same as:</p>
+<pre><code>al_identity_transform(&amp;T);
+al_scale_transform(&amp;T, 2, 2);
+al_translate_transform(&amp;T, 100, 0);
+al_use_transform(T);
+</code></pre>
+<h1 id="allegro_transform"><a href="#TOC">ALLEGRO_TRANSFORM</a></h1>
+<pre><code>typedef struct ALLEGRO_TRANSFORM ALLEGRO_TRANSFORM;
+</code></pre>
+<p>Defines the generic transformation type, a 4x4 matrix. 2D transforms use only a small subsection of this matrix, namely the top left 2x2 matrix, and the right most 2x1 matrix, for a total of 6 values.</p>
+<p><em>Fields:</em></p>
+<ul>
+<li>m - A 4x4 float matrix</li>
+</ul>
+<h1 id="al_copy_transform"><a href="#TOC">al_copy_transform</a></h1>
+<pre><code>void al_copy_transform(ALLEGRO_TRANSFORM *dest, const ALLEGRO_TRANSFORM *src)
+</code></pre>
+<p>Makes a copy of a transformation.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>dest - Source transformation</li>
+<li>src - Destination transformation</li>
+</ul>
+<h1 id="al_use_transform"><a href="#TOC">al_use_transform</a></h1>
+<pre><code>void al_use_transform(const ALLEGRO_TRANSFORM *trans)
+</code></pre>
+<p>Sets the transformation to be used for the the drawing operations on the target bitmap (each bitmap maintains its own transformation). Every drawing operation after this call will be transformed using this transformation. Call this function with an identity transformation to return to the default behaviour.</p>
+<p>This function does nothing if there is no target bitmap.</p>
+<p>The parameter is passed by reference as an optimization to avoid the overhead of stack copying. The reference will not be stored in the Allegro library so it is safe to pass references to local variables.</p>
+<pre><code>void setup_my_transformation(void)
+{
+   ALLEGRO_TRANSFORM transform;
+   al_translate_transform(&amp;transform, 5, 10);
+   al_use_transform(&amp;transform);
+}
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to use</li>
+</ul>
+<p>See also: <a href="transformations.html#al_get_current_transform">al_get_current_transform</a>, <a href="transformations.html#al_transform_coordinates">al_transform_coordinates</a></p>
+<h1 id="al_get_current_transform"><a href="#TOC">al_get_current_transform</a></h1>
+<pre><code>const ALLEGRO_TRANSFORM *al_get_current_transform(void)
+</code></pre>
+<p>Returns the transformation of the current target bitmap, as set by <a href="transformations.html#al_use_transform">al_use_transform</a>. If there is no target bitmap, this function returns NULL.</p>
+<p><em>Returns:</em> A pointer to the current transformation.</p>
+<h1 id="al_invert_transform"><a href="#TOC">al_invert_transform</a></h1>
+<pre><code>void al_invert_transform(ALLEGRO_TRANSFORM *trans)
+</code></pre>
+<p>Inverts the passed transformation. If the transformation is nearly singular (close to not having an inverse) then the returned transformation may be invalid. Use <a href="transformations.html#al_check_inverse">al_check_inverse</a> to ascertain if the transformation has an inverse before inverting it if you are in doubt.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to invert</li>
+</ul>
+<p>See also: <a href="transformations.html#al_check_inverse">al_check_inverse</a></p>
+<h1 id="al_check_inverse"><a href="#TOC">al_check_inverse</a></h1>
+<pre><code>int al_check_inverse(const ALLEGRO_TRANSFORM *trans, float tol)
+</code></pre>
+<p>Checks if the transformation has an inverse using the supplied tolerance. Tolerance should be a small value between 0 and 1, with 1e-7 being sufficient for most applications.</p>
+<p>In this function tolerance specifies how close the determinant can be to 0 (if the determinant is 0, the transformation has no inverse). Thus the smaller the tolerance you specify, the &quot;worse&quot; transformations will pass this test. Using a tolerance of 1e-7 will catch errors greater than 1/1000's of a pixel, but let smaller errors pass. That means that if you transformed a point by a transformation and then transformed it again by the inverse transformation that passed this check, the resultant point should less than 1/1000's of a pixel away from the original point.</p>
+<p>Note that this check is superfluous most of the time if you never touched the transformation matrix values yourself. The only thing that would cause the transformation to not have an inverse is if you applied a 0 (or very small) scale to the transformation or you have a really large translation. As long as the scale is comfortably above 0, the transformation will be invertible.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to check</li>
+<li>tol - Tolerance</li>
+</ul>
+<p><em>Returns:</em> 1 if the transformation is invertible, 0 otherwise</p>
+<p>See also: <a href="transformations.html#al_invert_transform">al_invert_transform</a></p>
+<h1 id="al_identity_transform"><a href="#TOC">al_identity_transform</a></h1>
+<pre><code>void al_identity_transform(ALLEGRO_TRANSFORM *trans)
+</code></pre>
+<p>Sets the transformation to be the identity transformation. This is the default transformation. Use <a href="transformations.html#al_use_transform">al_use_transform</a> on an identity transformation to return to the default.</p>
+<pre><code>ALLEGRO_TRANSFORM t;
+al_identity_transform(&amp;t);
+al_use_transform(&amp;t);
+</code></pre>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+</ul>
+<p>See also: <a href="transformations.html#al_translate_transform">al_translate_transform</a>, <a href="transformations.html#al_rotate_transform">al_rotate_transform</a>, <a href="transformations.html#al_scale_transform">al_scale_transform</a></p>
+<h1 id="al_build_transform"><a href="#TOC">al_build_transform</a></h1>
+<pre><code>void al_build_transform(ALLEGRO_TRANSFORM *trans, float x, float y,
+   float sx, float sy, float theta)
+</code></pre>
+<p>Builds a transformation given some parameters. This call is equivalent to calling the transformations in this order: make identity, scale, rotate, translate. This method is faster, however, than actually calling those functions.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+<li>x, y - Translation</li>
+<li>sx, sy - Scale</li>
+<li>theta - Rotation angle</li>
+</ul>
+<p>See also: <a href="transformations.html#al_translate_transform">al_translate_transform</a>, <a href="transformations.html#al_rotate_transform">al_rotate_transform</a>, <a href="transformations.html#al_scale_transform">al_scale_transform</a>, <a href="transformations.html#al_compose_transform">al_compose_transform</a></p>
+<h1 id="al_translate_transform"><a href="#TOC">al_translate_transform</a></h1>
+<pre><code>void al_translate_transform(ALLEGRO_TRANSFORM *trans, float x, float y)
+</code></pre>
+<p>Apply a translation to a transformation.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+<li>x, y - Translation</li>
+</ul>
+<p>See also: <a href="transformations.html#al_rotate_transform">al_rotate_transform</a>, <a href="transformations.html#al_scale_transform">al_scale_transform</a>, <a href="transformations.html#al_build_transform">al_build_transform</a></p>
+<h1 id="al_rotate_transform"><a href="#TOC">al_rotate_transform</a></h1>
+<pre><code>void al_rotate_transform(ALLEGRO_TRANSFORM *trans, float theta)
+</code></pre>
+<p>Apply a rotation to a transformation.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+<li>theta - Rotation angle</li>
+</ul>
+<p>See also: <a href="transformations.html#al_translate_transform">al_translate_transform</a>, <a href="transformations.html#al_scale_transform">al_scale_transform</a>, <a href="transformations.html#al_build_transform">al_build_transform</a></p>
+<h1 id="al_scale_transform"><a href="#TOC">al_scale_transform</a></h1>
+<pre><code>void al_scale_transform(ALLEGRO_TRANSFORM *trans, float sx, float sy)
+</code></pre>
+<p>Apply a scale to a transformation.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+<li>sx, sy - Scale</li>
+</ul>
+<p>See also: <a href="transformations.html#al_translate_transform">al_translate_transform</a>, <a href="transformations.html#al_rotate_transform">al_rotate_transform</a>, <a href="transformations.html#al_build_transform">al_build_transform</a></p>
+<h1 id="al_transform_coordinates"><a href="#TOC">al_transform_coordinates</a></h1>
+<pre><code>void al_transform_coordinates(const ALLEGRO_TRANSFORM *trans, float *x, float *y)
+</code></pre>
+<p>Transform a pair of coordinates.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to use</li>
+<li>x, y - Pointers to the coordinates</li>
+</ul>
+<p>See also: <a href="transformations.html#al_use_transform">al_use_transform</a></p>
+<h1 id="al_compose_transform"><a href="#TOC">al_compose_transform</a></h1>
+<pre><code>void al_compose_transform(ALLEGRO_TRANSFORM *trans, const ALLEGRO_TRANSFORM *other)
+</code></pre>
+<p>Compose (combine) two transformations by a matrix multiplication.</p>
+<pre><code>trans := trans other
+</code></pre>
+<p>Note that the order of matrix multiplications is important. The effect of applying the combined transform will be as if first applying <code>trans</code> and then applying <code>other</code> and not the other way around.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>trans - Transformation to alter</li>
+<li>other - Transformation used to transform <code>trans</code></li>
+</ul>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

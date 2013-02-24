@@ -1,0 +1,633 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Primitives addon</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Primitives addon</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#general">General</a><ul>
+<li><a href="#al_get_allegro_primitives_version">al_get_allegro_primitives_version</a></li>
+<li><a href="#al_init_primitives_addon">al_init_primitives_addon</a></li>
+<li><a href="#al_shutdown_primitives_addon">al_shutdown_primitives_addon</a></li>
+</ul></li>
+<li><a href="#high-level-drawing-routines">High level drawing routines</a><ul>
+<li><a href="#pixel-precise-output">Pixel-precise output</a></li>
+<li><a href="#al_draw_line">al_draw_line</a></li>
+<li><a href="#al_draw_triangle">al_draw_triangle</a></li>
+<li><a href="#al_draw_filled_triangle">al_draw_filled_triangle</a></li>
+<li><a href="#al_draw_rectangle">al_draw_rectangle</a></li>
+<li><a href="#al_draw_filled_rectangle">al_draw_filled_rectangle</a></li>
+<li><a href="#al_draw_rounded_rectangle">al_draw_rounded_rectangle</a></li>
+<li><a href="#al_draw_filled_rounded_rectangle">al_draw_filled_rounded_rectangle</a></li>
+<li><a href="#al_calculate_arc">al_calculate_arc</a></li>
+<li><a href="#al_draw_pieslice">al_draw_pieslice</a></li>
+<li><a href="#al_draw_filled_pieslice">al_draw_filled_pieslice</a></li>
+<li><a href="#al_draw_ellipse">al_draw_ellipse</a></li>
+<li><a href="#al_draw_filled_ellipse">al_draw_filled_ellipse</a></li>
+<li><a href="#al_draw_circle">al_draw_circle</a></li>
+<li><a href="#al_draw_filled_circle">al_draw_filled_circle</a></li>
+<li><a href="#al_draw_arc">al_draw_arc</a></li>
+<li><a href="#al_draw_elliptical_arc">al_draw_elliptical_arc</a></li>
+<li><a href="#al_calculate_spline">al_calculate_spline</a></li>
+<li><a href="#al_draw_spline">al_draw_spline</a></li>
+<li><a href="#al_calculate_ribbon">al_calculate_ribbon</a></li>
+<li><a href="#al_draw_ribbon">al_draw_ribbon</a></li>
+</ul></li>
+<li><a href="#low-level-drawing-routines">Low level drawing routines</a><ul>
+<li><a href="#al_draw_prim">al_draw_prim</a></li>
+<li><a href="#al_draw_indexed_prim">al_draw_indexed_prim</a></li>
+<li><a href="#al_create_vertex_decl">al_create_vertex_decl</a></li>
+<li><a href="#al_destroy_vertex_decl">al_destroy_vertex_decl</a></li>
+<li><a href="#al_draw_soft_triangle">al_draw_soft_triangle</a></li>
+<li><a href="#al_draw_soft_line">al_draw_soft_line</a></li>
+</ul></li>
+<li><a href="#structures-and-types">Structures and types</a><ul>
+<li><a href="#allegro_vertex">ALLEGRO_VERTEX</a></li>
+<li><a href="#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a></li>
+<li><a href="#allegro_vertex_element">ALLEGRO_VERTEX_ELEMENT</a></li>
+<li><a href="#allegro_prim_type">ALLEGRO_PRIM_TYPE</a></li>
+<li><a href="#allegro_prim_attr">ALLEGRO_PRIM_ATTR</a></li>
+<li><a href="#allegro_prim_storage">ALLEGRO_PRIM_STORAGE</a></li>
+<li><a href="#allegro_vertex_cache_size">ALLEGRO_VERTEX_CACHE_SIZE</a></li>
+<li><a href="#allegro_prim_quality">ALLEGRO_PRIM_QUALITY</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the following header file. Link with allegro_primitives.</p>
+<pre><code>#include &lt;allegro5/allegro_primitives.h&gt;
+</code></pre>
+<h1 id="general"><a href="#TOC">General</a></h1>
+<h2 id="al_get_allegro_primitives_version"><a href="#TOC">al_get_allegro_primitives_version</a></h2>
+<pre><code>uint32_t al_get_allegro_primitives_version(void)
+</code></pre>
+<p>Returns the (compiled) version of the addon, in the same format as <a href="system.html#al_get_allegro_version">al_get_allegro_version</a>.</p>
+<h2 id="al_init_primitives_addon"><a href="#TOC">al_init_primitives_addon</a></h2>
+<pre><code>bool al_init_primitives_addon(void)
+</code></pre>
+<p>Initializes the primitives addon.</p>
+<p><em>Returns:</em> True on success, false on failure.</p>
+<p>See also: <a href="primitives.html#al_shutdown_primitives_addon">al_shutdown_primitives_addon</a></p>
+<h2 id="al_shutdown_primitives_addon"><a href="#TOC">al_shutdown_primitives_addon</a></h2>
+<pre><code>void al_shutdown_primitives_addon(void)
+</code></pre>
+<p>Shut down the primitives addon. This is done automatically at program exit, but can be called any time the user wishes as well.</p>
+<p>See also: <a href="primitives.html#al_init_primitives_addon">al_init_primitives_addon</a></p>
+<h1 id="high-level-drawing-routines"><a href="#TOC">High level drawing routines</a></h1>
+<p>High level drawing routines encompass the most common usage of this addon: to draw geometric primitives, both smooth (variations on the circle theme) and piecewise linear. Outlined primitives support the concept of thickness with two distinct modes of output: hairline lines and thick lines. Hairline lines are specifically designed to be exactly a pixel wide, and are commonly used for drawing outlined figures that need to be a pixel wide. Hairline thickness is designated as thickness less than or equal to 0. Unfortunately, the exact rasterization rules for drawing these hairline lines vary from one video card to another, and sometimes leave gaps where the lines meet. If that matters to you, then you should use thick lines. In many cases, having a thickness of 1 will produce 1 pixel wide lines that look better than hairline lines. Obviously, hairline lines cannot replicate thicknesses greater than 1. Thick lines grow symmetrically around the generating shape as thickness is increased.</p>
+<h2 id="pixel-precise-output"><a href="#TOC">Pixel-precise output</a></h2>
+<p>While normally you should not be too concerned with which pixels are displayed when the high level primitives are drawn, it is nevertheless possible to control that precisely by carefully picking the coordinates at which you draw those primitives.</p>
+<p>To be able to do that, however, it is critical to understand how GPU cards convert shapes to pixels. Pixels are not the smallest unit that can be addressed by the GPU. Because the GPU deals with floating point coordinates, it can in fact assign different coordinates to different parts of a single pixel. To a GPU, thus, a screen is composed of a grid of squares that have width and length of 1. The top left corner of the top left pixel is located at (0, 0). Therefore, the center of that pixel is at (0.5, 0.5). The basic rule that determines which pixels are associated with which shape is then as follows: a pixel is treated to belong to a shape if the pixel's center is located in that shape. The figure below illustrates the above concepts:</p>
+<div class="figure">
+<img src="images/primitives1.png" alt="Diagram showing a how pixel output is calculated by the GPU given the mathematical description of several shapes." /><p class="caption"><em>Diagram showing a how pixel output is calculated by the GPU given the mathematical description of several shapes.</em></p>
+</div>
+<p>This figure depicts three shapes drawn at the top left of the screen: an orange and green rectangles and a purple circle. On the left are the mathematical descriptions of pixels on the screen and the shapes to be drawn. On the right is the screen output. Only a single pixel has its center inside the circle, and therefore only a single pixel is drawn on the screen. Similarly, two pixels are drawn for the orange rectangle. Since there are no pixels that have their centers inside the green rectangle, the output image has no green pixels.</p>
+<p>Here is a more practical example. The image below shows the output of this code:</p>
+<pre><code>/* blue vertical line */
+al_draw_line(0.5, 0, 0.5, 6, color_blue, 1);
+/* red horizontal line */
+al_draw_line(2, 1, 6, 1, color_red, 2);
+/* green filled rectangle */
+al_draw_filled_rectangle(3, 4, 5, 5, color_green);
+/* purple outlined rectangle */
+al_draw_rectangle(2.5, 3.5, 5.5, 5.5, color_purple, 1);
+</code></pre>
+<div class="figure">
+<img src="images/primitives2.png" alt="Diagram showing a practical example of pixel output resulting from the invocation of several primitives addon functions." /><p class="caption"><em>Diagram showing a practical example of pixel output resulting from the invocation of several primitives addon functions.</em></p>
+</div>
+<p>It can be seen that lines are generated by making a rectangle based on the dashed line between the two endpoints. The thickness causes the rectangle to grow symmetrically about that generating line, as can be seen by comparing the red and blue lines. Note that to get proper pixel coverage, the coordinates passed to the <code>al_draw_line</code> had to be offset by 0.5 in the appropriate dimensions.</p>
+<p>Filled rectangles are generated by making a rectangle between the endpoints passed to the <code>al_draw_filled_rectangle</code>.</p>
+<p>Outlined rectangles are generated by symmetrically expanding an outline of a rectangle. With thickness of 1, as depicted in the diagram, this means that an offset of 0.5 is needed for both sets of endpoint coordinates.</p>
+<p>The above rules only apply when multisampling is turned off. When multisampling is turned on, the area of a pixel that is covered by a shape is taken into account when choosing what color to draw there. This also means that shapes no longer have to contain the pixel's center to affect its color. For example, the green rectangle in the first diagram may in fact be drawn as two (or one) semi-transparent pixels. The advantages of multisampling is that slanted shapes will look smoother because they will not have jagged edges. A disadvantage of multisampling is that it may make vertical and horizontal edges blurry. While the exact rules for multisampling are unspecified, and may vary from GPU to GPU it is usually safe to assume that as long as a pixel is either completely covered by a shape or completely not covered, then the shape edges will be sharp. The offsets used in the second diagram were chosen so that this is the case: if you use those offsets, your shapes (if they are oriented the same way as they are on the diagram) should look the same whether multisampling is turned on or off.</p>
+<h2 id="al_draw_line"><a href="#TOC">al_draw_line</a></h2>
+<pre><code>void al_draw_line(float x1, float y1, float x2, float y2,
+   ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws a line segment between two points.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2 - Start and end points of the line</li>
+<li>color - Color of the line</li>
+<li>thickness - Thickness of the line, pass <code>&lt;= 0</code> to draw hairline lines</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_soft_line">al_draw_soft_line</a></p>
+<h2 id="al_draw_triangle"><a href="#TOC">al_draw_triangle</a></h2>
+<pre><code>void al_draw_triangle(float x1, float y1, float x2, float y2,
+   float x3, float y3, ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an outlined triangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2, x3, y3 - Three points of the triangle</li>
+<li>color - Color of the triangle</li>
+<li>thickness - Thickness of the lines, pass <code>&lt;= 0</code> to draw hairline lines</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_filled_triangle">al_draw_filled_triangle</a>, <a href="primitives.html#al_draw_soft_triangle">al_draw_soft_triangle</a></p>
+<h2 id="al_draw_filled_triangle"><a href="#TOC">al_draw_filled_triangle</a></h2>
+<pre><code>void al_draw_filled_triangle(float x1, float y1, float x2, float y2,
+   float x3, float y3, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a filled triangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2, x3, y3 - Three points of the triangle</li>
+<li>color - Color of the triangle</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_triangle">al_draw_triangle</a></p>
+<h2 id="al_draw_rectangle"><a href="#TOC">al_draw_rectangle</a></h2>
+<pre><code>void al_draw_rectangle(float x1, float y1, float x2, float y2,
+   ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an outlined rectangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2 - Upper left and lower right points of the rectangle</li>
+<li>color - Color of the rectangle</li>
+<li>thickness - Thickness of the lines, pass <code>&lt;= 0</code> to draw hairline lines</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_filled_rectangle">al_draw_filled_rectangle</a>, <a href="primitives.html#al_draw_rounded_rectangle">al_draw_rounded_rectangle</a></p>
+<h2 id="al_draw_filled_rectangle"><a href="#TOC">al_draw_filled_rectangle</a></h2>
+<pre><code>void al_draw_filled_rectangle(float x1, float y1, float x2, float y2,
+   ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a filled rectangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2 - Upper left and lower right points of the rectangle</li>
+<li>color - Color of the rectangle</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_rectangle">al_draw_rectangle</a>, <a href="primitives.html#al_draw_filled_rounded_rectangle">al_draw_filled_rounded_rectangle</a></p>
+<h2 id="al_draw_rounded_rectangle"><a href="#TOC">al_draw_rounded_rectangle</a></h2>
+<pre><code>void al_draw_rounded_rectangle(float x1, float y1, float x2, float y2,
+   float rx, float ry, ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an outlined rounded rectangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2 - Upper left and lower right points of the rectangle</li>
+<li>color - Color of the rectangle</li>
+<li>rx, ry - The radii of the round</li>
+<li>thickness - Thickness of the lines, pass <code>&lt;= 0</code> to draw hairline lines</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_filled_rounded_rectangle">al_draw_filled_rounded_rectangle</a>, <a href="primitives.html#al_draw_rectangle">al_draw_rectangle</a></p>
+<h2 id="al_draw_filled_rounded_rectangle"><a href="#TOC">al_draw_filled_rounded_rectangle</a></h2>
+<pre><code>void al_draw_filled_rounded_rectangle(float x1, float y1, float x2, float y2,
+   float rx, float ry, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws an filled rounded rectangle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>x1, y1, x2, y2 - Upper left and lower right points of the rectangle</li>
+<li>color - Color of the rectangle</li>
+<li>rx, ry - The radii of the round</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_rounded_rectangle">al_draw_rounded_rectangle</a>, <a href="primitives.html#al_draw_filled_rectangle">al_draw_filled_rectangle</a></p>
+<h2 id="al_calculate_arc"><a href="#TOC">al_calculate_arc</a></h2>
+<pre><code>void al_calculate_arc(float* dest, int stride, float cx, float cy,
+   float rx, float ry, float start_theta, float delta_theta, float thickness,
+   int num_segments)
+</code></pre>
+<p>Calculates an elliptical arc, and sets the vertices in the destination buffer to the calculated positions. If <code>thickness &lt;= 0</code>, then <code>num_points</code> of points are required in the destination, otherwise twice as many are needed. The destination buffer should consist of regularly spaced (by distance of <code>stride</code> bytes) doublets of floats, corresponding to x and y coordinates of the vertices.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>dest - The destination buffer</li>
+<li>stride - Distance (in bytes) between starts of successive pairs of coordinates</li>
+<li>cx, cy - Center of the arc</li>
+<li>rx, ry - Radii of the arc</li>
+<li>start_theta - The initial angle from which the arc is calculated</li>
+<li>delta_theta - Angular span of the arc (pass a negative number to switch direction)</li>
+<li>thickness - Thickness of the arc</li>
+<li>num_points - The number of points to calculate</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_arc">al_draw_arc</a>, <a href="primitives.html#al_calculate_spline">al_calculate_spline</a>, <a href="primitives.html#al_calculate_ribbon">al_calculate_ribbon</a></p>
+<h2 id="al_draw_pieslice"><a href="#TOC">al_draw_pieslice</a></h2>
+<pre><code>void al_draw_pieslice(float cx, float cy, float r, float start_theta,
+   float delta_theta, ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws a pieslice (outlined circular sector).</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the pieslice</li>
+<li>r - Radius of the pieslice</li>
+<li>color - Color of the pieslice</li>
+<li>start_theta - The initial angle from which the pieslice is drawn</li>
+<li>delta_theta - Angular span of the pieslice (pass a negative number to switch direction)</li>
+<li>thickness - Thickness of the circle, pass <code>&lt;= 0</code> to draw hairline pieslice</li>
+</ul>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="primitives.html#al_draw_filled_pieslice">al_draw_filled_pieslice</a></p>
+<h2 id="al_draw_filled_pieslice"><a href="#TOC">al_draw_filled_pieslice</a></h2>
+<pre><code>void al_draw_filled_pieslice(float cx, float cy, float r, float start_theta,
+   float delta_theta, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a filled pieslice (filled circular sector).</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the pieslice</li>
+<li>r - Radius of the pieslice</li>
+<li>color - Color of the pieslice</li>
+<li>start_theta - The initial angle from which the pieslice is drawn</li>
+<li>delta_theta - Angular span of the pieslice (pass a negative number to switch direction)</li>
+</ul>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="primitives.html#al_draw_pieslice">al_draw_pieslice</a></p>
+<h2 id="al_draw_ellipse"><a href="#TOC">al_draw_ellipse</a></h2>
+<pre><code>void al_draw_ellipse(float cx, float cy, float rx, float ry,
+   ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an outlined ellipse.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the ellipse</li>
+<li>rx, ry - Radii of the ellipse</li>
+<li>color - Color of the ellipse</li>
+<li>thickness - Thickness of the ellipse, pass <code>&lt;= 0</code> to draw a hairline ellipse</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_filled_ellipse">al_draw_filled_ellipse</a>, <a href="primitives.html#al_draw_circle">al_draw_circle</a></p>
+<h2 id="al_draw_filled_ellipse"><a href="#TOC">al_draw_filled_ellipse</a></h2>
+<pre><code>void al_draw_filled_ellipse(float cx, float cy, float rx, float ry,
+   ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a filled ellipse.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the ellipse</li>
+<li>rx, ry - Radii of the ellipse</li>
+<li>color - Color of the ellipse</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_ellipse">al_draw_ellipse</a>, <a href="primitives.html#al_draw_filled_circle">al_draw_filled_circle</a></p>
+<h2 id="al_draw_circle"><a href="#TOC">al_draw_circle</a></h2>
+<pre><code>void al_draw_circle(float cx, float cy, float r, ALLEGRO_COLOR color,
+   float thickness)
+</code></pre>
+<p>Draws an outlined circle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the circle</li>
+<li>r - Radius of the circle</li>
+<li>color - Color of the circle</li>
+<li>thickness - Thickness of the circle, pass <code>&lt;= 0</code> to draw a hairline circle</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_filled_circle">al_draw_filled_circle</a>, <a href="primitives.html#al_draw_ellipse">al_draw_ellipse</a></p>
+<h2 id="al_draw_filled_circle"><a href="#TOC">al_draw_filled_circle</a></h2>
+<pre><code>void al_draw_filled_circle(float cx, float cy, float r, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a filled circle.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the circle</li>
+<li>r - Radius of the circle</li>
+<li>color - Color of the circle</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_circle">al_draw_circle</a>, <a href="primitives.html#al_draw_filled_ellipse">al_draw_filled_ellipse</a></p>
+<h2 id="al_draw_arc"><a href="#TOC">al_draw_arc</a></h2>
+<pre><code>void al_draw_arc(float cx, float cy, float r, float start_theta,
+   float delta_theta, ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an arc.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the arc</li>
+<li>r - Radius of the arc</li>
+<li>color - Color of the arc</li>
+<li>start_theta - The initial angle from which the arc is calculated</li>
+<li>delta_theta - Angular span of the arc (pass a negative number to switch direction)</li>
+<li>thickness - Thickness of the arc, pass <code>&lt;= 0</code> to draw hairline arc</li>
+</ul>
+<p>See also: <a href="primitives.html#al_calculate_arc">al_calculate_arc</a>, <a href="primitives.html#al_draw_elliptical_arc">al_draw_elliptical_arc</a></p>
+<h2 id="al_draw_elliptical_arc"><a href="#TOC">al_draw_elliptical_arc</a></h2>
+<pre><code>void al_draw_elliptical_arc(float cx, float cy, float rx, float ry, float start_theta,
+   float delta_theta, ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws an elliptical arc.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>cx, cy - Center of the arc</li>
+<li>rx, ry - Radii of the arc</li>
+<li>color - Color of the arc</li>
+<li>start_theta - The initial angle from which the arc is calculated</li>
+<li>delta_theta - Angular span of the arc (pass a negative number to switch direction)</li>
+<li>thickness - Thickness of the arc, pass <code>&lt;= 0</code> to draw hairline arc</li>
+</ul>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="primitives.html#al_calculate_arc">al_calculate_arc</a>, <a href="primitives.html#al_draw_arc">al_draw_arc</a></p>
+<h2 id="al_calculate_spline"><a href="#TOC">al_calculate_spline</a></h2>
+<pre><code>void al_calculate_spline(float* dest, int stride, float points[8],
+   float thickness, int num_segments)
+</code></pre>
+<p>Calculates a Bézier spline given 4 control points. If <code>thickness &lt;= 0</code>, then <code>num_segments</code> of points are required in the destination, otherwise twice as many are needed. The destination buffer should consist of regularly spaced (by distance of stride bytes) doublets of floats, corresponding to x and y coordinates of the vertices.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>dest - The destination buffer</li>
+<li>stride - Distance (in bytes) between starts of successive pairs of coordinates</li>
+<li>points - An array of 4 pairs of coordinates of the 4 control points</li>
+<li>thickness - Thickness of the spline ribbon</li>
+<li>num_segments - The number of points to calculate</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_spline">al_draw_spline</a>, <a href="primitives.html#al_calculate_arc">al_calculate_arc</a>, <a href="primitives.html#al_calculate_ribbon">al_calculate_ribbon</a></p>
+<h2 id="al_draw_spline"><a href="#TOC">al_draw_spline</a></h2>
+<pre><code>void al_draw_spline(float points[8], ALLEGRO_COLOR color, float thickness)
+</code></pre>
+<p>Draws a Bézier spline given 4 control points.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>points - An array of 4 pairs of coordinates of the 4 control points</li>
+<li>color - Color of the spline</li>
+<li>thickness - Thickness of the spline, pass <code>&lt;= 0</code> to draw a hairline spline</li>
+</ul>
+<p>See also: <a href="primitives.html#al_calculate_spline">al_calculate_spline</a></p>
+<h2 id="al_calculate_ribbon"><a href="#TOC">al_calculate_ribbon</a></h2>
+<pre><code>void al_calculate_ribbon(float* dest, int dest_stride, const float *points,
+   int points_stride, float thickness, int num_segments)
+</code></pre>
+<p>Calculates a ribbon given an array of points. The ribbon will go through all of the passed points. If <code>thickness &lt;= 0</code>, then <code>num_segments</code> of points are required in the destination buffer, otherwise twice as many are needed. The destination and the points buffer should consist of regularly spaced doublets of floats, corresponding to x and y coordinates of the vertices.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>dest - Pointer to the destination buffer</li>
+<li>dest_stride - Distance (in bytes) between starts of successive pairs of coordinates in the destination buffer</li>
+<li>points - An array of pairs of coordinates for each point</li>
+<li>points_stride - Distance (in bytes) between starts successive pairs of coordinates in the points buffer</li>
+<li>thickness - Thickness of the spline ribbon</li>
+<li>num_segments - The number of points to calculate</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_ribbon">al_draw_ribbon</a>, <a href="primitives.html#al_calculate_arc">al_calculate_arc</a>, <a href="primitives.html#al_calculate_spline">al_calculate_spline</a></p>
+<h2 id="al_draw_ribbon"><a href="#TOC">al_draw_ribbon</a></h2>
+<pre><code>void al_draw_ribbon(const float *points, int points_stride, ALLEGRO_COLOR color,
+   float thickness, int num_segments)
+</code></pre>
+<p>Draws a series of straight lines given an array of points. The ribbon will go through all of the passed points.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>points - An array of coordinate pairs (x and y) for each point</li>
+<li>color - Color of the spline</li>
+<li>thickness - Thickness of the spline, pass <code>&lt;= 0</code> to draw hairline spline</li>
+</ul>
+<p>See also: <a href="primitives.html#al_calculate_ribbon">al_calculate_ribbon</a></p>
+<h1 id="low-level-drawing-routines"><a href="#TOC">Low level drawing routines</a></h1>
+<p>Low level drawing routines allow for more advanced usage of the addon, allowing you to pass arbitrary sequences of vertices to draw to the screen. These routines also support using textures on the primitives with some restrictions. For maximum portability, you should only use textures that have dimensions that are a power of two, as not every videocard supports them completely. This warning is relaxed, however, if the texture coordinates never exit the boundaries of a single bitmap (i.e. you are not having the texture repeat/tile). As long as that is the case, any texture can be used safely. Sub-bitmaps work as textures, but cannot be tiled.</p>
+<p>A note about pixel coordinates. In OpenGL the texture coordinate (0, 0) refers to the top left corner of the pixel. This confuses some drivers, because due to rounding errors the actual pixel sampled might be the pixel to the top and/or left of the (0, 0) pixel. To make this error less likely it is advisable to offset the texture coordinates you pass to the al_draw_prim by (0.5, 0.5) if you need precise pixel control. E.g. to refer to pixel (5, 10) you'd set the u and v to 5.5 and 10.5 respectively.</p>
+<h2 id="al_draw_prim"><a href="#TOC">al_draw_prim</a></h2>
+<pre><code>int al_draw_prim(const void* vtxs, const ALLEGRO_VERTEX_DECL* decl,
+   ALLEGRO_BITMAP* texture, int start, int end, int type)
+</code></pre>
+<p>Draws a subset of the passed vertex buffer.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>texture - Texture to use, pass 0 to use only color shaded primitves</li>
+<li>vtxs - Pointer to an array of vertices</li>
+<li>decl - Pointer to a vertex declaration. If set to NULL, the vertices are assumed to be of the ALLEGRO_VERTEX type</li>
+<li>start - Start index of the subset of the vertex buffer to draw</li>
+<li>end - One past the last index of subset of the vertex buffer to draw</li>
+<li>type - Primitive type to draw</li>
+</ul>
+<p><em>Returns:</em> Number of primitives drawn</p>
+<p>For example to draw a textured triangle you could use:</p>
+<pre><code>ALLEGRO_VERTEX v[] = {
+    {.x = 128, .y = 0, .z = 0, .u = 128, .v = 0},
+    {.x = 0, .y = 256, .z = 0, .u = 0, .v = 256},
+    {.x = 256, .y = 256, .z = 0, .u = 256, .v = 256}};
+al_draw_prim(v, NULL, texture, 0, 3, ALLEGRO_PRIM_TRIANGLE_LIST);
+</code></pre>
+<p>See also: <a href="primitives.html#allegro_vertex">ALLEGRO_VERTEX</a>, <a href="primitives.html#allegro_prim_type">ALLEGRO_PRIM_TYPE</a>, <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#al_draw_indexed_prim">al_draw_indexed_prim</a></p>
+<h2 id="al_draw_indexed_prim"><a href="#TOC">al_draw_indexed_prim</a></h2>
+<pre><code>int al_draw_indexed_prim(const void* vtxs, const ALLEGRO_VERTEX_DECL* decl,
+   ALLEGRO_BITMAP* texture, const int* indices, int num_vtx, int type)
+</code></pre>
+<p>Draws a subset of the passed vertex buffer. This function uses an index array to specify which vertices to use.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>texture - Texture to use, pass 0 to use only shaded primitves</li>
+<li>vtxs - Pointer to an array of vertices</li>
+<li>decl - Pointer to a vertex declaration. If set to 0, the vtxs are assumed to be of the ALLEGRO_VERTEX type</li>
+<li>indices - An array of indices into the vertex buffer</li>
+<li>num_vtx - Number of indices from the indices array you want to draw</li>
+<li>type - Primitive type to draw</li>
+</ul>
+<p><em>Returns:</em> Number of primitives drawn</p>
+<p>See also: <a href="primitives.html#allegro_vertex">ALLEGRO_VERTEX</a>, <a href="primitives.html#allegro_prim_type">ALLEGRO_PRIM_TYPE</a>, <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#al_draw_prim">al_draw_prim</a></p>
+<h2 id="al_create_vertex_decl"><a href="#TOC">al_create_vertex_decl</a></h2>
+<pre><code>ALLEGRO_VERTEX_DECL* al_create_vertex_decl(const ALLEGRO_VERTEX_ELEMENT* elements, int stride)
+</code></pre>
+<p>Creates a vertex declaration, which describes a custom vertex format.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>elements - An array of ALLEGRO_VERTEX_ELEMENT structures.</li>
+<li>stride - Size of the custom vertex structure</li>
+</ul>
+<p><em>Returns:</em> Newly created vertex declaration.</p>
+<p>See also: <a href="primitives.html#allegro_vertex_element">ALLEGRO_VERTEX_ELEMENT</a>, <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#al_destroy_vertex_decl">al_destroy_vertex_decl</a></p>
+<h2 id="al_destroy_vertex_decl"><a href="#TOC">al_destroy_vertex_decl</a></h2>
+<pre><code>void al_destroy_vertex_decl(ALLEGRO_VERTEX_DECL* decl)
+</code></pre>
+<p>Destroys a vertex declaration.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>decl - Vertex declaration to destroy</li>
+</ul>
+<p>See also: <a href="primitives.html#allegro_vertex_element">ALLEGRO_VERTEX_ELEMENT</a>, <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#al_create_vertex_decl">al_create_vertex_decl</a></p>
+<h2 id="al_draw_soft_triangle"><a href="#TOC">al_draw_soft_triangle</a></h2>
+<pre><code>void al_draw_soft_triangle(
+   ALLEGRO_VERTEX* v1, ALLEGRO_VERTEX* v2, ALLEGRO_VERTEX* v3, uintptr_t state,
+   void (*init)(uintptr_t, ALLEGRO_VERTEX*, ALLEGRO_VERTEX*, ALLEGRO_VERTEX*),
+   void (*first)(uintptr_t, int, int, int, int),
+   void (*step)(uintptr_t, int),
+   void (*draw)(uintptr_t, int, int, int))
+</code></pre>
+<p>Draws a triangle using the software rasterizer and user supplied pixel functions. For help in understanding what these functions do, see the implementation of the various shading routines in addons/primitives/tri_soft.c. The triangle is drawn in two segments, from top to bottom. The segments are deliniated by the vertically middle vertex of the triangle. One of each segment may be absent if two vertices are horizontally collinear.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>v1, v2, v3 - The three vertices of the triangle</li>
+<li>state - A pointer to a user supplied struct, this struct will be passed to all the pixel functions</li>
+<li>init - Called once per call before any drawing is done. The three points passed to it may be altered by clipping.</li>
+<li>first - Called twice per call, once per triangle segment. It is passed 4 parameters, the first two are the coordinates of the initial pixel drawn in the segment. The second two are the left minor and the left major steps, respectively. They represent the sizes of two steps taken by the rasterizer as it walks on the left side of the triangle. From then on, the each step will either be classified as a minor or a major step, corresponding to the above values.</li>
+<li>step - Called once per scanline. The last parameter is set to 1 if the step is a minor step, and 0 if it is a major step.</li>
+<li>draw - Called once per scanline. The function is expected to draw the scanline starting with a point specified by the first two parameters (corresponding to x and y values) going to the right until it reaches the value of the third parameter (the x value of the end point). All coordinates are inclusive.</li>
+</ul>
+<p>See also: <a href="primitives.html#al_draw_triangle">al_draw_triangle</a></p>
+<h2 id="al_draw_soft_line"><a href="#TOC">al_draw_soft_line</a></h2>
+<pre><code>void al_draw_soft_line(ALLEGRO_VERTEX* v1, ALLEGRO_VERTEX* v2, uintptr_t state,
+   void (*first)(uintptr_t, int, int, ALLEGRO_VERTEX*, ALLEGRO_VERTEX*),
+   void (*step)(uintptr_t, int),
+   void (*draw)(uintptr_t, int, int))
+</code></pre>
+<p>Draws a line using the software rasterizer and user supplied pixel functions. For help in understanding what these functions do, see the implementation of the various shading routines in addons/primitives/line_soft.c. The line is drawn top to bottom.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li>v1, v2 - The two vertices of the line</li>
+<li>state - A pointer to a user supplied struct, this struct will be passed to all the pixel functions</li>
+<li>first - Called before drawing the first pixel of the line. It is passed the coordinates of this pixel, as well as the two vertices above. The passed vertices may have been altered by clipping.</li>
+<li>step - Called once per pixel. The second parameter is set to 1 if the step is a minor step, and 0 if this step is a major step. Minor steps are taken only either in x or y directions. Major steps are taken in both directions diagonally. In all cases, the the absolute value of the change in coordinate is at most 1 in either direction.</li>
+<li>draw - Called once per pixel. The function is expected to draw the pixel at the coordinates passed to it.</li>
+</ul>
+<h1 id="structures-and-types"><a href="#TOC">Structures and types</a></h1>
+<h2 id="allegro_vertex"><a href="#TOC">ALLEGRO_VERTEX</a></h2>
+<pre><code>typedef struct ALLEGRO_VERTEX ALLEGRO_VERTEX;
+</code></pre>
+<p>Defines the generic vertex type, with a 3D position, color and texture coordinates for a single texture. Note that at this time, the software driver for this addon cannot render 3D primitives. If you want a 2D only primitive, set z to 0. Note that when you must initialize all members of this struct when you're using it. One exception to this rule are the u and v variables which can be left uninitialized when you are not using textures.</p>
+<p><em>Fields:</em></p>
+<ul>
+<li>x, y, z - Position of the vertex</li>
+<li>color - <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> structure, storing the color of the vertex</li>
+<li>u, v - Texture coordinates measured in pixels</li>
+</ul>
+<p>See also: <a href="primitives.html#allegro_prim_attr">ALLEGRO_PRIM_ATTR</a></p>
+<h2 id="allegro_vertex_decl"><a href="#TOC">ALLEGRO_VERTEX_DECL</a></h2>
+<pre><code>typedef struct ALLEGRO_VERTEX_DECL ALLEGRO_VERTEX_DECL;
+</code></pre>
+<p>A vertex declaration. This opaque structure is responsible for describing the format and layout of a user defined custom vertex. It is created and destroyed by specialized functions.</p>
+<p>See also: <a href="primitives.html#al_create_vertex_decl">al_create_vertex_decl</a>, <a href="primitives.html#al_destroy_vertex_decl">al_destroy_vertex_decl</a>, <a href="primitives.html#allegro_vertex_element">ALLEGRO_VERTEX_ELEMENT</a></p>
+<h2 id="allegro_vertex_element"><a href="#TOC">ALLEGRO_VERTEX_ELEMENT</a></h2>
+<pre><code>typedef struct ALLEGRO_VERTEX_ELEMENT ALLEGRO_VERTEX_ELEMENT;
+</code></pre>
+<p>A small structure describing a certain element of a vertex. E.g. the position of the vertex, or its color. These structures are used by the al_create_vertex_decl function to create the vertex declaration. For that they generally occur in an array. The last element of such an array should have the attribute field equal to 0, to signify that it is the end of the array. Here is an example code that would create a declaration describing the ALLEGRO_VERTEX structure (passing this as vertex declaration to al_draw_prim would be identical to passing NULL):</p>
+<pre><code>/* On compilers without the offsetof keyword you need to obtain the
+ * offset with sizeof and make sure to account for packing.
+ */
+ALLEGRO_VERTEX_ELEMENT elems[] = {
+   {ALLEGRO_PRIM_POSITION, ALLEGRO_PRIM_FLOAT_3, offsetof(ALLEGRO_VERTEX, x)},
+   {ALLEGRO_PRIM_TEX_COORD_PIXEL, ALLEGRO_PRIM_FLOAT_2, offsetof(ALLEGRO_VERTEX, u)},
+   {ALLEGRO_PRIM_COLOR_ATTR, 0, offsetof(ALLEGRO_VERTEX, color)},
+   {0, 0, 0}
+};
+ALLEGRO_VERTEX_DECL* decl = al_create_vertex_decl(elems, sizeof(ALLEGRO_VERTEX));
+</code></pre>
+<p><em>Fields:</em></p>
+<ul>
+<li>attribute - A member of the ALLEGRO_PRIM_ATTR enumeration, specifying what this attribute signifies</li>
+<li>storage - A member of the ALLEGRO_PRIM_STORAGE enumeration, specifying how this attribute is stored</li>
+<li>offset - Offset in bytes from the beginning of the custom vertex structure. C function offsetof is very useful here.</li>
+</ul>
+<p>See also: <a href="primitives.html#al_create_vertex_decl">al_create_vertex_decl</a>, <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#allegro_prim_storage">ALLEGRO_PRIM_STORAGE</a></p>
+<h2 id="allegro_prim_type"><a href="#TOC">ALLEGRO_PRIM_TYPE</a></h2>
+<pre><code>typedef enum ALLEGRO_PRIM_TYPE
+</code></pre>
+<p>Enumerates the types of primitives this addon can draw.</p>
+<ul>
+<li><p>ALLEGRO_PRIM_POINT_LIST - A list of points, each vertex defines a point</p></li>
+<li><p>ALLEGRO_PRIM_LINE_LIST - A list of lines, sequential pairs of vertices define disjointed lines</p></li>
+<li><p>ALLEGRO_PRIM_LINE_STRIP - A strip of lines, sequential vertices define a strip of lines</p></li>
+<li><p>ALLEGRO_PRIM_LINE_LOOP - Like a line strip, except at the end the first and the last vertices are also connected by a line</p></li>
+<li><p>ALLEGRO_PRIM_TRIANGLE_LIST - A list of triangles, sequential triplets of vertices define disjointed triangles</p></li>
+<li><p>ALLEGRO_PRIM_TRIANGLE_STRIP - A strip of triangles, sequential vertices define a strip of triangles</p></li>
+<li><p>ALLEGRO_PRIM_TRIANGLE_FAN - A fan of triangles, all triangles share the first vertex</p></li>
+</ul>
+<h2 id="allegro_prim_attr"><a href="#TOC">ALLEGRO_PRIM_ATTR</a></h2>
+<pre><code>typedef enum ALLEGRO_PRIM_ATTR
+</code></pre>
+<p>Enumerates the types of vertex attributes that a custom vertex may have.</p>
+<ul>
+<li><p>ALLEGRO_PRIM_POSITION - Position information, can be stored in any supported fashion</p></li>
+<li><p>ALLEGRO_PRIM_COLOR_ATTR - Color information, stored in an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>. The storage field of ALLEGRO_VERTEX_ELEMENT is ignored</p></li>
+<li><p>ALLEGRO_PRIM_TEX_COORD - Texture coordinate information, can be stored only in ALLEGRO_PRIM_FLOAT_2 and ALLEGRO_PRIM_SHORT_2. These coordinates are normalized by the width and height of the texture, meaning that the bottom-right corner has texture coordinates of (1, 1).</p></li>
+<li><p>ALLEGRO_PRIM_TEX_COORD_PIXEL - Texture coordinate information, can be stored only in ALLEGRO_PRIM_FLOAT_2 and ALLEGRO_PRIM_SHORT_2. These coordinates are measured in pixels.</p></li>
+</ul>
+<p>See also: <a href="primitives.html#allegro_vertex_decl">ALLEGRO_VERTEX_DECL</a>, <a href="primitives.html#allegro_prim_storage">ALLEGRO_PRIM_STORAGE</a></p>
+<h2 id="allegro_prim_storage"><a href="#TOC">ALLEGRO_PRIM_STORAGE</a></h2>
+<pre><code>typedef enum ALLEGRO_PRIM_STORAGE
+</code></pre>
+<p>Enumerates the types of storage an attribute of a custom vertex may be stored in.</p>
+<ul>
+<li>ALLEGRO_PRIM_FLOAT_2 - A doublet of floats</li>
+<li>ALLEGRO_PRIM_FLOAT_3 - A triplet of floats</li>
+<li>ALLEGRO_PRIM_SHORT_2 - A doublet of shorts</li>
+</ul>
+<p>See also: <a href="primitives.html#allegro_prim_attr">ALLEGRO_PRIM_ATTR</a></p>
+<h2 id="allegro_vertex_cache_size"><a href="#TOC">ALLEGRO_VERTEX_CACHE_SIZE</a></h2>
+<pre><code>#define ALLEGRO_VERTEX_CACHE_SIZE 256
+</code></pre>
+<p>Defines the size of the transformation vertex cache for the software renderer. If you pass less than this many vertices to the primitive rendering functions you will get a speed boost. This also defines the size of the cache vertex buffer, used for the high-level primitives. This corresponds to the maximum number of line segments that will be used to form them.</p>
+<h2 id="allegro_prim_quality"><a href="#TOC">ALLEGRO_PRIM_QUALITY</a></h2>
+<pre><code>#define ALLEGRO_PRIM_QUALITY 10
+</code></pre>
+<p>Defines the quality of the quadratic primitives. At 10, this roughly corresponds to error of less than half of a pixel.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:48 UTC
+</p>
+</div>
+
+
+</body>
+</html>

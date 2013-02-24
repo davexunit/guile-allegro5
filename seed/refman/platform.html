@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Platform-specific functions</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Platform-specific functions</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#windows">Windows</a><ul>
+<li><a href="#al_get_win_window_handle">al_get_win_window_handle</a></li>
+</ul></li>
+<li><a href="#iphone">iPhone</a><ul>
+<li><a href="#al_iphone_program_has_halted">al_iphone_program_has_halted</a></li>
+<li><a href="#al_iphone_override_screen_scale">al_iphone_override_screen_scale</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="windows"><a href="#TOC">Windows</a></h1>
+<p>These functions are declared in the following header file:</p>
+<pre><code>#include &lt;allegro5/allegro_windows.h&gt;
+</code></pre>
+<h2 id="al_get_win_window_handle"><a href="#TOC">al_get_win_window_handle</a></h2>
+<pre><code>HWND al_get_win_window_handle(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Returns the handle to the window that the passed display is using.</p>
+<h1 id="iphone"><a href="#TOC">iPhone</a></h1>
+<p>These functions are declared in the following header file:</p>
+<pre><code>#include &lt;allegro5/allegro_iphone.h&gt;
+</code></pre>
+<h2 id="al_iphone_program_has_halted"><a href="#TOC">al_iphone_program_has_halted</a></h2>
+<pre><code>void al_iphone_program_has_halted(void)
+</code></pre>
+<p>Multitasking on iOS is different than on other platforms. When an application receives an ALLEGRO_DISPLAY_SWITCH_OUT or ALLEGRO_DISPLAY_CLOSE event on a multitasking-capable device, it should cease all activity and do nothing but check for an ALLEGRO_DISPLAY_SWITCH_IN event. To let the iPhone driver know that you've ceased all activity, call this function. You should call this function very soon after receiving the event telling you it's time to switch out (within a couple milliseconds). Certain operations, if done, will crash the program after this call, most notably any function which uses OpenGL. This function is needed because the &quot;switch out&quot; handler on iPhone can't return until these operations have stopped, or a crash as described before can happen.</p>
+<h2 id="al_iphone_override_screen_scale"><a href="#TOC">al_iphone_override_screen_scale</a></h2>
+<pre><code>void al_iphone_override_screen_scale(float scale)
+</code></pre>
+<p>Original iPhones and iPod Touches had a screen resolution of 320x480 (in Portrait mode). When the iPhone 4 and iPod Touch 4th generation devices came out, they were backwards compatible with all old iPhone apps. This means that they assume a 320x480 screen resolution by default, while they actually have a 640x960 pixel screen (exactly 2x on each dimension). An API was added to allow access to the full (or in fact any fraction of the) resolution of the new devices. This function is normally not needed, as in the case when you want a scale of 2.0 for &quot;retina display&quot; resolution (640x960). In that case you would just call al_create_display with the larger width and height parameters. It is not limited to 2.0 scaling factors however. You can use 1.5 or 0.5 or other values in between, however if it's not an exact multiple of the original iPhone resolution, linear filtering will be applied to the final image.</p>
+<p>This function should be called BEFORE calling al_create_display.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

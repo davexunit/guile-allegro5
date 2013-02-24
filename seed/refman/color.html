@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Color addon</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Color addon</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_color_cmyk">al_color_cmyk</a></li>
+<li><a href="#al_color_cmyk_to_rgb">al_color_cmyk_to_rgb</a></li>
+<li><a href="#al_color_hsl">al_color_hsl</a></li>
+<li><a href="#al_color_hsl_to_rgb">al_color_hsl_to_rgb</a></li>
+<li><a href="#al_color_hsv">al_color_hsv</a></li>
+<li><a href="#al_color_hsv_to_rgb">al_color_hsv_to_rgb</a></li>
+<li><a href="#al_color_html">al_color_html</a></li>
+<li><a href="#al_color_html_to_rgb">al_color_html_to_rgb</a></li>
+<li><a href="#al_color_rgb_to_html">al_color_rgb_to_html</a></li>
+<li><a href="#al_color_name">al_color_name</a></li>
+<li><a href="#al_color_name_to_rgb">al_color_name_to_rgb</a></li>
+<li><a href="#al_color_rgb_to_cmyk">al_color_rgb_to_cmyk</a></li>
+<li><a href="#al_color_rgb_to_hsl">al_color_rgb_to_hsl</a></li>
+<li><a href="#al_color_rgb_to_hsv">al_color_rgb_to_hsv</a></li>
+<li><a href="#al_color_rgb_to_name">al_color_rgb_to_name</a></li>
+<li><a href="#al_color_rgb_to_yuv">al_color_rgb_to_yuv</a></li>
+<li><a href="#al_color_yuv">al_color_yuv</a></li>
+<li><a href="#al_color_yuv_to_rgb">al_color_yuv_to_rgb</a></li>
+<li><a href="#al_get_allegro_color_version">al_get_allegro_color_version</a></li>
+</ul>
+</div>
+<p>These functions are declared in the following header file. Link with allegro_color.</p>
+<pre><code>#include &lt;allegro5/allegro_color.h&gt;
+</code></pre>
+<h1 id="al_color_cmyk"><a href="#TOC">al_color_cmyk</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_cmyk(float c, float m, float y, float k)
+</code></pre>
+<p>Return an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> structure from CMYK values (cyan, magenta, yellow, black).</p>
+<p>See also: <a href="color.html#al_color_cmyk_to_rgb">al_color_cmyk_to_rgb</a>, <a href="color.html#al_color_rgb_to_cmyk">al_color_rgb_to_cmyk</a></p>
+<h1 id="al_color_cmyk_to_rgb"><a href="#TOC">al_color_cmyk_to_rgb</a></h1>
+<pre><code>void al_color_cmyk_to_rgb(float cyan, float magenta, float yellow,
+    float key, float *red, float *green, float *blue)
+</code></pre>
+<p>Convert CMYK values to RGB values.</p>
+<p>See also: <a href="color.html#al_color_cmyk">al_color_cmyk</a>, <a href="color.html#al_color_rgb_to_cmyk">al_color_rgb_to_cmyk</a></p>
+<h1 id="al_color_hsl"><a href="#TOC">al_color_hsl</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_hsl(float h, float s, float l)
+</code></pre>
+<p>Return an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> structure from HSL (hue, saturation, lightness) values.</p>
+<p>See also: <a href="color.html#al_color_hsl_to_rgb">al_color_hsl_to_rgb</a>, <a href="color.html#al_color_hsv">al_color_hsv</a></p>
+<h1 id="al_color_hsl_to_rgb"><a href="#TOC">al_color_hsl_to_rgb</a></h1>
+<pre><code>void al_color_hsl_to_rgb(float hue, float saturation, float lightness,
+   float *red, float *green, float *blue)
+</code></pre>
+<p>Convert values in HSL color model to RGB color model.</p>
+<p>Parameters:</p>
+<ul>
+<li>hue - Color hue angle in the range 0..360.</li>
+<li>saturation - Color saturation in the range 0..1.</li>
+<li>lightness - Color lightness in the range 0..1.</li>
+<li>red, green, blue - returned RGB values in the range 0..1.</li>
+</ul>
+<p>See also: <a href="color.html#al_color_rgb_to_hsl">al_color_rgb_to_hsl</a>, <a href="color.html#al_color_hsl">al_color_hsl</a>, <a href="color.html#al_color_hsv_to_rgb">al_color_hsv_to_rgb</a></p>
+<h1 id="al_color_hsv"><a href="#TOC">al_color_hsv</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_hsv(float h, float s, float v)
+</code></pre>
+<p>Return an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> structure from HSV (hue, saturation, value) values.</p>
+<p>See also: <a href="color.html#al_color_hsv_to_rgb">al_color_hsv_to_rgb</a>, <a href="color.html#al_color_hsl">al_color_hsl</a></p>
+<h1 id="al_color_hsv_to_rgb"><a href="#TOC">al_color_hsv_to_rgb</a></h1>
+<pre><code>void al_color_hsv_to_rgb(float hue, float saturation, float value,
+   float *red, float *green, float *blue)
+</code></pre>
+<p>Convert values in HSV color model to RGB color model.</p>
+<p>Parameters:</p>
+<ul>
+<li>hue - Color hue angle in the range 0..360.</li>
+<li>saturation - Color saturation in the range 0..1.</li>
+<li>value - Color value in the range 0..1.</li>
+<li>red, green, blue - returned RGB values in the range 0..1.</li>
+</ul>
+<p>See also: <a href="color.html#al_color_rgb_to_hsv">al_color_rgb_to_hsv</a>, <a href="color.html#al_color_hsv">al_color_hsv</a>, <a href="color.html#al_color_hsl_to_rgb">al_color_hsl_to_rgb</a></p>
+<h1 id="al_color_html"><a href="#TOC">al_color_html</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_html(char const *string)
+</code></pre>
+<p>Interprets an HTML styled hex number (e.g. #00faff) as a color. Components that are malformed are set to 0.</p>
+<p>See also: <a href="color.html#al_color_html_to_rgb">al_color_html_to_rgb</a>, <a href="color.html#al_color_rgb_to_html">al_color_rgb_to_html</a></p>
+<h1 id="al_color_html_to_rgb"><a href="#TOC">al_color_html_to_rgb</a></h1>
+<pre><code>void al_color_html_to_rgb(char const *string,
+   float *red, float *green, float *blue)
+</code></pre>
+<p>Interprets an HTML styled hex number (e.g. #00faff) as a color. Components that are malformed are set to 0.</p>
+<p>See also: <a href="color.html#al_color_html">al_color_html</a>, <a href="color.html#al_color_rgb_to_html">al_color_rgb_to_html</a></p>
+<h1 id="al_color_rgb_to_html"><a href="#TOC">al_color_rgb_to_html</a></h1>
+<pre><code>void al_color_rgb_to_html(float red, float green, float blue,
+    char *string)
+</code></pre>
+<p>Create an HTML-style string representation of an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, e.g. #00faff.</p>
+<p>Parameters:</p>
+<ul>
+<li>red, green, blue - The color components in the range 0..1.</li>
+<li>string - A string with a size of 8 bytes into which the result will be written.</li>
+</ul>
+<p>Example:</p>
+<pre><code>char html[8];
+al_color_rgb_to_html(1, 0, 0, html);
+</code></pre>
+<p>Now html will contain &quot;#ff0000&quot;.</p>
+<p>See also: <a href="color.html#al_color_html">al_color_html</a>, <a href="color.html#al_color_html_to_rgb">al_color_html_to_rgb</a></p>
+<h1 id="al_color_name"><a href="#TOC">al_color_name</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_name(char const *name)
+</code></pre>
+<p>Return an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> with the given name. If the color is not found then black is returned.</p>
+<p>See <a href="color.html#al_color_name_to_rgb">al_color_name_to_rgb</a> for the list of names.</p>
+<h1 id="al_color_name_to_rgb"><a href="#TOC">al_color_name_to_rgb</a></h1>
+<pre><code>bool al_color_name_to_rgb(char const *name, float *r, float *g, float *b)
+</code></pre>
+<p>Parameters:</p>
+<ul>
+<li>name - The (lowercase) name of the color.</li>
+<li>r, g, b - If one of the recognized color names below is passed, the corresponding RGB values in the range 0..1 are written.</li>
+</ul>
+<p>The recognized names are:</p>
+<blockquote>
+<p>aliceblue, antiquewhite, aqua, aquamarine, azure, beige, bisque, black, blanchedalmond, blue, blueviolet, brown, burlywood, cadetblue, chartreuse, chocolate, coral, cornflowerblue, cornsilk, crimson, cyan, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred, darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise, darkviolet, deeppink, deepskyblue, dimgray, dodgerblue, firebrick, floralwhite, forestgreen, fuchsia, gainsboro, ghostwhite, goldenrod, gold, gray, green, greenyellow, honeydew, hotpink, indianred, indigo, ivory, khaki, lavenderblush, lavender, lawngreen, lemonchiffon, lightblue, lightcoral, lightcyan, lightgoldenrodyellow, lightgreen, lightgrey, lightpink, lightsalmon, lightseagreen, lightskyblue, lightslategray, lightsteelblue, lightyellow, lime, limegreen, linen, magenta, maroon, mediumaquamarine, mediumblue, mediumorchid, mediumpurple, mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise, mediumvioletred, midnightblue, mintcream, mistyrose, moccasin, avajowhite, navy, oldlace, olive, olivedrab, orange, orangered, orchid, palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip, peachpuff, peru, pink, plum, powderblue, purple, purwablue, red, rosybrown, royalblue, saddlebrown, salmon, sandybrown, seagreen, seashell, sienna, silver, skyblue, slateblue, slategray, snow, springgreen, steelblue, tan, teal, thistle, tomato, turquoise, violet, wheat, white, whitesmoke, yellow, yellowgreen</p>
+</blockquote>
+<p>They are taken from <a href="http://www.w3.org/TR/2010/PR-css3-color-20101028/#svg-color"><code class="url">http://www.w3.org/TR/2010/PR-css3-color-20101028/#svg-color</code></a>.</p>
+<p>Returns: true if a name from the list above was passed, else false.</p>
+<p>See also: <a href="color.html#al_color_name">al_color_name</a></p>
+<h1 id="al_color_rgb_to_cmyk"><a href="#TOC">al_color_rgb_to_cmyk</a></h1>
+<pre><code>void al_color_rgb_to_cmyk(float red, float green, float blue,
+   float *cyan, float *magenta, float *yellow, float *key)
+</code></pre>
+<p>Each RGB color can be represented in CMYK with a K component of 0 with the following formula:</p>
+<pre><code>C = 1 - R
+M = 1 - G
+Y = 1 - B
+K = 0
+</code></pre>
+<p>This function will instead find the representation with the maximal value for K and minimal color components.</p>
+<p>See also: <a href="color.html#al_color_cmyk">al_color_cmyk</a>, <a href="color.html#al_color_cmyk_to_rgb">al_color_cmyk_to_rgb</a></p>
+<h1 id="al_color_rgb_to_hsl"><a href="#TOC">al_color_rgb_to_hsl</a></h1>
+<pre><code>void al_color_rgb_to_hsl(float red, float green, float blue,
+   float *hue, float *saturation, float *lightness)
+</code></pre>
+<p>Given an RGB triplet with components in the range 0..1, return the hue in degrees from 0..360 and saturation and lightness in the range 0..1.</p>
+<p>See also: <a href="color.html#al_color_hsl_to_rgb">al_color_hsl_to_rgb</a>, <a href="color.html#al_color_hsl">al_color_hsl</a></p>
+<h1 id="al_color_rgb_to_hsv"><a href="#TOC">al_color_rgb_to_hsv</a></h1>
+<pre><code>void al_color_rgb_to_hsv(float red, float green, float blue,
+   float *hue, float *saturation, float *value)
+</code></pre>
+<p>Given an RGB triplet with components in the range 0..1, return the hue in degrees from 0..360 and saturation and value in the range 0..1.</p>
+<p>See also: <a href="color.html#al_color_hsv_to_rgb">al_color_hsv_to_rgb</a>, <a href="color.html#al_color_hsv">al_color_hsv</a></p>
+<h1 id="al_color_rgb_to_name"><a href="#TOC">al_color_rgb_to_name</a></h1>
+<pre><code>char const *al_color_rgb_to_name(float r, float g, float b)
+</code></pre>
+<p>Given an RGB triplet with components in the range 0..1, find a color name describing it approximately.</p>
+<p>See also: <a href="color.html#al_color_name_to_rgb">al_color_name_to_rgb</a>, <a href="color.html#al_color_name">al_color_name</a></p>
+<h1 id="al_color_rgb_to_yuv"><a href="#TOC">al_color_rgb_to_yuv</a></h1>
+<pre><code>void al_color_rgb_to_yuv(float red, float green, float blue,
+   float *y, float *u, float *v)
+</code></pre>
+<p>Convert RGB values to YUV color space.</p>
+<p>See also: <a href="color.html#al_color_yuv">al_color_yuv</a>, <a href="color.html#al_color_yuv_to_rgb">al_color_yuv_to_rgb</a></p>
+<h1 id="al_color_yuv"><a href="#TOC">al_color_yuv</a></h1>
+<pre><code>ALLEGRO_COLOR al_color_yuv(float y, float u, float v)
+</code></pre>
+<p>Return an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a> structure from YUV values.</p>
+<p>See also: <a href="color.html#al_color_yuv_to_rgb">al_color_yuv_to_rgb</a>, <a href="color.html#al_color_rgb_to_yuv">al_color_rgb_to_yuv</a></p>
+<h1 id="al_color_yuv_to_rgb"><a href="#TOC">al_color_yuv_to_rgb</a></h1>
+<pre><code>void al_color_yuv_to_rgb(float y, float u, float v,
+    float *red, float *green, float *blue)
+</code></pre>
+<p>Convert YUV color values to RGB color space.</p>
+<p>See also: <a href="color.html#al_color_yuv">al_color_yuv</a>, <a href="color.html#al_color_rgb_to_yuv">al_color_rgb_to_yuv</a></p>
+<h1 id="al_get_allegro_color_version"><a href="#TOC">al_get_allegro_color_version</a></h1>
+<pre><code>uint32_t al_get_allegro_color_version(void)
+</code></pre>
+<p>Returns the (compiled) version of the addon, in the same format as <a href="system.html#al_get_allegro_version">al_get_allegro_version</a>.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

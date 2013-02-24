@@ -1,0 +1,943 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Graphics routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Graphics routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#colors">Colors</a><ul>
+<li><a href="#allegro_color">ALLEGRO_COLOR</a></li>
+<li><a href="#al_map_rgb">al_map_rgb</a></li>
+<li><a href="#al_map_rgb_f">al_map_rgb_f</a></li>
+<li><a href="#al_map_rgba">al_map_rgba</a></li>
+<li><a href="#al_map_rgba_f">al_map_rgba_f</a></li>
+<li><a href="#al_unmap_rgb">al_unmap_rgb</a></li>
+<li><a href="#al_unmap_rgb_f">al_unmap_rgb_f</a></li>
+<li><a href="#al_unmap_rgba">al_unmap_rgba</a></li>
+<li><a href="#al_unmap_rgba_f">al_unmap_rgba_f</a></li>
+</ul></li>
+<li><a href="#locking-and-pixel-formats">Locking and pixel formats</a><ul>
+<li><a href="#allegro_locked_region">ALLEGRO_LOCKED_REGION</a></li>
+<li><a href="#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a></li>
+<li><a href="#al_get_pixel_size">al_get_pixel_size</a></li>
+<li><a href="#al_get_pixel_format_bits">al_get_pixel_format_bits</a></li>
+<li><a href="#al_lock_bitmap">al_lock_bitmap</a></li>
+<li><a href="#al_lock_bitmap_region">al_lock_bitmap_region</a></li>
+<li><a href="#al_unlock_bitmap">al_unlock_bitmap</a></li>
+</ul></li>
+<li><a href="#bitmap-creation">Bitmap creation</a><ul>
+<li><a href="#allegro_bitmap">ALLEGRO_BITMAP</a></li>
+<li><a href="#al_create_bitmap">al_create_bitmap</a></li>
+<li><a href="#al_create_sub_bitmap">al_create_sub_bitmap</a></li>
+<li><a href="#al_clone_bitmap">al_clone_bitmap</a></li>
+<li><a href="#al_destroy_bitmap">al_destroy_bitmap</a></li>
+<li><a href="#al_get_new_bitmap_flags">al_get_new_bitmap_flags</a></li>
+<li><a href="#al_get_new_bitmap_format">al_get_new_bitmap_format</a></li>
+<li><a href="#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a></li>
+<li><a href="#al_add_new_bitmap_flag">al_add_new_bitmap_flag</a></li>
+<li><a href="#al_set_new_bitmap_format">al_set_new_bitmap_format</a></li>
+</ul></li>
+<li><a href="#bitmap-properties">Bitmap properties</a><ul>
+<li><a href="#al_get_bitmap_flags">al_get_bitmap_flags</a></li>
+<li><a href="#al_get_bitmap_format">al_get_bitmap_format</a></li>
+<li><a href="#al_get_bitmap_height">al_get_bitmap_height</a></li>
+<li><a href="#al_get_bitmap_width">al_get_bitmap_width</a></li>
+<li><a href="#al_get_pixel">al_get_pixel</a></li>
+<li><a href="#al_is_bitmap_locked">al_is_bitmap_locked</a></li>
+<li><a href="#al_is_compatible_bitmap">al_is_compatible_bitmap</a></li>
+<li><a href="#al_is_sub_bitmap">al_is_sub_bitmap</a></li>
+<li><a href="#al_get_parent_bitmap">al_get_parent_bitmap</a></li>
+</ul></li>
+<li><a href="#drawing-operations">Drawing operations</a><ul>
+<li><a href="#al_clear_to_color">al_clear_to_color</a></li>
+<li><a href="#al_draw_bitmap">al_draw_bitmap</a></li>
+<li><a href="#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></li>
+<li><a href="#al_draw_bitmap_region">al_draw_bitmap_region</a></li>
+<li><a href="#al_draw_tinted_bitmap_region">al_draw_tinted_bitmap_region</a></li>
+<li><a href="#al_draw_pixel">al_draw_pixel</a></li>
+<li><a href="#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a></li>
+<li><a href="#al_draw_tinted_rotated_bitmap">al_draw_tinted_rotated_bitmap</a></li>
+<li><a href="#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a></li>
+<li><a href="#al_draw_tinted_scaled_rotated_bitmap">al_draw_tinted_scaled_rotated_bitmap</a></li>
+<li><a href="#al_draw_tinted_scaled_rotated_bitmap_region">al_draw_tinted_scaled_rotated_bitmap_region</a></li>
+<li><a href="#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a></li>
+<li><a href="#al_draw_tinted_scaled_bitmap">al_draw_tinted_scaled_bitmap</a></li>
+<li><a href="#al_get_target_bitmap">al_get_target_bitmap</a></li>
+<li><a href="#al_put_pixel">al_put_pixel</a></li>
+<li><a href="#al_put_blended_pixel">al_put_blended_pixel</a></li>
+<li><a href="#al_set_target_bitmap">al_set_target_bitmap</a></li>
+<li><a href="#al_set_target_backbuffer">al_set_target_backbuffer</a></li>
+<li><a href="#al_get_current_display">al_get_current_display</a></li>
+</ul></li>
+<li><a href="#blending-modes">Blending modes</a><ul>
+<li><a href="#al_get_blender">al_get_blender</a></li>
+<li><a href="#al_get_separate_blender">al_get_separate_blender</a></li>
+<li><a href="#al_set_blender">al_set_blender</a></li>
+<li><a href="#al_set_separate_blender">al_set_separate_blender</a></li>
+</ul></li>
+<li><a href="#clipping">Clipping</a><ul>
+<li><a href="#al_get_clipping_rectangle">al_get_clipping_rectangle</a></li>
+<li><a href="#al_set_clipping_rectangle">al_set_clipping_rectangle</a></li>
+<li><a href="#al_reset_clipping_rectangle">al_reset_clipping_rectangle</a></li>
+</ul></li>
+<li><a href="#graphics-utility-functions">Graphics utility functions</a><ul>
+<li><a href="#al_convert_mask_to_alpha">al_convert_mask_to_alpha</a></li>
+</ul></li>
+<li><a href="#deferred-drawing">Deferred drawing</a><ul>
+<li><a href="#al_hold_bitmap_drawing">al_hold_bitmap_drawing</a></li>
+<li><a href="#al_is_bitmap_drawing_held">al_is_bitmap_drawing_held</a></li>
+</ul></li>
+<li><a href="#image-io">Image I/O</a><ul>
+<li><a href="#al_register_bitmap_loader">al_register_bitmap_loader</a></li>
+<li><a href="#al_register_bitmap_saver">al_register_bitmap_saver</a></li>
+<li><a href="#al_register_bitmap_loader_f">al_register_bitmap_loader_f</a></li>
+<li><a href="#al_register_bitmap_saver_f">al_register_bitmap_saver_f</a></li>
+<li><a href="#al_load_bitmap">al_load_bitmap</a></li>
+<li><a href="#al_load_bitmap_f">al_load_bitmap_f</a></li>
+<li><a href="#al_save_bitmap">al_save_bitmap</a></li>
+<li><a href="#al_save_bitmap_f">al_save_bitmap_f</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="colors"><a href="#TOC">Colors</a></h1>
+<h2 id="allegro_color"><a href="#TOC">ALLEGRO_COLOR</a></h2>
+<pre><code>typedef struct ALLEGRO_COLOR ALLEGRO_COLOR;
+</code></pre>
+<p>An ALLEGRO_COLOR structure describes a color in a device independant way. Use <a href="graphics.html#al_map_rgb">al_map_rgb</a> et al. and <a href="graphics.html#al_unmap_rgb">al_unmap_rgb</a> et al. to translate from and to various color representations.</p>
+<h2 id="al_map_rgb"><a href="#TOC">al_map_rgb</a></h2>
+<pre><code>ALLEGRO_COLOR al_map_rgb(
+   unsigned char r, unsigned char g, unsigned char b)
+</code></pre>
+<p>Convert r, g, b (ranging from 0-255) into an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, using 255 for alpha.</p>
+<p>See also: <a href="graphics.html#al_map_rgba">al_map_rgba</a>, <a href="graphics.html#al_map_rgba_f">al_map_rgba_f</a>, <a href="graphics.html#al_map_rgb_f">al_map_rgb_f</a></p>
+<h2 id="al_map_rgb_f"><a href="#TOC">al_map_rgb_f</a></h2>
+<pre><code>ALLEGRO_COLOR al_map_rgb_f(float r, float g, float b)
+</code></pre>
+<p>Convert r, g, b, (ranging from 0.0f-1.0f) into an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, using 1.0f for alpha.</p>
+<p>See also: <a href="graphics.html#al_map_rgba">al_map_rgba</a>, <a href="graphics.html#al_map_rgb">al_map_rgb</a>, <a href="graphics.html#al_map_rgba_f">al_map_rgba_f</a></p>
+<h2 id="al_map_rgba"><a href="#TOC">al_map_rgba</a></h2>
+<pre><code>ALLEGRO_COLOR al_map_rgba(
+   unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+</code></pre>
+<p>Convert r, g, b, a (ranging from 0-255) into an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>.</p>
+<p>See also: <a href="graphics.html#al_map_rgb">al_map_rgb</a>, <a href="graphics.html#al_map_rgba_f">al_map_rgba_f</a>, <a href="graphics.html#al_map_rgb_f">al_map_rgb_f</a></p>
+<h2 id="al_map_rgba_f"><a href="#TOC">al_map_rgba_f</a></h2>
+<pre><code>ALLEGRO_COLOR al_map_rgba_f(float r, float g, float b, float a)
+</code></pre>
+<p>Convert r, g, b, a (ranging from 0.0f-1.0f) into an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>.</p>
+<p>See also: <a href="graphics.html#al_map_rgba">al_map_rgba</a>, <a href="graphics.html#al_map_rgb">al_map_rgb</a>, <a href="graphics.html#al_map_rgb_f">al_map_rgb_f</a></p>
+<h2 id="al_unmap_rgb"><a href="#TOC">al_unmap_rgb</a></h2>
+<pre><code>void al_unmap_rgb(ALLEGRO_COLOR color,
+   unsigned char *r, unsigned char *g, unsigned char *b)
+</code></pre>
+<p>Retrieves components of an ALLEGRO_COLOR, ignoring alpha Components will range from 0-255.</p>
+<p>See also: <a href="graphics.html#al_unmap_rgba">al_unmap_rgba</a>, <a href="graphics.html#al_unmap_rgba_f">al_unmap_rgba_f</a>, <a href="graphics.html#al_unmap_rgb_f">al_unmap_rgb_f</a></p>
+<h2 id="al_unmap_rgb_f"><a href="#TOC">al_unmap_rgb_f</a></h2>
+<pre><code>void al_unmap_rgb_f(ALLEGRO_COLOR color, float *r, float *g, float *b)
+</code></pre>
+<p>Retrieves components of an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, ignoring alpha. Components will range from 0.0f-1.0f.</p>
+<p>See also: <a href="graphics.html#al_unmap_rgba">al_unmap_rgba</a>, <a href="graphics.html#al_unmap_rgb">al_unmap_rgb</a>, <a href="graphics.html#al_unmap_rgba_f">al_unmap_rgba_f</a></p>
+<h2 id="al_unmap_rgba"><a href="#TOC">al_unmap_rgba</a></h2>
+<pre><code>void al_unmap_rgba(ALLEGRO_COLOR color,
+   unsigned char *r, unsigned char *g, unsigned char *b, unsigned char *a)
+</code></pre>
+<p>Retrieves components of an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>. Components will range from 0-255.</p>
+<p>See also: <a href="graphics.html#al_unmap_rgb">al_unmap_rgb</a>, <a href="graphics.html#al_unmap_rgba_f">al_unmap_rgba_f</a>, <a href="graphics.html#al_unmap_rgb_f">al_unmap_rgb_f</a></p>
+<h2 id="al_unmap_rgba_f"><a href="#TOC">al_unmap_rgba_f</a></h2>
+<pre><code>void al_unmap_rgba_f(ALLEGRO_COLOR color,
+   float *r, float *g, float *b, float *a)
+</code></pre>
+<p>Retrieves components of an <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>. Components will range from 0.0f-1.0f.</p>
+<p>See also: <a href="graphics.html#al_unmap_rgba">al_unmap_rgba</a>, <a href="graphics.html#al_unmap_rgb">al_unmap_rgb</a>, <a href="graphics.html#al_unmap_rgb_f">al_unmap_rgb_f</a></p>
+<h1 id="locking-and-pixel-formats"><a href="#TOC">Locking and pixel formats</a></h1>
+<h2 id="allegro_locked_region"><a href="#TOC">ALLEGRO_LOCKED_REGION</a></h2>
+<pre><code>typedef struct ALLEGRO_LOCKED_REGION ALLEGRO_LOCKED_REGION;
+</code></pre>
+<p>Users who wish to manually edit or read from a bitmap are required to lock it first. The ALLEGRO_LOCKED_REGION structure represents the locked region of the bitmap. This call will work with any bitmap, including memory bitmaps.</p>
+<pre><code>typedef struct ALLEGRO_LOCKED_REGION {
+    void *data;
+    int format;
+    int pitch;
+    int pixel_size;
+} ALLEGRO_LOCKED_REGION;
+</code></pre>
+<ul>
+<li><p><em>data</em> points to the leftmost pixel of the first row (row 0) of the locked region.</p></li>
+<li><p><em>format</em> indicates the pixel format of the data.</p></li>
+<li><p><em>pitch</em> gives the size in bytes of a single row (also known as the stride). The pitch may be greater than <code>width * pixel_size</code> due to padding; this is not uncommon. It is also <em>not</em> uncommon for the pitch to be negative (the bitmap may be upside down).</p></li>
+<li><p><em>pixel_size</em> is the number of bytes used to represent a single pixel.</p></li>
+</ul>
+<p>See also: <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a>, <a href="graphics.html#al_lock_bitmap_region">al_lock_bitmap_region</a>, <a href="graphics.html#al_unlock_bitmap">al_unlock_bitmap</a>, <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a></p>
+<h2 id="allegro_pixel_format"><a href="#TOC">ALLEGRO_PIXEL_FORMAT</a></h2>
+<pre><code>typedef enum ALLEGRO_PIXEL_FORMAT
+</code></pre>
+<p>Pixel formats. Each pixel format specifies the exact size and bit layout of a pixel in memory. Components are specified from high bits to low bits, so for example a fully opaque red pixel in ARGB_8888 format is 0xFFFF0000.</p>
+<blockquote>
+<p><em>Note:</em></p>
+<p>The pixel format is independent of endianness. That is, in the above example you can always get the red component with</p>
+<pre><code>(pixel &amp; 0x00ff0000) &gt;&gt; 16
+</code></pre>
+<p>But you can <em>not</em> rely on this code:</p>
+<pre><code>*(pixel + 2)
+</code></pre>
+<p>It will return the red component on little endian systems, but the green component on big endian systems.</p>
+</blockquote>
+<p>Also note that Allegro's naming is different from OpenGL naming here, where a format of GL_RGBA8 merely defines the component order and the exact layout including endianness treatment is specified separately. Usually GL_RGBA8 will correspond to ALLEGRO_PIXEL_ABGR_8888 though on little endian systems, so care must be taken (note the reversal of RGBA &lt;-&gt; ABGR).</p>
+<p>The only exception to this ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE which will always have the components as 4 bytes corresponding to red, green, blue and alpha, in this order, independent of the endianness.</p>
+<ul>
+<li>ALLEGRO_PIXEL_FORMAT_ANY - Let the driver choose a format. This is the default format at program start.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_NO_ALPHA - Let the driver choose a format without alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_WITH_ALPHA - Let the driver choose a format with alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_15_NO_ALPHA - Let the driver choose a 15 bit format without alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_16_NO_ALPHA - Let the driver choose a 16 bit format without alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_16_WITH_ALPHA - Let the driver choose a 16 bit format with alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_24_NO_ALPHA - Let the driver choose a 24 bit format without alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_32_NO_ALPHA - Let the driver choose a 32 bit format without alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ANY_32_WITH_ALPHA - Let the driver choose a 32 bit format with alpha.</li>
+<li>ALLEGRO_PIXEL_FORMAT_ARGB_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGBA_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_ARGB_4444 - 16 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGB_888 - 24 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGB_565 - 16 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGB_555 - 15 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGBA_5551 - 16 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_ARGB_1555 - 16 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_ABGR_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_XBGR_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_BGR_888 - 24 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_BGR_565 - 16 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_BGR_555 - 15 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGBX_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_XRGB_8888 - 32 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_ABGR_F32 - 128 bit</li>
+<li>ALLEGRO_PIXEL_FORMAT_ABGR_8888_LE - Like the version without _LE, but the component order is guaranteed to be red, green, blue, alpha. This only makes a difference on big endian systems, on little endian it is just an alias.</li>
+<li>ALLEGRO_PIXEL_FORMAT_RGBA_4444 - 16bit</li>
+</ul>
+<p>See also: <a href="graphics.html#al_set_new_bitmap_format">al_set_new_bitmap_format</a>, <a href="graphics.html#al_get_bitmap_format">al_get_bitmap_format</a></p>
+<h2 id="al_get_pixel_size"><a href="#TOC">al_get_pixel_size</a></h2>
+<pre><code>int al_get_pixel_size(int format)
+</code></pre>
+<p>Return the number of bytes that a pixel of the given format occupies.</p>
+<p>See also: <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_get_pixel_format_bits">al_get_pixel_format_bits</a></p>
+<h2 id="al_get_pixel_format_bits"><a href="#TOC">al_get_pixel_format_bits</a></h2>
+<pre><code>int al_get_pixel_format_bits(int format)
+</code></pre>
+<p>Return the number of bits that a pixel of the given format occupies.</p>
+<p>See also: <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_get_pixel_size">al_get_pixel_size</a></p>
+<h2 id="al_lock_bitmap"><a href="#TOC">al_lock_bitmap</a></h2>
+<pre><code>ALLEGRO_LOCKED_REGION *al_lock_bitmap(ALLEGRO_BITMAP *bitmap,
+   int format, int flags)
+</code></pre>
+<p>Lock an entire bitmap for reading or writing. If the bitmap is a display bitmap it will be updated from system memory after the bitmap is unlocked (unless locked read only). Returns NULL if the bitmap cannot be locked, e.g. the bitmap was locked previously and not unlocked.</p>
+<p>Flags are:</p>
+<ul>
+<li><p>ALLEGRO_LOCK_READONLY - The locked region will not be written to. This can be faster if the bitmap is a video texture, as it can be discarded after the lock instead of uploaded back to the card.</p></li>
+<li><p>ALLEGRO_LOCK_WRITEONLY - The locked region will not be read from. This can be faster if the bitmap is a video texture, as no data need to be read from the video card. You are required to fill in all pixels before unlocking the bitmap again, so be careful when using this flag.</p></li>
+<li><p>ALLEGRO_LOCK_READWRITE - The locked region can be written to and read from. Use this flag if a partial number of pixels need to be written to, even if reading is not needed.</p></li>
+</ul>
+<p>'format' indicates the pixel format that the returned buffer will be in. To lock in the same format as the bitmap stores it's data internally, call with <code>al_get_bitmap_format(bitmap)</code> as the format or use ALLEGRO_PIXEL_FORMAT_ANY. Locking in the native format will usually be faster.</p>
+<blockquote>
+<p><em>Note:</em> While a bitmap is locked, you can not use any drawing operations on it (with the sole exception of <a href="graphics.html#al_put_pixel">al_put_pixel</a> and <a href="graphics.html#al_put_blended_pixel">al_put_blended_pixel</a>).</p>
+</blockquote>
+<p>See also: <a href="graphics.html#allegro_locked_region">ALLEGRO_LOCKED_REGION</a>, <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_unlock_bitmap">al_unlock_bitmap</a></p>
+<h2 id="al_lock_bitmap_region"><a href="#TOC">al_lock_bitmap_region</a></h2>
+<pre><code>ALLEGRO_LOCKED_REGION *al_lock_bitmap_region(ALLEGRO_BITMAP *bitmap,
+   int x, int y, int width, int height, int format, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a>, but only locks a specific area of the bitmap. If the bitmap is a display bitmap, only that area of the texture will be updated when it is unlocked. Locking only the region you indend to modify will be faster than locking the whole bitmap.</p>
+<p>See also: <a href="graphics.html#allegro_locked_region">ALLEGRO_LOCKED_REGION</a>, <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_unlock_bitmap">al_unlock_bitmap</a></p>
+<h2 id="al_unlock_bitmap"><a href="#TOC">al_unlock_bitmap</a></h2>
+<pre><code>void al_unlock_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Unlock a previously locked bitmap or bitmap region. If the bitmap is a display bitmap, the texture will be updated to match the system memory copy (unless it was locked read only).</p>
+<p>See also: <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a>, <a href="graphics.html#al_lock_bitmap_region">al_lock_bitmap_region</a></p>
+<h1 id="bitmap-creation"><a href="#TOC">Bitmap creation</a></h1>
+<h2 id="allegro_bitmap"><a href="#TOC">ALLEGRO_BITMAP</a></h2>
+<pre><code>typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
+</code></pre>
+<p>Abstract type representing a bitmap (2D image).</p>
+<h2 id="al_create_bitmap"><a href="#TOC">al_create_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_create_bitmap(int w, int h)
+</code></pre>
+<p>Creates a new bitmap using the bitmap format and flags for the current thread. Blitting between bitmaps of differing formats, or blitting between memory bitmaps and display bitmaps may be slow.</p>
+<p>Unless you set the ALLEGRO_MEMORY_BITMAP flag, the bitmap is created for the current display. Blitting to another display may be slow.</p>
+<p>If a display bitmap is created, there may be limitations on the allowed dimensions. For example a DirectX or OpenGL backend usually has a maximum allowed texture size - so if bitmap creation fails for very large dimensions, you may want to re-try with a smaller bitmap. Some platforms also dictate a minimum texture size, which is relevant if you plan to use this bitmap with the primitives addon. If you try to create a bitmap smaller than this, this call will not fail but the returned bitmap will be a section of a larger bitmap with the minimum size. This minimum size is 16 by 16.</p>
+<p>Some platforms do not directly support display bitmaps whose dimensions are not powers of two. Allegro handles this by creating a larger bitmap that has dimensions that are powers of two and then returning a section of that bitmap with the dimensions you requested. This can be relevant if you plan to use this bitmap with the primitives addon but shouldn't be an issue otherwise.</p>
+<p>See also: <a href="graphics.html#al_set_new_bitmap_format">al_set_new_bitmap_format</a>, <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a>, <a href="graphics.html#al_clone_bitmap">al_clone_bitmap</a>, <a href="graphics.html#al_create_sub_bitmap">al_create_sub_bitmap</a></p>
+<h2 id="al_create_sub_bitmap"><a href="#TOC">al_create_sub_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_create_sub_bitmap(ALLEGRO_BITMAP *parent,
+   int x, int y, int w, int h)
+</code></pre>
+<p>Creates a sub-bitmap of the parent, at the specified coordinates and of the specified size. A sub-bitmap is a bitmap that shares drawing memory with a pre-existing (parent) bitmap, but possibly with a different size and clipping settings.</p>
+<p>The sub-bitmap may originate off or extend past the parent bitmap.</p>
+<p>See the discussion in <a href="display.html#al_get_backbuffer">al_get_backbuffer</a> about using sub-bitmaps of the backbuffer.</p>
+<p>The parent bitmap's clipping rectangles are ignored.</p>
+<p>If a sub-bitmap was not or cannot be created then NULL is returned.</p>
+<p>Note that destroying parents of sub-bitmaps will not destroy the sub-bitmaps; instead the sub-bitmaps become invalid and should no longer be used.</p>
+<p>See also: <a href="graphics.html#al_create_bitmap">al_create_bitmap</a></p>
+<h2 id="al_clone_bitmap"><a href="#TOC">al_clone_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_clone_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Create a new bitmap with <a href="graphics.html#al_create_bitmap">al_create_bitmap</a>, and copy the pixel data from the old bitmap across.</p>
+<p>See also: <a href="graphics.html#al_create_bitmap">al_create_bitmap</a>, <a href="graphics.html#al_set_new_bitmap_format">al_set_new_bitmap_format</a>, <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a></p>
+<h2 id="al_destroy_bitmap"><a href="#TOC">al_destroy_bitmap</a></h2>
+<pre><code>void al_destroy_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Destroys the given bitmap, freeing all resources used by it. Does nothing if given the null pointer.</p>
+<h2 id="al_get_new_bitmap_flags"><a href="#TOC">al_get_new_bitmap_flags</a></h2>
+<pre><code>int al_get_new_bitmap_flags(void)
+</code></pre>
+<p>Returns the flags used for newly created bitmaps.</p>
+<p>See also: <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a></p>
+<h2 id="al_get_new_bitmap_format"><a href="#TOC">al_get_new_bitmap_format</a></h2>
+<pre><code>int al_get_new_bitmap_format(void)
+</code></pre>
+<p>Returns the format used for newly created bitmaps.</p>
+<p>See also: <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_set_new_bitmap_format">al_set_new_bitmap_format</a></p>
+<h2 id="al_set_new_bitmap_flags"><a href="#TOC">al_set_new_bitmap_flags</a></h2>
+<pre><code>void al_set_new_bitmap_flags(int flags)
+</code></pre>
+<p>Sets the flags to use for newly created bitmaps. Valid flags are:</p>
+<dl>
+<dt>ALLEGRO_VIDEO_BITMAP</dt>
+<dd><p>Creates a bitmap that resides in the video card memory. These types of bitmaps receive the greatest benefit from hardware acceleration. <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a> will implicitly set this flag unless ALLEGRO_MEMORY_BITMAP is present.</p>
+</dd>
+<dt>ALLEGRO_MEMORY_BITMAP</dt>
+<dd><p>Create a bitmap residing in system memory. Operations on, and with, memory bitmaps will not be hardware accelerated. However, direct pixel access can be relatively quick compared to video bitmaps, which depend on the display driver in use.</p>
+<p><em>Note: Allegro's software rendering routines are currently very unoptimised.</em></p>
+</dd>
+<dt>ALLEGRO_KEEP_BITMAP_FORMAT</dt>
+<dd><p>Only used when loading bitmaps from disk files, forces the resulting <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a> to use the same format as the file.</p>
+<p><em>This is not yet honoured.</em></p>
+</dd>
+<dt>ALLEGRO_FORCE_LOCKING</dt>
+<dd><p>When drawing to a bitmap with this flag set, always use pixel locking and draw to it using Allegro's software drawing primitives. This should never be used if you plan to draw to the bitmap using Allegro's graphics primitives as it would cause severe performance penalties. However if you know that the bitmap will only ever be accessed by locking it, no unneeded FBOs will be created for it in the OpenGL drivers.</p>
+</dd>
+<dt>ALLEGRO_NO_PRESERVE_TEXTURE</dt>
+<dd><p>Normally, every effort is taken to preserve the contents of bitmaps, since Direct3D may forget them. This can take extra processing time. If you know it doesn't matter if a bitmap keeps its pixel data, for example its a temporary buffer, use this flag to tell Allegro not to attempt to preserve its contents. This can increase performance of your game or application, but there is a catch. See ALLEGRO_EVENT_DISPLAY_LOST for further information.</p>
+</dd>
+<dt>ALLEGRO_ALPHA_TEST</dt>
+<dd><p>This is a driver hint only. It tells the graphics driver to do alpha testing instead of alpha blending on bitmaps created with this flag. Alpha testing is usually faster and preferred if your bitmaps have only one level of alpha (0). This flag is currently not widely implemented (i.e., only for memory bitmaps).</p>
+</dd>
+<dt>ALLEGRO_MIN_LINEAR</dt>
+<dd><p>When drawing a scaled down version of the bitmap, use linear filtering. This usually looks better. You can also combine it with the MIPMAP flag for even better quality.</p>
+</dd>
+<dt>ALLEGRO_MAG_LINEAR</dt>
+<dd><p>When drawing a magnified version of a bitmap, use linear filtering. This will cause the picture to get blurry instead of creating a big rectangle for each pixel. It depends on how you want things to look like whether you want to use this or not.</p>
+</dd>
+<dt>ALLEGRO_MIPMAP</dt>
+<dd><p>This can only be used for bitmaps whose width and height is a power of two. In that case, it will generate mipmaps and use them when drawing scaled down versions. For example if the bitmap is 64x64, then extra bitmaps of sizes 32x32, 16x16, 8x8, 4x4, 2x2 and 1x1 will be created always containing a scaled down version of the original.</p>
+</dd>
+<dt>ALLEGRO_NO_PREMULTIPLIED_ALPHA</dt>
+<dd><p>By default, Allegro pre-multiplies the alpha channel of an image with the images color data when it loads it. Typically that would look something like this:</p>
+<pre><code>r = get_float_byte();
+g = get_float_byte();
+b = get_float_byte();
+a = get_float_byte();
+
+r = r * a;
+g = g * a;
+b = b * a;
+
+set_image_pixel(x, y, r, g, b, a);
+</code></pre>
+<p>The reason for this can be seen in the Allegro example ex_premulalpha, ie, using pre-multiplied alpha gives more accurate color results in some cases. To use alpha blending with images loaded with pre-multiplied alpha, you would use the default blending mode, which is set with al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA).</p>
+<p>The ALLEGRO_NO_PREMULTIPLIED_ALPHA flag being set will ensure that images are not loaded with alpha pre-multiplied, but are loaded with color values direct from the image. That looks like this:</p>
+<pre><code>r = get_float_byte();
+g = get_float_byte();
+b = get_float_byte();
+a = get_float_byte();
+
+set_image_pixel(x, y, r, g, b, a);
+</code></pre>
+<p>To draw such an image using regular alpha blending, you would use al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA) to set the correct blender. This has some caveats. First, as mentioned above, drawing such an image can result in less accurate color blending (when drawing an image with linear filtering on, the edges will be darker than they should be). Second, the behaviour is somewhat confusing, which is explained in the example below.</p>
+<pre><code>// Load and create bitmaps with an alpha channel
+al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ANY_32_WITH_ALPHA);
+// Load some bitmap with alpha in it
+bmp = al_load_bitmap(&quot;some_alpha_bitmap.png&quot;);
+// We will draw to this buffer and then draw this buffer to the screen
+tmp_buffer = al_create_bitmap(SCREEN_W, SCREEN_H);
+// Set the buffer as the target and clear it
+al_set_target_bitmap(tmp_buffer);
+al_clear_to_color(al_map_rgba_f(0, 0, 0, 1));
+// Draw the bitmap to the temporary buffer
+al_draw_bitmap(bmp, 0, 0, 0);
+// Finally, draw the buffer to the screen
+// The output will look incorrect (may take close inspection
+// depending on the bitmap -- it may also be very obvious)
+al_set_target_bitmap(al_get_backbuffer(display));
+al_draw_bitmap(tmp_buffer, 0, 0, 0);
+</code></pre>
+</dd>
+</dl>
+<p>To explain further, if you have a pixel with 0.5 alpha, and you're using (ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA) for blending, the formula is:</p>
+<pre><code>    a = da * dst + sa * src
+</code></pre>
+<p>Expands to:</p>
+<pre><code>    result_a = dst_a * (1-0.5) + 0.5 * 0.5;
+</code></pre>
+<p>So if you draw the image to the temporary buffer, it is blended once resulting in 0.75 alpha, then drawn again to the screen, blended in the same way, resulting in a pixel has 0.1875 as an alpha value.</p>
+<p>See also: <a href="graphics.html#al_get_new_bitmap_flags">al_get_new_bitmap_flags</a>, <a href="graphics.html#al_get_bitmap_flags">al_get_bitmap_flags</a></p>
+<h2 id="al_add_new_bitmap_flag"><a href="#TOC">al_add_new_bitmap_flag</a></h2>
+<pre><code>void al_add_new_bitmap_flag(int flag)
+</code></pre>
+<p>A convenience function which does the same as</p>
+<pre><code>al_set_new_bitmap_flags(al_get_new_bitmap_flags() | flag);
+</code></pre>
+<p>See also: <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a>, <a href="graphics.html#al_get_new_bitmap_flags">al_get_new_bitmap_flags</a>, <a href="graphics.html#al_get_bitmap_flags">al_get_bitmap_flags</a></p>
+<h2 id="al_set_new_bitmap_format"><a href="#TOC">al_set_new_bitmap_format</a></h2>
+<pre><code>void al_set_new_bitmap_format(int format)
+</code></pre>
+<p>Sets the pixel format for newly created bitmaps. The default format is 0 and means the display driver will choose the best format.</p>
+<p>See also: <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_get_new_bitmap_format">al_get_new_bitmap_format</a>, <a href="graphics.html#al_get_bitmap_format">al_get_bitmap_format</a></p>
+<h1 id="bitmap-properties"><a href="#TOC">Bitmap properties</a></h1>
+<h2 id="al_get_bitmap_flags"><a href="#TOC">al_get_bitmap_flags</a></h2>
+<pre><code>int al_get_bitmap_flags(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Return the flags user to create the bitmap.</p>
+<p>See also: <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a></p>
+<h2 id="al_get_bitmap_format"><a href="#TOC">al_get_bitmap_format</a></h2>
+<pre><code>int al_get_bitmap_format(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the pixel format of a bitmap.</p>
+<p>See also: <a href="graphics.html#allegro_pixel_format">ALLEGRO_PIXEL_FORMAT</a>, <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a></p>
+<h2 id="al_get_bitmap_height"><a href="#TOC">al_get_bitmap_height</a></h2>
+<pre><code>int al_get_bitmap_height(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the height of a bitmap in pixels.</p>
+<h2 id="al_get_bitmap_width"><a href="#TOC">al_get_bitmap_width</a></h2>
+<pre><code>int al_get_bitmap_width(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the width of a bitmap in pixels.</p>
+<h2 id="al_get_pixel"><a href="#TOC">al_get_pixel</a></h2>
+<pre><code>ALLEGRO_COLOR al_get_pixel(ALLEGRO_BITMAP *bitmap, int x, int y)
+</code></pre>
+<p>Get a pixel's color value from the specified bitmap. This operation is slow on non-memory bitmaps. Consider locking the bitmap if you are going to use this function multiple times on the same bitmap.</p>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, <a href="graphics.html#al_put_pixel">al_put_pixel</a>, <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a></p>
+<h2 id="al_is_bitmap_locked"><a href="#TOC">al_is_bitmap_locked</a></h2>
+<pre><code>bool al_is_bitmap_locked(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns whether or not a bitmap is already locked.</p>
+<p>See also: <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a>, <a href="graphics.html#al_lock_bitmap_region">al_lock_bitmap_region</a>, <a href="graphics.html#al_unlock_bitmap">al_unlock_bitmap</a></p>
+<h2 id="al_is_compatible_bitmap"><a href="#TOC">al_is_compatible_bitmap</a></h2>
+<pre><code>bool al_is_compatible_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>D3D and OpenGL allow sharing a texture in a way so it can be used for multiple windows. Each <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a> created with <a href="graphics.html#al_create_bitmap">al_create_bitmap</a> however is usually tied to a single ALLEGRO_DISPLAY. This function can be used to know if the bitmap is compatible with the given display, even if it is a different display to the one it was created with. It returns true if the bitmap is compatible (things like a cached texture version can be used) and false otherwise (blitting in the current display will be slow).</p>
+<p>The only time this function is useful is if you are using multiple windows and need accelerated blitting of the same bitmaps to both.</p>
+<p>Returns true if the bitmap is compatible with the current display, false otherwise. If there is no current display, false is returned.</p>
+<h2 id="al_is_sub_bitmap"><a href="#TOC">al_is_sub_bitmap</a></h2>
+<pre><code>bool al_is_sub_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns true if the specified bitmap is a sub-bitmap, false otherwise.</p>
+<p>See also: <a href="graphics.html#al_create_sub_bitmap">al_create_sub_bitmap</a>, <a href="graphics.html#al_get_parent_bitmap">al_get_parent_bitmap</a></p>
+<h2 id="al_get_parent_bitmap"><a href="#TOC">al_get_parent_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_get_parent_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the bitmap this bitmap is a sub-bitmap of. Returns NULL if this bitmap is not a sub-bitmap.</p>
+<p>Since: 5.0.6, 5.1.2</p>
+<p>See also: <a href="graphics.html#al_create_sub_bitmap">al_create_sub_bitmap</a>, <a href="graphics.html#al_is_sub_bitmap">al_is_sub_bitmap</a></p>
+<h1 id="drawing-operations"><a href="#TOC">Drawing operations</a></h1>
+<p>All drawing operations draw to the current &quot;target bitmap&quot; of the current thread. Initially, the target bitmap will be the backbuffer of the last display created in a thread.</p>
+<h2 id="al_clear_to_color"><a href="#TOC">al_clear_to_color</a></h2>
+<pre><code>void al_clear_to_color(ALLEGRO_COLOR color)
+</code></pre>
+<p>Clear the complete target bitmap, but confined by the clipping rectangle.</p>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, <a href="graphics.html#al_set_clipping_rectangle">al_set_clipping_rectangle</a></p>
+<h2 id="al_draw_bitmap"><a href="#TOC">al_draw_bitmap</a></h2>
+<pre><code>void al_draw_bitmap(ALLEGRO_BITMAP *bitmap, float dx, float dy, int flags)
+</code></pre>
+<p>Draws an unscaled, unrotated bitmap at the given position to the current target bitmap (see <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a>).</p>
+<p><code>flags</code> can be a combination of:</p>
+<ul>
+<li>ALLEGRO_FLIP_HORIZONTAL - flip the bitmap about the y-axis</li>
+<li>ALLEGRO_FLIP_VERTICAL - flip the bitmap about the x-axis</li>
+</ul>
+<blockquote>
+<p><em>Note:</em> The current target bitmap must be a different bitmap. Drawing a bitmap to itself (or to a sub-bitmap of itself) or drawing a sub-bitmap to its parent (or another sub-bitmap of its parent) are not currently supported. To copy part of a bitmap into the same bitmap simply use a temporary bitmap instead.</p>
+</blockquote>
+<blockquote>
+<p><em>Note:</em> The backbuffer (or a sub-bitmap thereof) can not be transformed, blended or tinted. If you need to draw the backbuffer draw it to a temporary bitmap first with no active transformation (except translation). Blending and tinting settings/parameters will be ignored. This does not apply when drawing into a memory bitmap.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#al_draw_bitmap_region">al_draw_bitmap_region</a>, <a href="graphics.html#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a>, <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a>, <a href="graphics.html#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a></p>
+<h2 id="al_draw_tinted_bitmap"><a href="#TOC">al_draw_tinted_bitmap</a></h2>
+<pre><code>void al_draw_tinted_bitmap(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR tint,
+   float dx, float dy, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a> but multiplies all colors in the bitmap with the given color. For example:</p>
+<pre><code>al_draw_tinted_bitmap(bitmap, al_map_rgba_f(1, 1, 1, 0.5), x, y, 0);
+</code></pre>
+<p>The above will draw the bitmap 50% transparently.</p>
+<pre><code>al_draw_tinted_bitmap(bitmap, al_map_rgba_f(1, 0, 0, 1), x, y, 0);
+</code></pre>
+<p>The above will only draw the red component of the bitmap.</p>
+<h2 id="al_draw_bitmap_region"><a href="#TOC">al_draw_bitmap_region</a></h2>
+<pre><code>void al_draw_bitmap_region(ALLEGRO_BITMAP *bitmap,
+   float sx, float sy, float sw, float sh, float dx, float dy, int flags)
+</code></pre>
+<p>Draws a region of the given bitmap to the target bitmap.</p>
+<ul>
+<li>sx - source x</li>
+<li>sy - source y</li>
+<li>sw - source width (width of region to blit)</li>
+<li>sh - source height (height of region to blit)</li>
+<li>dx - destination x</li>
+<li>dy - destination y</li>
+<li>flags - same as for <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a></li>
+</ul>
+<p>See also: <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a>, <a href="graphics.html#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a>, <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a>, <a href="graphics.html#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a></p>
+<h2 id="al_draw_tinted_bitmap_region"><a href="#TOC">al_draw_tinted_bitmap_region</a></h2>
+<pre><code>void al_draw_tinted_bitmap_region(ALLEGRO_BITMAP *bitmap,
+   ALLEGRO_COLOR tint,
+   float sx, float sy, float sw, float sh, float dx, float dy,
+   int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_bitmap_region">al_draw_bitmap_region</a> but multiplies all colors in the bitmap with the given color.</p>
+<p>See also: <a href="graphics.html#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></p>
+<h2 id="al_draw_pixel"><a href="#TOC">al_draw_pixel</a></h2>
+<pre><code>void al_draw_pixel(float x, float y, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draws a single pixel at x, y. This function, unlike <a href="graphics.html#al_put_pixel">al_put_pixel</a>, does blending and, unlike <a href="graphics.html#al_put_blended_pixel">al_put_blended_pixel</a>, respects the transformations. This function can be slow if called often; if you need to draw a lot of pixels consider using <a href="primitives.html#al_draw_prim">al_draw_prim</a> with ALLEGRO_PRIM_POINT_LIST from the primitives addon.</p>
+<ul>
+<li>x - destination x</li>
+<li>y - destination y</li>
+<li>color - color of the pixel</li>
+</ul>
+<blockquote>
+<p><em>Note:</em> This function may not draw exactly where you expect it to. See the <a href="primitives.html#pixel-precise-output">pixel-precise output section</a> on the primitives addon documentation for details on how to control exactly where the pixel is drawn.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, <a href="graphics.html#al_put_pixel">al_put_pixel</a></p>
+<h2 id="al_draw_rotated_bitmap"><a href="#TOC">al_draw_rotated_bitmap</a></h2>
+<pre><code>void al_draw_rotated_bitmap(ALLEGRO_BITMAP *bitmap,
+   float cx, float cy, float dx, float dy, float angle, int flags)
+</code></pre>
+<p>Draws a rotated version of the given bitmap to the target bitmap. The bitmap is rotated by 'angle' radians clockwise.</p>
+<p>The point at cx/cy relative to the upper left corner of the bitmap will be drawn at dx/dy and the bitmap is rotated around this point. If cx,cy is 0,0 the bitmap will rotate around its upper left corner.</p>
+<ul>
+<li>cx - center x (relative to the bitmap)</li>
+<li>cy - center y (relative to the bitmap)</li>
+<li>dx - destination x</li>
+<li>dy - destination y</li>
+<li>angle - angle by which to rotate</li>
+<li>flags - same as for <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a></li>
+</ul>
+<p>Example</p>
+<pre><code>float w = al_get_bitmap_width(bitmap);
+float h = al_get_bitmap_height(bitmap);
+al_draw_rotated_bitmap(bitmap, w / 2, h / 2, x, y, ALLEGRO_PI / 2, 0);
+</code></pre>
+<p>The above code draws the bitmap centered on x/y and rotates it 90° clockwise.</p>
+<p>See also: <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a>, <a href="graphics.html#al_draw_bitmap_region">al_draw_bitmap_region</a>, <a href="graphics.html#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a>, <a href="graphics.html#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a></p>
+<h2 id="al_draw_tinted_rotated_bitmap"><a href="#TOC">al_draw_tinted_rotated_bitmap</a></h2>
+<pre><code>void al_draw_tinted_rotated_bitmap(ALLEGRO_BITMAP *bitmap,
+   ALLEGRO_COLOR tint,
+   float cx, float cy, float dx, float dy, float angle, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a> but multiplies all colors in the bitmap with the given color.</p>
+<p>See also: <a href="graphics.html#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></p>
+<h2 id="al_draw_scaled_rotated_bitmap"><a href="#TOC">al_draw_scaled_rotated_bitmap</a></h2>
+<pre><code>void al_draw_scaled_rotated_bitmap(ALLEGRO_BITMAP *bitmap,
+   float cx, float cy, float dx, float dy, float xscale, float yscale,
+   float angle, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a>, but can also scale the bitmap.</p>
+<p>The point at cx/cy in the bitmap will be drawn at dx/dy and the bitmap is rotated and scaled around this point.</p>
+<ul>
+<li>cx - center x</li>
+<li>cy - center y</li>
+<li>dx - destination x</li>
+<li>dy - destination y</li>
+<li>xscale - how much to scale on the x-axis (e.g. 2 for twice the size)</li>
+<li>yscale - how much to scale on the y-axis</li>
+<li>angle - angle by which to rotate</li>
+<li>flags - same as for <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a></li>
+</ul>
+<p>See also: <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a>, <a href="graphics.html#al_draw_bitmap_region">al_draw_bitmap_region</a>, <a href="graphics.html#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a>, <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a></p>
+<h2 id="al_draw_tinted_scaled_rotated_bitmap"><a href="#TOC">al_draw_tinted_scaled_rotated_bitmap</a></h2>
+<pre><code>void al_draw_tinted_scaled_rotated_bitmap(ALLEGRO_BITMAP *bitmap,
+   ALLEGRO_COLOR tint,
+   float cx, float cy, float dx, float dy, float xscale, float yscale,
+   float angle, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a> but multiplies all colors in the bitmap with the given color.</p>
+<p>See also: <a href="graphics.html#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></p>
+<h2 id="al_draw_tinted_scaled_rotated_bitmap_region"><a href="#TOC">al_draw_tinted_scaled_rotated_bitmap_region</a></h2>
+<pre><code>void al_draw_tinted_scaled_rotated_bitmap_region(ALLEGRO_BITMAP *bitmap,
+   float sx, float sy, float sw, float sh,
+   ALLEGRO_COLOR tint,
+   float cx, float cy, float dx, float dy, float xscale, float yscale,
+   float angle, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_tinted_scaled_rotated_bitmap">al_draw_tinted_scaled_rotated_bitmap</a> but you specify an area within the bitmap to be drawn.</p>
+<p>You can get the same effect with a sub bitmap:</p>
+<pre><code>al_draw_tinted_scaled_rotated_bitmap(bitmap, sx, sy, sw, sh, tint,
+    cx, cy, dx, dy, xscale, yscale, angle, flags);
+
+/* This draws the same: */
+sub_bitmap = al_create_sub_bitmap(bitmap, sx, sy, sw, sh);
+al_draw_tinted_scaled_rotated_bitmap(sub_bitmap, tint, cx, cy,
+    dx, dy, xscale, yscale, angle, flags);
+</code></pre>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="graphics.html#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></p>
+<h2 id="al_draw_scaled_bitmap"><a href="#TOC">al_draw_scaled_bitmap</a></h2>
+<pre><code>void al_draw_scaled_bitmap(ALLEGRO_BITMAP *bitmap,
+   float sx, float sy, float sw, float sh,
+   float dx, float dy, float dw, float dh, int flags)
+</code></pre>
+<p>Draws a scaled version of the given bitmap to the target bitmap.</p>
+<ul>
+<li>sx - source x</li>
+<li>sy - source y</li>
+<li>sw - source width</li>
+<li>sh - source height</li>
+<li>dx - destination x</li>
+<li>dy - destination y</li>
+<li>dw - destination width</li>
+<li>dh - destination height</li>
+<li>flags - same as for <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a></li>
+</ul>
+<p>See also: <a href="graphics.html#al_draw_bitmap">al_draw_bitmap</a>, <a href="graphics.html#al_draw_bitmap_region">al_draw_bitmap_region</a>, <a href="graphics.html#al_draw_rotated_bitmap">al_draw_rotated_bitmap</a>, <a href="graphics.html#al_draw_scaled_rotated_bitmap">al_draw_scaled_rotated_bitmap</a>,</p>
+<h2 id="al_draw_tinted_scaled_bitmap"><a href="#TOC">al_draw_tinted_scaled_bitmap</a></h2>
+<pre><code>void al_draw_tinted_scaled_bitmap(ALLEGRO_BITMAP *bitmap,
+   ALLEGRO_COLOR tint,
+   float sx, float sy, float sw, float sh,
+   float dx, float dy, float dw, float dh, int flags)
+</code></pre>
+<p>Like <a href="graphics.html#al_draw_scaled_bitmap">al_draw_scaled_bitmap</a> but multiplies all colors in the bitmap with the given color.</p>
+<p>See also: <a href="graphics.html#al_draw_tinted_bitmap">al_draw_tinted_bitmap</a></p>
+<h2 id="al_get_target_bitmap"><a href="#TOC">al_get_target_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_get_target_bitmap(void)
+</code></pre>
+<p>Return the target bitmap of the calling thread.</p>
+<p>See also: <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a></p>
+<h2 id="al_put_pixel"><a href="#TOC">al_put_pixel</a></h2>
+<pre><code>void al_put_pixel(int x, int y, ALLEGRO_COLOR color)
+</code></pre>
+<p>Draw a single pixel on the target bitmap. This operation is slow on non-memory bitmaps. Consider locking the bitmap if you are going to use this function multiple times on the same bitmap. This function is not affected by the transformations or the color blenders.</p>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, <a href="graphics.html#al_get_pixel">al_get_pixel</a>, <a href="graphics.html#al_put_blended_pixel">al_put_blended_pixel</a>, <a href="graphics.html#al_lock_bitmap">al_lock_bitmap</a></p>
+<h2 id="al_put_blended_pixel"><a href="#TOC">al_put_blended_pixel</a></h2>
+<pre><code>void al_put_blended_pixel(int x, int y, ALLEGRO_COLOR color)
+</code></pre>
+<p>Like <a href="graphics.html#al_put_pixel">al_put_pixel</a>, but the pixel color is blended using the current blenders before being drawn.</p>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a>, <a href="graphics.html#al_put_pixel">al_put_pixel</a></p>
+<h2 id="al_set_target_bitmap"><a href="#TOC">al_set_target_bitmap</a></h2>
+<pre><code>void al_set_target_bitmap(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>This function selects the bitmap to which all subsequent drawing operations in the calling thread will draw to. To return to drawing to a display, set the backbuffer of the display as the target bitmap, using <a href="display.html#al_get_backbuffer">al_get_backbuffer</a>. As a convenience, you may also use <a href="graphics.html#al_set_target_backbuffer">al_set_target_backbuffer</a>.</p>
+<p>Each video bitmap is tied to a display. When a video bitmap is set to as the target bitmap, the display that the bitmap belongs to is automatically made &quot;current&quot; for the calling thread (if it is not current already). Then drawing other bitmaps which are tied to the same display can be hardware accelerated.</p>
+<p>A single display cannot be current for multiple threads simultaneously. If you need to release a display, so it is not current for the calling thread, call <code>al_set_target_bitmap(NULL);</code></p>
+<p>Setting a memory bitmap as the target bitmap will not change which display is current for the calling thread.</p>
+<p>OpenGL note:</p>
+<p>Framebuffer objects (FBOs) allow OpenGL to directly draw to a bitmap, which is very fast. When using an OpenGL display, if all of the following conditions are met an FBO will be created for use with the bitmap:</p>
+<ul>
+<li>The GL_EXT_framebuffer_object OpenGL extension is available.</li>
+<li>The bitmap is not a memory bitmap.</li>
+<li>The bitmap is not currently locked.</li>
+</ul>
+<p>In Allegro 5.0.0, you had to be careful as an FBO would be kept around until the bitmap is destroyed or you explicitly called <a href="opengl.html#al_remove_opengl_fbo">al_remove_opengl_fbo</a> on the bitmap, wasting resources. In newer versions, FBOs will be freed automatically when the bitmap is no longer the target bitmap, <em>unless</em> you have called <a href="opengl.html#al_get_opengl_fbo">al_get_opengl_fbo</a> to retrieve the FBO id.</p>
+<p>In the following example, no FBO will be created:</p>
+<pre><code>lock = al_lock_bitmap(bitmap);
+al_set_target_bitmap(bitmap);
+al_put_pixel(x, y, color);
+al_unlock_bitmap(bitmap);
+</code></pre>
+<p>The above allows using <a href="graphics.html#al_put_pixel">al_put_pixel</a> on a locked bitmap without creating an FBO.</p>
+<p>In this example an FBO is created however:</p>
+<pre><code>al_set_target_bitmap(bitmap);
+al_draw_line(x1, y1, x2, y2, color, 0);
+</code></pre>
+<p>An OpenGL command will be used to directly draw the line into the bitmap's associated texture.</p>
+<p>See also: <a href="graphics.html#al_get_target_bitmap">al_get_target_bitmap</a>, <a href="graphics.html#al_set_target_backbuffer">al_set_target_backbuffer</a></p>
+<h2 id="al_set_target_backbuffer"><a href="#TOC">al_set_target_backbuffer</a></h2>
+<pre><code>void al_set_target_backbuffer(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Same as <code>al_set_target_bitmap(al_get_backbuffer(display));</code></p>
+<p>See also: <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a>, <a href="display.html#al_get_backbuffer">al_get_backbuffer</a></p>
+<h2 id="al_get_current_display"><a href="#TOC">al_get_current_display</a></h2>
+<pre><code>ALLEGRO_DISPLAY *al_get_current_display(void)
+</code></pre>
+<p>Return the display that is &quot;current&quot; for the calling thread, or NULL if there is none.</p>
+<p>See also: <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a></p>
+<h1 id="blending-modes"><a href="#TOC">Blending modes</a></h1>
+<h2 id="al_get_blender"><a href="#TOC">al_get_blender</a></h2>
+<pre><code>void al_get_blender(int *op, int *src, int *dst)
+</code></pre>
+<p>Returns the active blender for the current thread. You can pass NULL for values you are not interested in.</p>
+<p>See also: <a href="graphics.html#al_set_blender">al_set_blender</a>, <a href="graphics.html#al_get_separate_blender">al_get_separate_blender</a></p>
+<h2 id="al_get_separate_blender"><a href="#TOC">al_get_separate_blender</a></h2>
+<pre><code>void al_get_separate_blender(int *op, int *src, int *dst,
+   int *alpha_op, int *alpha_src, int *alpha_dst)
+</code></pre>
+<p>Returns the active blender for the current thread. You can pass NULL for values you are not interested in.</p>
+<p>See also: <a href="graphics.html#al_set_separate_blender">al_set_separate_blender</a>, <a href="graphics.html#al_get_blender">al_get_blender</a></p>
+<h2 id="al_set_blender"><a href="#TOC">al_set_blender</a></h2>
+<pre><code>void al_set_blender(int op, int src, int dst)
+</code></pre>
+<p>Sets the function to use for blending for the current thread.</p>
+<p>Blending means, the source and destination colors are combined in drawing operations.</p>
+<p>Assume the source color (e.g. color of a rectangle to draw, or pixel of a bitmap to draw) is given as its red/green/blue/alpha components (if the bitmap has no alpha it always is assumed to be fully opaque, so 255 for 8-bit or 1.0 for floating point): <em>sr, sg, sb, sa</em>. And this color is drawn to a destination, which already has a color: <em>dr, dg, db, da</em>.</p>
+<p>The conceptional formula used by Allegro to draw any pixel then depends on the <code>op</code> parameter:</p>
+<ul>
+<li><p>ALLEGRO_ADD</p>
+<pre><code> r = dr * dst + sr * src
+ g = dg * dst + sg * src
+ b = db * dst + sb * src
+ a = da * dst + sa * src
+</code></pre></li>
+<li><p>ALLEGRO_DEST_MINUS_SRC</p>
+<pre><code> r = dr * dst - sr * src
+ g = dg * dst - sg * src
+ b = db * dst - sb * src
+ a = da * dst - sa * src
+</code></pre></li>
+<li><p>ALLEGRO_SRC_MINUS_DEST</p>
+<pre><code> r = sr * src - dr * dst
+ g = sg * src - dg * dst
+ b = sb * src - db * dst
+ a = sa * src - da * dst
+</code></pre></li>
+</ul>
+<p>Valid values for <code>src</code> and <code>dst</code> passed to this function are</p>
+<ul>
+<li><p>ALLEGRO_ZERO</p>
+<pre><code> src = 0
+ dst = 0
+</code></pre></li>
+<li><p>ALLEGRO_ONE</p>
+<pre><code> src = 1
+ dst = 1
+</code></pre></li>
+<li><p>ALLEGRO_ALPHA</p>
+<pre><code> src = sa
+ dst = sa
+</code></pre></li>
+<li><p>ALLEGRO_INVERSE_ALPHA</p>
+<pre><code> src = 1 - sa
+ dst = 1 - sa
+</code></pre></li>
+</ul>
+<p>Blending examples:</p>
+<p>So for example, to restore the default of using premultiplied alpha blending, you would use (pseudo code)</p>
+<pre><code>al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_INVERSE_ALPHA)
+</code></pre>
+<p>If you are using non-pre-multiplied alpha, you could use</p>
+<pre><code>al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA)
+</code></pre>
+<p>Additive blending would be achieved with</p>
+<pre><code>al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ONE)
+</code></pre>
+<p>Copying the source to the destination (including alpha) unmodified</p>
+<pre><code>al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO)
+</code></pre>
+<p>See also: <a href="graphics.html#al_set_separate_blender">al_set_separate_blender</a>, <a href="graphics.html#al_get_blender">al_get_blender</a></p>
+<h2 id="al_set_separate_blender"><a href="#TOC">al_set_separate_blender</a></h2>
+<pre><code>void al_set_separate_blender(int op, int src, int dst,
+   int alpha_op, int alpha_src, int alpha_dst)
+</code></pre>
+<p>Like <a href="graphics.html#al_set_blender">al_set_blender</a>, but allows specifying a separate blending operation for the alpha channel. This is useful if your target bitmap also has an alpha channel and the two alpha channels need to be combined in a different way than the color components.</p>
+<p>See also: <a href="graphics.html#al_set_blender">al_set_blender</a>, <a href="graphics.html#al_get_blender">al_get_blender</a>, <a href="graphics.html#al_get_separate_blender">al_get_separate_blender</a></p>
+<h1 id="clipping"><a href="#TOC">Clipping</a></h1>
+<h2 id="al_get_clipping_rectangle"><a href="#TOC">al_get_clipping_rectangle</a></h2>
+<pre><code>void al_get_clipping_rectangle(int *x, int *y, int *w, int *h)
+</code></pre>
+<p>Gets the clipping rectangle of the target bitmap.</p>
+<p>See also: <a href="graphics.html#al_set_clipping_rectangle">al_set_clipping_rectangle</a></p>
+<h2 id="al_set_clipping_rectangle"><a href="#TOC">al_set_clipping_rectangle</a></h2>
+<pre><code>void al_set_clipping_rectangle(int x, int y, int width, int height)
+</code></pre>
+<p>Set the region of the target bitmap or display that pixels get clipped to. The default is to clip pixels to the entire bitmap.</p>
+<p>See also: <a href="graphics.html#al_get_clipping_rectangle">al_get_clipping_rectangle</a>, <a href="graphics.html#al_reset_clipping_rectangle">al_reset_clipping_rectangle</a></p>
+<h2 id="al_reset_clipping_rectangle"><a href="#TOC">al_reset_clipping_rectangle</a></h2>
+<pre><code>void al_reset_clipping_rectangle(void)
+</code></pre>
+<p>Equivalent to calling `al_set_clipping_rectangle(0, 0, w, h)' where <em>w</em> and <em>h</em> are the width and height of the target bitmap respectively.</p>
+<p>Does nothing if there is no target bitmap.</p>
+<p>See also: <a href="graphics.html#al_set_clipping_rectangle">al_set_clipping_rectangle</a></p>
+<p>Since: 5.0.6, 5.1.0</p>
+<h1 id="graphics-utility-functions"><a href="#TOC">Graphics utility functions</a></h1>
+<h2 id="al_convert_mask_to_alpha"><a href="#TOC">al_convert_mask_to_alpha</a></h2>
+<pre><code>void al_convert_mask_to_alpha(ALLEGRO_BITMAP *bitmap, ALLEGRO_COLOR mask_color)
+</code></pre>
+<p>Convert the given mask color to an alpha channel in the bitmap. Can be used to convert older 4.2-style bitmaps with magic pink to alpha-ready bitmaps.</p>
+<p>See also: <a href="graphics.html#allegro_color">ALLEGRO_COLOR</a></p>
+<h1 id="deferred-drawing"><a href="#TOC">Deferred drawing</a></h1>
+<h2 id="al_hold_bitmap_drawing"><a href="#TOC">al_hold_bitmap_drawing</a></h2>
+<pre><code>void al_hold_bitmap_drawing(bool hold)
+</code></pre>
+<p>Enables or disables deferred bitmap drawing. This allows for efficient drawing of many bitmaps that share a parent bitmap, such as sub-bitmaps from a tilesheet or simply identical bitmaps. Drawing bitmaps that do not share a parent is less efficient, so it is advisable to stagger bitmap drawing calls such that the parent bitmap is the same for large number of those calls. While deferred bitmap drawing is enabled, the only functions that can be used are the bitmap drawing functions and font drawing functions. Changing the state such as the blending modes will result in undefined behaviour. One exception to this rule are the transformations. It is possible to set a new transformation while the drawing is held.</p>
+<p>No drawing is guaranteed to take place until you disable the hold. Thus, the idiom of this function's usage is to enable the deferred bitmap drawing, draw as many bitmaps as possible, taking care to stagger bitmaps that share parent bitmaps, and then disable deferred drawing. As mentioned above, this function also works with bitmap and truetype fonts, so if multiple lines of text need to be drawn, this function can speed things up.</p>
+<p>See also: <a href="graphics.html#al_is_bitmap_drawing_held">al_is_bitmap_drawing_held</a></p>
+<h2 id="al_is_bitmap_drawing_held"><a href="#TOC">al_is_bitmap_drawing_held</a></h2>
+<pre><code>bool al_is_bitmap_drawing_held(void)
+</code></pre>
+<p>Returns whether the deferred bitmap drawing mode is turned on or off.</p>
+<p>See also: <a href="graphics.html#al_hold_bitmap_drawing">al_hold_bitmap_drawing</a></p>
+<h1 id="image-io"><a href="#TOC">Image I/O</a></h1>
+<h2 id="al_register_bitmap_loader"><a href="#TOC">al_register_bitmap_loader</a></h2>
+<pre><code>bool al_register_bitmap_loader(const char *extension,
+   ALLEGRO_BITMAP *(*loader)(const char *filename))
+</code></pre>
+<p>Register a handler for <a href="graphics.html#al_load_bitmap">al_load_bitmap</a>. The given function will be used to handle the loading of bitmaps files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="graphics.html#al_register_bitmap_saver">al_register_bitmap_saver</a>, <a href="graphics.html#al_register_bitmap_loader_f">al_register_bitmap_loader_f</a></p>
+<h2 id="al_register_bitmap_saver"><a href="#TOC">al_register_bitmap_saver</a></h2>
+<pre><code>bool al_register_bitmap_saver(const char *extension,
+   bool (*saver)(const char *filename, ALLEGRO_BITMAP *bmp))
+</code></pre>
+<p>Register a handler for <a href="graphics.html#al_save_bitmap">al_save_bitmap</a>. The given function will be used to handle the loading of bitmaps files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>saver</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="graphics.html#al_register_bitmap_loader">al_register_bitmap_loader</a>, <a href="graphics.html#al_register_bitmap_saver_f">al_register_bitmap_saver_f</a></p>
+<h2 id="al_register_bitmap_loader_f"><a href="#TOC">al_register_bitmap_loader_f</a></h2>
+<pre><code>bool al_register_bitmap_loader_f(const char *extension,
+   ALLEGRO_BITMAP *(*loader_f)(ALLEGRO_FILE *fp))
+</code></pre>
+<p>Register a handler for <a href="graphics.html#al_load_bitmap_f">al_load_bitmap_f</a>. The given function will be used to handle the loading of bitmaps files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>fs_loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="graphics.html#al_register_bitmap_loader">al_register_bitmap_loader</a></p>
+<h2 id="al_register_bitmap_saver_f"><a href="#TOC">al_register_bitmap_saver_f</a></h2>
+<pre><code>bool al_register_bitmap_saver_f(const char *extension,
+   bool (*saver_f)(ALLEGRO_FILE *fp, ALLEGRO_BITMAP *bmp))
+</code></pre>
+<p>Register a handler for <a href="graphics.html#al_save_bitmap_f">al_save_bitmap_f</a>. The given function will be used to handle the loading of bitmaps files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>saver_f</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="graphics.html#al_register_bitmap_saver">al_register_bitmap_saver</a></p>
+<h2 id="al_load_bitmap"><a href="#TOC">al_load_bitmap</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_load_bitmap(const char *filename)
+</code></pre>
+<p>Loads an image file into an <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a>. The file type is determined by the extension.</p>
+<p>Returns NULL on error.</p>
+<blockquote>
+<p><em>Note:</em> the core Allegro library does not support any image file formats by default. You must use the allegro_image addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#al_load_bitmap_f">al_load_bitmap_f</a>, <a href="graphics.html#al_register_bitmap_loader">al_register_bitmap_loader</a>, <a href="graphics.html#al_set_new_bitmap_format">al_set_new_bitmap_format</a>, <a href="graphics.html#al_set_new_bitmap_flags">al_set_new_bitmap_flags</a>, <a href="image.html#al_init_image_addon">al_init_image_addon</a></p>
+<h2 id="al_load_bitmap_f"><a href="#TOC">al_load_bitmap_f</a></h2>
+<pre><code>ALLEGRO_BITMAP *al_load_bitmap_f(ALLEGRO_FILE *fp, const char *ident)
+</code></pre>
+<p>Loads an image from an <a href="file.html#allegro_file">ALLEGRO_FILE</a> stream into an <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a>. The file type is determined by the passed 'ident' parameter, which is a file name extension including the leading dot.</p>
+<p>Returns NULL on error. The file remains open afterwards.</p>
+<blockquote>
+<p><em>Note:</em> the core Allegro library does not support any image file formats by default. You must use the allegro_image addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#al_load_bitmap">al_load_bitmap</a>, <a href="graphics.html#al_register_bitmap_loader_f">al_register_bitmap_loader_f</a>, <a href="image.html#al_init_image_addon">al_init_image_addon</a></p>
+<h2 id="al_save_bitmap"><a href="#TOC">al_save_bitmap</a></h2>
+<pre><code>bool al_save_bitmap(const char *filename, ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Saves an <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a> to an image file. The file type is determined by the extension.</p>
+<p>Returns true on success, false on error.</p>
+<blockquote>
+<p><em>Note:</em> the core Allegro library does not support any image file formats by default. You must use the allegro_image addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#al_save_bitmap_f">al_save_bitmap_f</a>, <a href="graphics.html#al_register_bitmap_saver">al_register_bitmap_saver</a>, <a href="image.html#al_init_image_addon">al_init_image_addon</a></p>
+<h2 id="al_save_bitmap_f"><a href="#TOC">al_save_bitmap_f</a></h2>
+<pre><code>bool al_save_bitmap_f(ALLEGRO_FILE *fp, const char *ident,
+   ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Saves an <a href="graphics.html#allegro_bitmap">ALLEGRO_BITMAP</a> to an <a href="file.html#allegro_file">ALLEGRO_FILE</a> stream. The file type is determined by the passed 'ident' parameter, which is a file name extension including the leading dot.</p>
+<p>Returns true on success, false on error. The file remains open afterwards.</p>
+<blockquote>
+<p><em>Note:</em> the core Allegro library does not support any image file formats by default. You must use the allegro_image addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="graphics.html#al_save_bitmap">al_save_bitmap</a>, <a href="graphics.html#al_register_bitmap_saver_f">al_register_bitmap_saver_f</a>, <a href="image.html#al_init_image_addon">al_init_image_addon</a></p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

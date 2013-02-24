@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Memory management routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Memory management routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_malloc">al_malloc</a></li>
+<li><a href="#al_free">al_free</a></li>
+<li><a href="#al_realloc">al_realloc</a></li>
+<li><a href="#al_calloc">al_calloc</a></li>
+<li><a href="#al_malloc_with_context">al_malloc_with_context</a></li>
+<li><a href="#al_free_with_context">al_free_with_context</a></li>
+<li><a href="#al_realloc_with_context">al_realloc_with_context</a></li>
+<li><a href="#al_calloc_with_context">al_calloc_with_context</a></li>
+<li><a href="#allegro_memory_interface">ALLEGRO_MEMORY_INTERFACE</a></li>
+<li><a href="#al_set_memory_interface">al_set_memory_interface</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="al_malloc"><a href="#TOC">al_malloc</a></h1>
+<pre><code>#define al_malloc(n) \
+   (al_malloc_with_context((n), __LINE__, __FILE__, __func__))
+</code></pre>
+<p>Like malloc() in the C standard library, but the implementation may be overridden.</p>
+<p>This is a macro.</p>
+<p>See also: <a href="memory.html#al_free">al_free</a>, <a href="memory.html#al_realloc">al_realloc</a>, <a href="memory.html#al_calloc">al_calloc</a>, <a href="memory.html#al_malloc_with_context">al_malloc_with_context</a>, <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a></p>
+<h1 id="al_free"><a href="#TOC">al_free</a></h1>
+<pre><code>#define al_free(p) \
+   (al_free_with_context((p), __LINE__, __FILE__, __func__))
+</code></pre>
+<p>Like free() in the C standard library, but the implementation may be overridden.</p>
+<p>Additionally, on Windows, a memory block allocated by one DLL must be freed from the same DLL. In the few places where an Allegro function returns a pointer that must be freed, you must use <a href="memory.html#al_free">al_free</a> for portability to Windows.</p>
+<p>This is a macro.</p>
+<p>See also: <a href="memory.html#al_malloc">al_malloc</a>, <a href="memory.html#al_free_with_context">al_free_with_context</a></p>
+<h1 id="al_realloc"><a href="#TOC">al_realloc</a></h1>
+<pre><code>#define al_realloc(p, n) \
+   (al_realloc_with_context((p), (n), __LINE__, __FILE__, __func__))
+</code></pre>
+<p>Like realloc() in the C standard library, but the implementation may be overridden.</p>
+<p>This is a macro.</p>
+<p>See also: <a href="memory.html#al_malloc">al_malloc</a>, <a href="memory.html#al_realloc_with_context">al_realloc_with_context</a></p>
+<h1 id="al_calloc"><a href="#TOC">al_calloc</a></h1>
+<pre><code>#define al_calloc(c, n) \
+   (al_calloc_with_context((c), (n), __LINE__, __FILE__, __func__))
+</code></pre>
+<p>Like calloc() in the C standard library, but the implementation may be overridden.</p>
+<p>This is a macro.</p>
+<p>See also: <a href="memory.html#al_malloc">al_malloc</a>, <a href="memory.html#al_calloc_with_context">al_calloc_with_context</a></p>
+<h1 id="al_malloc_with_context"><a href="#TOC">al_malloc_with_context</a></h1>
+<pre><code>void *al_malloc_with_context(size_t n,
+   int line, const char *file, const char *func)
+</code></pre>
+<p>This calls malloc() from the Allegro library (this matters on Windows), unless overriden with <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a>,</p>
+<p>Generally you should use the <a href="memory.html#al_malloc">al_malloc</a> macro.</p>
+<h1 id="al_free_with_context"><a href="#TOC">al_free_with_context</a></h1>
+<pre><code>void al_free_with_context(void *ptr,
+   int line, const char *file, const char *func)
+</code></pre>
+<p>This calls free() from the Allegro library (this matters on Windows), unless overriden with <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a>.</p>
+<p>Generally you should use the <a href="memory.html#al_free">al_free</a> macro.</p>
+<h1 id="al_realloc_with_context"><a href="#TOC">al_realloc_with_context</a></h1>
+<pre><code>void *al_realloc_with_context(void *ptr, size_t n,
+   int line, const char *file, const char *func)
+</code></pre>
+<p>This calls realloc() from the Allegro library (this matters on Windows), unless overriden with <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a>,</p>
+<p>Generally you should use the <a href="memory.html#al_realloc">al_realloc</a> macro.</p>
+<h1 id="al_calloc_with_context"><a href="#TOC">al_calloc_with_context</a></h1>
+<pre><code>void *al_calloc_with_context(size_t count, size_t n,
+   int line, const char *file, const char *func)
+</code></pre>
+<p>This calls calloc() from the Allegro library (this matters on Windows), unless overriden with <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a>,</p>
+<p>Generally you should use the <a href="memory.html#al_calloc">al_calloc</a> macro.</p>
+<h1 id="allegro_memory_interface"><a href="#TOC">ALLEGRO_MEMORY_INTERFACE</a></h1>
+<pre><code>typedef struct ALLEGRO_MEMORY_INTERFACE ALLEGRO_MEMORY_INTERFACE;
+</code></pre>
+<p>This structure has the following fields.</p>
+<pre><code>void *(*mi_malloc)(size_t n, int line, const char *file, const char *func);
+void (*mi_free)(void *ptr, int line, const char *file, const char *func);
+void *(*mi_realloc)(void *ptr, size_t n, int line, const char *file,
+                    const char *func);
+void *(*mi_calloc)(size_t count, size_t n, int line, const char *file,
+                   const char *func);
+</code></pre>
+<p>See also: <a href="memory.html#al_set_memory_interface">al_set_memory_interface</a></p>
+<h1 id="al_set_memory_interface"><a href="#TOC">al_set_memory_interface</a></h1>
+<pre><code>void al_set_memory_interface(ALLEGRO_MEMORY_INTERFACE *memory_interface)
+</code></pre>
+<p>Override the memory management functions with implementations of <a href="memory.html#al_malloc_with_context">al_malloc_with_context</a>, <a href="memory.html#al_free_with_context">al_free_with_context</a>, <a href="memory.html#al_realloc_with_context">al_realloc_with_context</a> and <a href="memory.html#al_calloc_with_context">al_calloc_with_context</a>. The context arguments may be used for debugging.</p>
+<p>If the pointer is NULL, the default behaviour will be restored.</p>
+<p>See also: <a href="memory.html#allegro_memory_interface">ALLEGRO_MEMORY_INTERFACE</a></p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

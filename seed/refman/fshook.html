@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>File system routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">File system routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_fs_entry">ALLEGRO_FS_ENTRY</a></li>
+<li><a href="#allegro_file_mode">ALLEGRO_FILE_MODE</a></li>
+<li><a href="#al_create_fs_entry">al_create_fs_entry</a></li>
+<li><a href="#al_destroy_fs_entry">al_destroy_fs_entry</a></li>
+<li><a href="#al_get_fs_entry_name">al_get_fs_entry_name</a></li>
+<li><a href="#al_update_fs_entry">al_update_fs_entry</a></li>
+<li><a href="#al_get_fs_entry_mode">al_get_fs_entry_mode</a></li>
+<li><a href="#al_get_fs_entry_atime">al_get_fs_entry_atime</a></li>
+<li><a href="#al_get_fs_entry_ctime">al_get_fs_entry_ctime</a></li>
+<li><a href="#al_get_fs_entry_mtime">al_get_fs_entry_mtime</a></li>
+<li><a href="#al_get_fs_entry_size">al_get_fs_entry_size</a></li>
+<li><a href="#al_fs_entry_exists">al_fs_entry_exists</a></li>
+<li><a href="#al_remove_fs_entry">al_remove_fs_entry</a></li>
+<li><a href="#al_filename_exists">al_filename_exists</a></li>
+<li><a href="#al_remove_filename">al_remove_filename</a></li>
+<li><a href="#directory-functions">Directory functions</a><ul>
+<li><a href="#al_open_directory">al_open_directory</a></li>
+<li><a href="#al_read_directory">al_read_directory</a></li>
+<li><a href="#al_close_directory">al_close_directory</a></li>
+<li><a href="#al_get_current_directory">al_get_current_directory</a></li>
+<li><a href="#al_change_directory">al_change_directory</a></li>
+<li><a href="#al_make_directory">al_make_directory</a></li>
+<li><a href="#al_open_fs_entry">al_open_fs_entry</a></li>
+</ul></li>
+<li><a href="#alternative-filesystem-functions">Alternative filesystem functions</a><ul>
+<li><a href="#allegro_fs_interface">ALLEGRO_FS_INTERFACE</a></li>
+<li><a href="#al_set_fs_interface">al_set_fs_interface</a></li>
+<li><a href="#al_set_standard_fs_interface">al_set_standard_fs_interface</a></li>
+<li><a href="#al_get_fs_interface">al_get_fs_interface</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<p>These functions allow access to the filesystem. This can either be the real filesystem like your harddrive, or a virtual filesystem like a .zip archive (or whatever else you or an addon makes it do).</p>
+<h1 id="allegro_fs_entry"><a href="#TOC">ALLEGRO_FS_ENTRY</a></h1>
+<pre><code>typedef struct ALLEGRO_FS_ENTRY ALLEGRO_FS_ENTRY;
+</code></pre>
+<p>Opaque filesystem entry object. Represents a file or a directory (check with <a href="fshook.html#al_get_fs_entry_mode">al_get_fs_entry_mode</a>). There are no user accessible member variables.</p>
+<h1 id="allegro_file_mode"><a href="#TOC">ALLEGRO_FILE_MODE</a></h1>
+<pre><code>typedef enum ALLEGRO_FILE_MODE
+</code></pre>
+<p>Filesystem modes/types</p>
+<ul>
+<li>ALLEGRO_FILEMODE_READ - Readable</li>
+<li>ALLEGRO_FILEMODE_WRITE - Writable</li>
+<li>ALLEGRO_FILEMODE_EXECUTE - Executable</li>
+<li>ALLEGRO_FILEMODE_HIDDEN - Hidden</li>
+<li>ALLEGRO_FILEMODE_ISFILE - Regular file</li>
+<li>ALLEGRO_FILEMODE_ISDIR - Directory</li>
+</ul>
+<h1 id="al_create_fs_entry"><a href="#TOC">al_create_fs_entry</a></h1>
+<pre><code>ALLEGRO_FS_ENTRY *al_create_fs_entry(const char *path)
+</code></pre>
+<p>Creates an <a href="fshook.html#allegro_fs_entry">ALLEGRO_FS_ENTRY</a> object pointing to path on the filesystem. 'path' can be a file or a directory and must not be NULL.</p>
+<h1 id="al_destroy_fs_entry"><a href="#TOC">al_destroy_fs_entry</a></h1>
+<pre><code>void al_destroy_fs_entry(ALLEGRO_FS_ENTRY *fh)
+</code></pre>
+<p>Destroys a fs entry handle. The file or directory represented by it is not destroyed. If the entry was opened, it is closed before being destroyed.</p>
+<p>Does nothing if passed NULL.</p>
+<h1 id="al_get_fs_entry_name"><a href="#TOC">al_get_fs_entry_name</a></h1>
+<pre><code>const char *al_get_fs_entry_name(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the entry's filename path. Note that the path will not be an absolute path if the entry wasn't created from an absolute path. Also note that the filesystem encoding may not be known and the conversion to UTF-8 could in very rare cases cause this to return an invalid path. Therefore it's always safest to access the file over its <a href="fshook.html#allegro_fs_entry">ALLEGRO_FS_ENTRY</a> and not the path.</p>
+<p>On success returns a read only string which you must not modify or destroy. Returns NULL on failure.</p>
+<h1 id="al_update_fs_entry"><a href="#TOC">al_update_fs_entry</a></h1>
+<pre><code>bool al_update_fs_entry(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Updates file status information for a filesystem entry. File status information is automatically updated when the entry is created, however you may update it again with this function, e.g. in case it changed.</p>
+<p>Returns true on success, false on failure. Fills in errno to indicate the error.</p>
+<p>See also: <a href="state.html#al_get_errno">al_get_errno</a>, <a href="fshook.html#al_get_fs_entry_atime">al_get_fs_entry_atime</a>, <a href="fshook.html#al_get_fs_entry_ctime">al_get_fs_entry_ctime</a>, <a href="fshook.html#al_get_fs_entry_mode">al_get_fs_entry_mode</a></p>
+<h1 id="al_get_fs_entry_mode"><a href="#TOC">al_get_fs_entry_mode</a></h1>
+<pre><code>uint32_t al_get_fs_entry_mode(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the entry's mode flags, i.e. permissions and whether the entry refers to a file or directory.</p>
+<p>See also: <a href="state.html#al_get_errno">al_get_errno</a>, <a href="fshook.html#allegro_file_mode">ALLEGRO_FILE_MODE</a></p>
+<h1 id="al_get_fs_entry_atime"><a href="#TOC">al_get_fs_entry_atime</a></h1>
+<pre><code>time_t al_get_fs_entry_atime(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the time in seonds since the epoch since the entry was last accessed.</p>
+<p>Warning: some filesystem either don't support this flag, or people turn it off to increase performance. It may not be valid in all circumstances.</p>
+<p>See also: <a href="fshook.html#al_get_fs_entry_ctime">al_get_fs_entry_ctime</a>, <a href="fshook.html#al_get_fs_entry_mtime">al_get_fs_entry_mtime</a>, <a href="fshook.html#al_update_fs_entry">al_update_fs_entry</a></p>
+<h1 id="al_get_fs_entry_ctime"><a href="#TOC">al_get_fs_entry_ctime</a></h1>
+<pre><code>time_t al_get_fs_entry_ctime(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the time in seconds since the epoch this entry was created on the filsystem.</p>
+<p>See also: <a href="fshook.html#al_get_fs_entry_atime">al_get_fs_entry_atime</a>, <a href="fshook.html#al_get_fs_entry_mtime">al_get_fs_entry_mtime</a>, <a href="fshook.html#al_update_fs_entry">al_update_fs_entry</a></p>
+<h1 id="al_get_fs_entry_mtime"><a href="#TOC">al_get_fs_entry_mtime</a></h1>
+<pre><code>time_t al_get_fs_entry_mtime(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the time in seconds since the epoch since the entry was last modified.</p>
+<p>See also: <a href="fshook.html#al_get_fs_entry_atime">al_get_fs_entry_atime</a>, <a href="fshook.html#al_get_fs_entry_ctime">al_get_fs_entry_ctime</a>, <a href="fshook.html#al_update_fs_entry">al_update_fs_entry</a></p>
+<h1 id="al_get_fs_entry_size"><a href="#TOC">al_get_fs_entry_size</a></h1>
+<pre><code>off_t al_get_fs_entry_size(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Returns the size, in bytes, of the given entry. May not return anything sensible for a directory entry.</p>
+<p>See also: <a href="fshook.html#al_update_fs_entry">al_update_fs_entry</a></p>
+<h1 id="al_fs_entry_exists"><a href="#TOC">al_fs_entry_exists</a></h1>
+<pre><code>bool al_fs_entry_exists(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Check if the given entry exists on in the filesystem. Returns true if it does exist or false if it doesn't exist, or an error occured. Error is indicated in Allegro' errno.</p>
+<h1 id="al_remove_fs_entry"><a href="#TOC">al_remove_fs_entry</a></h1>
+<pre><code>bool al_remove_fs_entry(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Delete this filesystem entry from the filesystem. Only files and empty directories may be deleted.</p>
+<p>Returns true on success, and false on failure, error is indicated in Allegro' errno.</p>
+<p>See also: <a href="fshook.html#al_filename_exists">al_filename_exists</a></p>
+<h1 id="al_filename_exists"><a href="#TOC">al_filename_exists</a></h1>
+<pre><code>bool al_filename_exists(const char *path)
+</code></pre>
+<p>Check if the path exists on the filesystem, without creating an <a href="fshook.html#allegro_fs_entry">ALLEGRO_FS_ENTRY</a> object explicitly.</p>
+<p>See also: <a href="fshook.html#al_fs_entry_exists">al_fs_entry_exists</a></p>
+<h1 id="al_remove_filename"><a href="#TOC">al_remove_filename</a></h1>
+<pre><code>bool al_remove_filename(const char *path)
+</code></pre>
+<p>Delete the given path from the filesystem, which may be a file or an empty directory. This is the same as <a href="fshook.html#al_remove_fs_entry">al_remove_fs_entry</a>, except it expects the path as a string.</p>
+<p>Returns true on success, and false on failure. Allegro's errno is filled in to indicate the error.</p>
+<p>See also: <a href="fshook.html#al_remove_fs_entry">al_remove_fs_entry</a></p>
+<h1 id="directory-functions"><a href="#TOC">Directory functions</a></h1>
+<h2 id="al_open_directory"><a href="#TOC">al_open_directory</a></h2>
+<pre><code>bool al_open_directory(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Opens a directory entry object. You must call this before using <a href="fshook.html#al_read_directory">al_read_directory</a> on an entry and you must call <a href="fshook.html#al_close_directory">al_close_directory</a> when you no longer need it.</p>
+<p>Returns true on success.</p>
+<p>See also: <a href="fshook.html#al_read_directory">al_read_directory</a>, <a href="fshook.html#al_close_directory">al_close_directory</a></p>
+<h2 id="al_read_directory"><a href="#TOC">al_read_directory</a></h2>
+<pre><code>ALLEGRO_FS_ENTRY *al_read_directory(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Reads the next directory item and returns a filesystem entry for it.</p>
+<p>Returns NULL if there are no more entries or if an error occurs. Call <a href="fshook.html#al_destroy_fs_entry">al_destroy_fs_entry</a> on the returned entry when you are done with it.</p>
+<p>See also: <a href="fshook.html#al_open_directory">al_open_directory</a>, <a href="fshook.html#al_close_directory">al_close_directory</a></p>
+<h2 id="al_close_directory"><a href="#TOC">al_close_directory</a></h2>
+<pre><code>bool al_close_directory(ALLEGRO_FS_ENTRY *e)
+</code></pre>
+<p>Closes a previously opened directory entry object.</p>
+<p>Returns true on success, false on failure and fills in Allegro's errno to indicate the error.</p>
+<p>See also: <a href="fshook.html#al_open_directory">al_open_directory</a>, <a href="fshook.html#al_read_directory">al_read_directory</a></p>
+<h2 id="al_get_current_directory"><a href="#TOC">al_get_current_directory</a></h2>
+<pre><code>char *al_get_current_directory(void)
+</code></pre>
+<p>Returns the path to the current working directory, or NULL on failure. The returned path is dynamically allocated and must be destroyed with <a href="memory.html#al_free">al_free</a>.</p>
+<p>Allegro's errno is filled in to indicate the error if there is a failure. This function may not be implemented on some (virtual) filesystems.</p>
+<p>See also: <a href="state.html#al_get_errno">al_get_errno</a>, <a href="memory.html#al_free">al_free</a></p>
+<h2 id="al_change_directory"><a href="#TOC">al_change_directory</a></h2>
+<pre><code>bool al_change_directory(const char *path)
+</code></pre>
+<p>Changes the current working directory to 'path'.</p>
+<p>Returns true on success, false on error.</p>
+<h2 id="al_make_directory"><a href="#TOC">al_make_directory</a></h2>
+<pre><code>bool al_make_directory(const char *path)
+</code></pre>
+<p>Creates a new directory on the filesystem. This function also creates any parent directories as needed.</p>
+<p>Returns true on success (including if the directory already exists), otherwise returns false on error. Fills in Allegro's errno to indicate the error.</p>
+<p>See also: <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h2 id="al_open_fs_entry"><a href="#TOC">al_open_fs_entry</a></h2>
+<pre><code>ALLEGRO_FILE *al_open_fs_entry(ALLEGRO_FS_ENTRY *e, const char *mode)
+</code></pre>
+<p>Open an <a href="file.html#allegro_file">ALLEGRO_FILE</a> handle to a filesystem entry, for the given access mode. This is like calling <a href="file.html#al_fopen">al_fopen</a> with the name of the filesystem entry, but uses the appropriate file interface, not whatever was set with the latest call to <a href="file.html#al_set_new_file_interface">al_set_new_file_interface</a>.</p>
+<p>Returns the handle on success, NULL on error.</p>
+<p>See also: <a href="file.html#al_fopen">al_fopen</a></p>
+<h1 id="alternative-filesystem-functions"><a href="#TOC">Alternative filesystem functions</a></h1>
+<p>By default, Allegro uses platform specific filesystem functions for things like directory access. However if for example the files of your game are not in the local filesystem but inside some file archive, you can provide your own set of functions (or use an addon which does this for you, for example our physfs addon allows access to the most common archive formats).</p>
+<h2 id="allegro_fs_interface"><a href="#TOC">ALLEGRO_FS_INTERFACE</a></h2>
+<pre><code>typedef struct ALLEGRO_FS_INTERFACE ALLEGRO_FS_INTERFACE;
+</code></pre>
+<p>The available functions you can provide for a filesystem. They are:</p>
+<pre><code>   ALLEGRO_FS_ENTRY *  fs_create_entry   (const char *path);
+   void                fs_destroy_entry  (ALLEGRO_FS_ENTRY *e);
+   const char *        fs_entry_name     (ALLEGRO_FS_ENTRY *e);
+   bool                fs_update_entry   (ALLEGRO_FS_ENTRY *e);
+   uint32_t            fs_entry_mode     (ALLEGRO_FS_ENTRY *e);
+   time_t              fs_entry_atime    (ALLEGRO_FS_ENTRY *e);
+   time_t              fs_entry_mtime    (ALLEGRO_FS_ENTRY *e);
+   time_t              fs_entry_ctime    (ALLEGRO_FS_ENTRY *e);
+   off_t               fs_entry_size     (ALLEGRO_FS_ENTRY *e);
+   bool                fs_entry_exists   (ALLEGRO_FS_ENTRY *e);
+   bool                fs_remove_entry   (ALLEGRO_FS_ENTRY *e);
+
+   bool                fs_open_directory (ALLEGRO_FS_ENTRY *e);
+   ALLEGRO_FS_ENTRY *  fs_read_directory (ALLEGRO_FS_ENTRY *e);
+   bool                fs_close_directory(ALLEGRO_FS_ENTRY *e);
+
+   bool                fs_filename_exists(const char *path);
+   bool                fs_remove_filename(const char *path);
+   char *              fs_get_current_directory(void);
+   bool                fs_change_directory(const char *path);
+   bool                fs_make_directory(const char *path);
+
+   ALLEGRO_FILE *      fs_open_file(ALLEGRO_FS_ENTRY *e);
+</code></pre>
+<h2 id="al_set_fs_interface"><a href="#TOC">al_set_fs_interface</a></h2>
+<pre><code>void al_set_fs_interface(const ALLEGRO_FS_INTERFACE *fs_interface)
+</code></pre>
+<p>Set the <a href="fshook.html#allegro_fs_interface">ALLEGRO_FS_INTERFACE</a> table for the calling thread.</p>
+<p>See also: <a href="fshook.html#al_set_standard_fs_interface">al_set_standard_fs_interface</a>, <a href="state.html#al_store_state">al_store_state</a>, <a href="state.html#al_restore_state">al_restore_state</a>.</p>
+<h2 id="al_set_standard_fs_interface"><a href="#TOC">al_set_standard_fs_interface</a></h2>
+<pre><code>void al_set_standard_fs_interface(void)
+</code></pre>
+<p>Return the <a href="fshook.html#allegro_fs_interface">ALLEGRO_FS_INTERFACE</a> table to the default, for the calling thread.</p>
+<p>See also: <a href="fshook.html#al_set_fs_interface">al_set_fs_interface</a>.</p>
+<h2 id="al_get_fs_interface"><a href="#TOC">al_get_fs_interface</a></h2>
+<pre><code>const ALLEGRO_FS_INTERFACE *al_get_fs_interface(void)
+</code></pre>
+<p>Return a pointer to the <a href="fshook.html#allegro_fs_interface">ALLEGRO_FS_INTERFACE</a> table in effect for the calling thread.</p>
+<p>See also: <a href="state.html#al_store_state">al_store_state</a>, <a href="state.html#al_restore_state">al_restore_state</a>.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:45 UTC
+</p>
+</div>
+
+
+</body>
+</html>

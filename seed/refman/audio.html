@@ -1,0 +1,1097 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Audio addon</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Audio addon</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#audio-types">Audio types</a><ul>
+<li><a href="#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a></li>
+<li><a href="#allegro_audio_pan_none">ALLEGRO_AUDIO_PAN_NONE</a></li>
+<li><a href="#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a></li>
+<li><a href="#allegro_mixer">ALLEGRO_MIXER</a></li>
+<li><a href="#allegro_mixer_quality">ALLEGRO_MIXER_QUALITY</a></li>
+<li><a href="#allegro_playmode">ALLEGRO_PLAYMODE</a></li>
+<li><a href="#allegro_sample_id">ALLEGRO_SAMPLE_ID</a></li>
+<li><a href="#allegro_sample">ALLEGRO_SAMPLE</a></li>
+<li><a href="#allegro_sample_instance">ALLEGRO_SAMPLE_INSTANCE</a></li>
+<li><a href="#allegro_audio_stream">ALLEGRO_AUDIO_STREAM</a></li>
+<li><a href="#allegro_voice">ALLEGRO_VOICE</a></li>
+</ul></li>
+<li><a href="#setting-up-audio">Setting up audio</a><ul>
+<li><a href="#al_install_audio">al_install_audio</a></li>
+<li><a href="#al_uninstall_audio">al_uninstall_audio</a></li>
+<li><a href="#al_is_audio_installed">al_is_audio_installed</a></li>
+<li><a href="#al_reserve_samples">al_reserve_samples</a></li>
+</ul></li>
+<li><a href="#misc-audio-functions">Misc audio functions</a><ul>
+<li><a href="#al_get_allegro_audio_version">al_get_allegro_audio_version</a></li>
+<li><a href="#al_get_audio_depth_size">al_get_audio_depth_size</a></li>
+<li><a href="#al_get_channel_count">al_get_channel_count</a></li>
+</ul></li>
+<li><a href="#voice-functions">Voice functions</a><ul>
+<li><a href="#al_create_voice">al_create_voice</a></li>
+<li><a href="#al_destroy_voice">al_destroy_voice</a></li>
+<li><a href="#al_detach_voice">al_detach_voice</a></li>
+<li><a href="#al_attach_audio_stream_to_voice">al_attach_audio_stream_to_voice</a></li>
+<li><a href="#al_attach_mixer_to_voice">al_attach_mixer_to_voice</a></li>
+<li><a href="#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a></li>
+<li><a href="#al_get_voice_frequency">al_get_voice_frequency</a></li>
+<li><a href="#al_get_voice_channels">al_get_voice_channels</a></li>
+<li><a href="#al_get_voice_depth">al_get_voice_depth</a></li>
+<li><a href="#al_get_voice_playing">al_get_voice_playing</a></li>
+<li><a href="#al_set_voice_playing">al_set_voice_playing</a></li>
+<li><a href="#al_get_voice_position">al_get_voice_position</a></li>
+<li><a href="#al_set_voice_position">al_set_voice_position</a></li>
+</ul></li>
+<li><a href="#sample-functions">Sample functions</a><ul>
+<li><a href="#al_create_sample">al_create_sample</a></li>
+<li><a href="#al_destroy_sample">al_destroy_sample</a></li>
+<li><a href="#al_play_sample">al_play_sample</a></li>
+<li><a href="#al_stop_sample">al_stop_sample</a></li>
+<li><a href="#al_stop_samples">al_stop_samples</a></li>
+<li><a href="#al_get_sample_channels">al_get_sample_channels</a></li>
+<li><a href="#al_get_sample_depth">al_get_sample_depth</a></li>
+<li><a href="#al_get_sample_frequency">al_get_sample_frequency</a></li>
+<li><a href="#al_get_sample_length">al_get_sample_length</a></li>
+<li><a href="#al_get_sample_data">al_get_sample_data</a></li>
+</ul></li>
+<li><a href="#sample-instance-functions">Sample instance functions</a><ul>
+<li><a href="#al_create_sample_instance">al_create_sample_instance</a></li>
+<li><a href="#al_destroy_sample_instance">al_destroy_sample_instance</a></li>
+<li><a href="#al_play_sample_instance">al_play_sample_instance</a></li>
+<li><a href="#al_stop_sample_instance">al_stop_sample_instance</a></li>
+<li><a href="#al_get_sample_instance_channels">al_get_sample_instance_channels</a></li>
+<li><a href="#al_get_sample_instance_depth">al_get_sample_instance_depth</a></li>
+<li><a href="#al_get_sample_instance_frequency">al_get_sample_instance_frequency</a></li>
+<li><a href="#al_get_sample_instance_length">al_get_sample_instance_length</a></li>
+<li><a href="#al_set_sample_instance_length">al_set_sample_instance_length</a></li>
+<li><a href="#al_get_sample_instance_position">al_get_sample_instance_position</a></li>
+<li><a href="#al_set_sample_instance_position">al_set_sample_instance_position</a></li>
+<li><a href="#al_get_sample_instance_speed">al_get_sample_instance_speed</a></li>
+<li><a href="#al_set_sample_instance_speed">al_set_sample_instance_speed</a></li>
+<li><a href="#al_get_sample_instance_gain">al_get_sample_instance_gain</a></li>
+<li><a href="#al_set_sample_instance_gain">al_set_sample_instance_gain</a></li>
+<li><a href="#al_get_sample_instance_pan">al_get_sample_instance_pan</a></li>
+<li><a href="#al_set_sample_instance_pan">al_set_sample_instance_pan</a></li>
+<li><a href="#al_get_sample_instance_time">al_get_sample_instance_time</a></li>
+<li><a href="#al_get_sample_instance_playmode">al_get_sample_instance_playmode</a></li>
+<li><a href="#al_set_sample_instance_playmode">al_set_sample_instance_playmode</a></li>
+<li><a href="#al_get_sample_instance_playing">al_get_sample_instance_playing</a></li>
+<li><a href="#al_set_sample_instance_playing">al_set_sample_instance_playing</a></li>
+<li><a href="#al_get_sample_instance_attached">al_get_sample_instance_attached</a></li>
+<li><a href="#al_detach_sample_instance">al_detach_sample_instance</a></li>
+<li><a href="#al_get_sample">al_get_sample</a></li>
+<li><a href="#al_set_sample">al_set_sample</a></li>
+</ul></li>
+<li><a href="#mixer-functions">Mixer functions</a><ul>
+<li><a href="#al_create_mixer">al_create_mixer</a></li>
+<li><a href="#al_destroy_mixer">al_destroy_mixer</a></li>
+<li><a href="#al_get_default_mixer">al_get_default_mixer</a></li>
+<li><a href="#al_set_default_mixer">al_set_default_mixer</a></li>
+<li><a href="#al_restore_default_mixer">al_restore_default_mixer</a></li>
+<li><a href="#al_attach_mixer_to_mixer">al_attach_mixer_to_mixer</a></li>
+<li><a href="#al_attach_sample_instance_to_mixer">al_attach_sample_instance_to_mixer</a></li>
+<li><a href="#al_attach_audio_stream_to_mixer">al_attach_audio_stream_to_mixer</a></li>
+<li><a href="#al_get_mixer_frequency">al_get_mixer_frequency</a></li>
+<li><a href="#al_set_mixer_frequency">al_set_mixer_frequency</a></li>
+<li><a href="#al_get_mixer_channels">al_get_mixer_channels</a></li>
+<li><a href="#al_get_mixer_depth">al_get_mixer_depth</a></li>
+<li><a href="#al_get_mixer_gain">al_get_mixer_gain</a></li>
+<li><a href="#al_set_mixer_gain">al_set_mixer_gain</a></li>
+<li><a href="#al_get_mixer_quality">al_get_mixer_quality</a></li>
+<li><a href="#al_set_mixer_quality">al_set_mixer_quality</a></li>
+<li><a href="#al_get_mixer_playing">al_get_mixer_playing</a></li>
+<li><a href="#al_set_mixer_playing">al_set_mixer_playing</a></li>
+<li><a href="#al_get_mixer_attached">al_get_mixer_attached</a></li>
+<li><a href="#al_detach_mixer">al_detach_mixer</a></li>
+<li><a href="#al_set_mixer_postprocess_callback">al_set_mixer_postprocess_callback</a></li>
+</ul></li>
+<li><a href="#stream-functions">Stream functions</a><ul>
+<li><a href="#al_create_audio_stream">al_create_audio_stream</a></li>
+<li><a href="#al_destroy_audio_stream">al_destroy_audio_stream</a></li>
+<li><a href="#al_get_audio_stream_event_source">al_get_audio_stream_event_source</a></li>
+<li><a href="#al_drain_audio_stream">al_drain_audio_stream</a></li>
+<li><a href="#al_rewind_audio_stream">al_rewind_audio_stream</a></li>
+<li><a href="#al_get_audio_stream_frequency">al_get_audio_stream_frequency</a></li>
+<li><a href="#al_get_audio_stream_channels">al_get_audio_stream_channels</a></li>
+<li><a href="#al_get_audio_stream_depth">al_get_audio_stream_depth</a></li>
+<li><a href="#al_get_audio_stream_length">al_get_audio_stream_length</a></li>
+<li><a href="#al_get_audio_stream_speed">al_get_audio_stream_speed</a></li>
+<li><a href="#al_set_audio_stream_speed">al_set_audio_stream_speed</a></li>
+<li><a href="#al_get_audio_stream_gain">al_get_audio_stream_gain</a></li>
+<li><a href="#al_set_audio_stream_gain">al_set_audio_stream_gain</a></li>
+<li><a href="#al_get_audio_stream_pan">al_get_audio_stream_pan</a></li>
+<li><a href="#al_set_audio_stream_pan">al_set_audio_stream_pan</a></li>
+<li><a href="#al_get_audio_stream_playing">al_get_audio_stream_playing</a></li>
+<li><a href="#al_set_audio_stream_playing">al_set_audio_stream_playing</a></li>
+<li><a href="#al_get_audio_stream_playmode">al_get_audio_stream_playmode</a></li>
+<li><a href="#al_set_audio_stream_playmode">al_set_audio_stream_playmode</a></li>
+<li><a href="#al_get_audio_stream_attached">al_get_audio_stream_attached</a></li>
+<li><a href="#al_detach_audio_stream">al_detach_audio_stream</a></li>
+<li><a href="#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a></li>
+<li><a href="#al_set_audio_stream_fragment">al_set_audio_stream_fragment</a></li>
+<li><a href="#al_get_audio_stream_fragments">al_get_audio_stream_fragments</a></li>
+<li><a href="#al_get_available_audio_stream_fragments">al_get_available_audio_stream_fragments</a></li>
+<li><a href="#al_seek_audio_stream_secs">al_seek_audio_stream_secs</a></li>
+<li><a href="#al_get_audio_stream_position_secs">al_get_audio_stream_position_secs</a></li>
+<li><a href="#al_get_audio_stream_length_secs">al_get_audio_stream_length_secs</a></li>
+<li><a href="#al_set_audio_stream_loop_secs">al_set_audio_stream_loop_secs</a></li>
+</ul></li>
+<li><a href="#audio-file-io">Audio file I/O</a><ul>
+<li><a href="#al_register_sample_loader">al_register_sample_loader</a></li>
+<li><a href="#al_register_sample_loader_f">al_register_sample_loader_f</a></li>
+<li><a href="#al_register_sample_saver">al_register_sample_saver</a></li>
+<li><a href="#al_register_sample_saver_f">al_register_sample_saver_f</a></li>
+<li><a href="#al_register_audio_stream_loader">al_register_audio_stream_loader</a></li>
+<li><a href="#al_register_audio_stream_loader_f">al_register_audio_stream_loader_f</a></li>
+<li><a href="#al_load_sample">al_load_sample</a></li>
+<li><a href="#al_load_sample_f">al_load_sample_f</a></li>
+<li><a href="#al_load_audio_stream">al_load_audio_stream</a></li>
+<li><a href="#al_load_audio_stream_f">al_load_audio_stream_f</a></li>
+<li><a href="#al_save_sample">al_save_sample</a></li>
+<li><a href="#al_save_sample_f">al_save_sample_f</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the following header file. Link with allegro_audio.</p>
+<pre><code>#include &lt;allegro5/allegro_audio.h&gt;
+</code></pre>
+<h1 id="audio-types"><a href="#TOC">Audio types</a></h1>
+<h2 id="allegro_audio_depth"><a href="#TOC">ALLEGRO_AUDIO_DEPTH</a></h2>
+<pre><code>enum ALLEGRO_AUDIO_DEPTH
+</code></pre>
+<p>Sample depth and type, and signedness. Mixers only use 32-bit signed float (-1..+1), or 16-bit signed integers. The unsigned value is a bit-flag applied to the depth value.</p>
+<ul>
+<li>ALLEGRO_AUDIO_DEPTH_INT8</li>
+<li>ALLEGRO_AUDIO_DEPTH_INT16</li>
+<li>ALLEGRO_AUDIO_DEPTH_INT24</li>
+<li>ALLEGRO_AUDIO_DEPTH_FLOAT32</li>
+<li>ALLEGRO_AUDIO_DEPTH_UNSIGNED</li>
+</ul>
+<p>For convenience:</p>
+<ul>
+<li>ALLEGRO_AUDIO_DEPTH_UINT8</li>
+<li>ALLEGRO_AUDIO_DEPTH_UINT16</li>
+<li>ALLEGRO_AUDIO_DEPTH_UINT24</li>
+</ul>
+<h2 id="allegro_audio_pan_none"><a href="#TOC">ALLEGRO_AUDIO_PAN_NONE</a></h2>
+<pre><code>#define ALLEGRO_AUDIO_PAN_NONE      (-1000.0f)
+</code></pre>
+<p>Special value for the ALLEGRO_AUDIOPROP_PAN property. Use this value to play samples at their original volume with panning disabled.</p>
+<h2 id="allegro_channel_conf"><a href="#TOC">ALLEGRO_CHANNEL_CONF</a></h2>
+<pre><code>enum ALLEGRO_CHANNEL_CONF
+</code></pre>
+<p>Speaker configuration (mono, stereo, 2.1, etc).</p>
+<ul>
+<li>ALLEGRO_CHANNEL_CONF_1</li>
+<li>ALLEGRO_CHANNEL_CONF_2</li>
+<li>ALLEGRO_CHANNEL_CONF_3</li>
+<li>ALLEGRO_CHANNEL_CONF_4</li>
+<li>ALLEGRO_CHANNEL_CONF_5_1</li>
+<li>ALLEGRO_CHANNEL_CONF_6_1</li>
+<li>ALLEGRO_CHANNEL_CONF_7_1</li>
+</ul>
+<h2 id="allegro_mixer"><a href="#TOC">ALLEGRO_MIXER</a></h2>
+<pre><code>typedef struct ALLEGRO_MIXER ALLEGRO_MIXER;
+</code></pre>
+<p>A mixer is a type of stream which mixes together attached streams into a single buffer.</p>
+<h2 id="allegro_mixer_quality"><a href="#TOC">ALLEGRO_MIXER_QUALITY</a></h2>
+<pre><code>enum ALLEGRO_MIXER_QUALITY
+</code></pre>
+<ul>
+<li>ALLEGRO_MIXER_QUALITY_POINT - point sampling</li>
+<li>ALLEGRO_MIXER_QUALITY_LINEAR - linear interpolation</li>
+</ul>
+<h2 id="allegro_playmode"><a href="#TOC">ALLEGRO_PLAYMODE</a></h2>
+<pre><code>enum ALLEGRO_PLAYMODE
+</code></pre>
+<p>Sample and stream playback mode.</p>
+<ul>
+<li>ALLEGRO_PLAYMODE_ONCE</li>
+<li>ALLEGRO_PLAYMODE_LOOP</li>
+<li>ALLEGRO_PLAYMODE_BIDIR</li>
+</ul>
+<h2 id="allegro_sample_id"><a href="#TOC">ALLEGRO_SAMPLE_ID</a></h2>
+<pre><code>typedef struct ALLEGRO_SAMPLE_ID ALLEGRO_SAMPLE_ID;
+</code></pre>
+<p>An ALLEGRO_SAMPLE_ID represents a sample being played via <a href="audio.html#al_play_sample">al_play_sample</a>. It can be used to later stop the sample with <a href="audio.html#al_stop_sample">al_stop_sample</a>.</p>
+<h2 id="allegro_sample"><a href="#TOC">ALLEGRO_SAMPLE</a></h2>
+<pre><code>typedef struct ALLEGRO_SAMPLE ALLEGRO_SAMPLE;
+</code></pre>
+<p>An ALLEGRO_SAMPLE object stores the data necessary for playing pre-defined digital audio. It holds information pertaining to data length, frequency, channel configuration, etc. You can have an ALLEGRO_SAMPLE object playing multiple times simultaneously. The object holds a user-specified PCM data buffer, of the format the object is created with.</p>
+<p>See also: <a href="audio.html#allegro_sample_instance">ALLEGRO_SAMPLE_INSTANCE</a></p>
+<h2 id="allegro_sample_instance"><a href="#TOC">ALLEGRO_SAMPLE_INSTANCE</a></h2>
+<pre><code>typedef struct ALLEGRO_SAMPLE_INSTANCE ALLEGRO_SAMPLE_INSTANCE;
+</code></pre>
+<p>An ALLEGRO_SAMPLE_INSTANCE object represents a playable instance of a predefined sound effect. It holds information pertaining to the looping mode, loop start/end points, playing position, etc. An instance uses the data from an <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a> object. Multiple instances may be created from the same ALLEGRO_SAMPLE. An ALLEGRO_SAMPLE must not be destroyed while there are instances which reference it.</p>
+<p>To be played, an ALLEGRO_SAMPLE_INSTANCE object must be attached to an <a href="audio.html#allegro_voice">ALLEGRO_VOICE</a> object, or to an <a href="audio.html#allegro_mixer">ALLEGRO_MIXER</a> object which is itself attached to an ALLEGRO_VOICE object (or to another ALLEGRO_MIXER object which is attached to an ALLEGRO_VOICE object, etc).</p>
+<p>See also: <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a></p>
+<h2 id="allegro_audio_stream"><a href="#TOC">ALLEGRO_AUDIO_STREAM</a></h2>
+<pre><code>typedef struct ALLEGRO_AUDIO_STREAM ALLEGRO_AUDIO_STREAM;
+</code></pre>
+<p>An ALLEGRO_AUDIO_STREAM object is used to stream generated audio to the sound device, in real-time. This is done by reading from a buffer, which is split into a number of fragments. Whenever a fragment has finished playing, the user can refill it with new data.</p>
+<p>As with <a href="audio.html#allegro_sample_instance">ALLEGRO_SAMPLE_INSTANCE</a> objects, streams store information necessary for playback, so you may not play the same stream multiple times simultaneously. Streams also need to be attached to an <a href="audio.html#allegro_voice">ALLEGRO_VOICE</a> object, or to an <a href="audio.html#allegro_mixer">ALLEGRO_MIXER</a> object which, eventually, reaches an ALLEGRO_VOICE object.</p>
+<p>While playing, you must periodically fill fragments with new audio data. To know when a new fragment is ready to be filled, you can either directly check with <a href="audio.html#al_get_available_audio_stream_fragments">al_get_available_audio_stream_fragments</a>, or listen to events from the stream.</p>
+<p>You can register an audio stream event source to an event queue; see <a href="audio.html#al_get_audio_stream_event_source">al_get_audio_stream_event_source</a>. An ALLEGRO_EVENT_AUDIO_STREAM_FRAGMENT event is generated whenever a new fragment is ready. When you receive an event, use <a href="audio.html#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a> to obtain a pointer to the fragment to be filled. The size and format are determined by the parameters passed to <a href="audio.html#al_create_audio_stream">al_create_audio_stream</a>.</p>
+<p>If you're late with supplying new data, the stream will be silent until new data is provided. You must call <a href="audio.html#al_drain_audio_stream">al_drain_audio_stream</a> when you're finished with supplying data to the stream.</p>
+<p>If the stream is created by <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a> then it can also generate an ALLEGRO_EVENT_AUDIO_STREAM_FINISHED event if it reaches the end of the file and is not set to loop.</p>
+<h2 id="allegro_voice"><a href="#TOC">ALLEGRO_VOICE</a></h2>
+<pre><code>typedef struct ALLEGRO_VOICE ALLEGRO_VOICE;
+</code></pre>
+<p>A voice represents an audio device on the system, which may be a real device, or an abstract device provided by the operating system. To play back audio, you would attach a mixer or sample or stream to a voice.</p>
+<p>See also: <a href="audio.html#allegro_mixer">ALLEGRO_MIXER</a>, <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a>, <a href="audio.html#allegro_audio_stream">ALLEGRO_AUDIO_STREAM</a></p>
+<h1 id="setting-up-audio"><a href="#TOC">Setting up audio</a></h1>
+<h2 id="al_install_audio"><a href="#TOC">al_install_audio</a></h2>
+<pre><code>bool al_install_audio(void)
+</code></pre>
+<p>Install the audio subsystem.</p>
+<p>Returns true on success, false on failure.</p>
+<p>Note: most users will call <a href="audio.html#al_reserve_samples">al_reserve_samples</a> and <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a> after this.</p>
+<p>See also: <a href="audio.html#al_reserve_samples">al_reserve_samples</a>, <a href="audio.html#al_uninstall_audio">al_uninstall_audio</a>, <a href="audio.html#al_is_audio_installed">al_is_audio_installed</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_uninstall_audio"><a href="#TOC">al_uninstall_audio</a></h2>
+<pre><code>void al_uninstall_audio(void)
+</code></pre>
+<p>Uninstalls the audio subsystem.</p>
+<p>See also: <a href="audio.html#al_install_audio">al_install_audio</a></p>
+<h2 id="al_is_audio_installed"><a href="#TOC">al_is_audio_installed</a></h2>
+<pre><code>bool al_is_audio_installed(void)
+</code></pre>
+<p>Returns true if <a href="audio.html#al_install_audio">al_install_audio</a> was called previously and returned successfully.</p>
+<h2 id="al_reserve_samples"><a href="#TOC">al_reserve_samples</a></h2>
+<pre><code>bool al_reserve_samples(int reserve_samples)
+</code></pre>
+<p>Reserves a number of sample instances, attaching them to the default mixer. If no default mixer is set when this function is called, then it will automatically create a voice with an attached mixer, which becomes the default mixer. This diagram illustrates the structures that are set up:</p>
+<pre><code>                              sample instance 1
+                            / sample instance 2
+voice &lt;-- default mixer &lt;---         .
+                            \        .
+                              sample instance N
+</code></pre>
+<p>Returns true on success, false on error. <a href="audio.html#al_install_audio">al_install_audio</a> must have been called first.</p>
+<p>See also: <a href="audio.html#al_set_default_mixer">al_set_default_mixer</a>, <a href="audio.html#al_play_sample">al_play_sample</a></p>
+<h1 id="misc-audio-functions"><a href="#TOC">Misc audio functions</a></h1>
+<h2 id="al_get_allegro_audio_version"><a href="#TOC">al_get_allegro_audio_version</a></h2>
+<pre><code>uint32_t al_get_allegro_audio_version(void)
+</code></pre>
+<p>Returns the (compiled) version of the addon, in the same format as <a href="system.html#al_get_allegro_version">al_get_allegro_version</a>.</p>
+<h2 id="al_get_audio_depth_size"><a href="#TOC">al_get_audio_depth_size</a></h2>
+<pre><code>size_t al_get_audio_depth_size(ALLEGRO_AUDIO_DEPTH depth)
+</code></pre>
+<p>Return the size of a sample, in bytes, for the given format. The format is one of the values listed under <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p>
+<h2 id="al_get_channel_count"><a href="#TOC">al_get_channel_count</a></h2>
+<pre><code>size_t al_get_channel_count(ALLEGRO_CHANNEL_CONF conf)
+</code></pre>
+<p>Return the number of channels for the given channel configuration, which is one of the values listed under <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p>
+<h1 id="voice-functions"><a href="#TOC">Voice functions</a></h1>
+<h2 id="al_create_voice"><a href="#TOC">al_create_voice</a></h2>
+<pre><code>ALLEGRO_VOICE *al_create_voice(unsigned int freq,
+   ALLEGRO_AUDIO_DEPTH depth, ALLEGRO_CHANNEL_CONF chan_conf)
+</code></pre>
+<p>Creates a voice structure and allocates a voice from the digital sound driver. The passed frequency, sample format and channel configuration are used as a hint to what kind of data will be sent to the voice. However, the underlying sound driver is free to use non-matching values. For example it may be the native format of the sound hardware. If a mixer is attached to the voice, the mixer will convert from the mixer's format to the voice format and care does not have to be taken for this.</p>
+<p>However if you access the voice directly, make sure to not rely on the parameters passed to this function, but instead query the returned voice for the actual settings.</p>
+<p>See also: <a href="audio.html#al_destroy_voice">al_destroy_voice</a></p>
+<h2 id="al_destroy_voice"><a href="#TOC">al_destroy_voice</a></h2>
+<pre><code>void al_destroy_voice(ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Destroys the voice and deallocates it from the digital driver. Does nothing if the voice is NULL.</p>
+<p>See also: <a href="audio.html#al_create_voice">al_create_voice</a></p>
+<h2 id="al_detach_voice"><a href="#TOC">al_detach_voice</a></h2>
+<pre><code>void al_detach_voice(ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Detaches the mixer or sample or stream from the voice.</p>
+<p>See also: <a href="audio.html#al_attach_mixer_to_voice">al_attach_mixer_to_voice</a>, <a href="audio.html#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a>, <a href="audio.html#al_attach_audio_stream_to_voice">al_attach_audio_stream_to_voice</a></p>
+<h2 id="al_attach_audio_stream_to_voice"><a href="#TOC">al_attach_audio_stream_to_voice</a></h2>
+<pre><code>bool al_attach_audio_stream_to_voice(ALLEGRO_AUDIO_STREAM *stream,
+   ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Attaches an audio stream to a voice. The same rules as <a href="audio.html#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a> apply. This may fail if the driver can't create a voice with the buffer count and buffer size the stream uses.</p>
+<p>An audio stream attached directly to a voice has a number of limitations. The audio stream plays immediately and cannot be stopped. The stream position, speed, gain, panning, cannot be changed. At this time, we don't recommend attaching audio streams directly to voices. Use a mixer in between.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_detach_voice">al_detach_voice</a></p>
+<h2 id="al_attach_mixer_to_voice"><a href="#TOC">al_attach_mixer_to_voice</a></h2>
+<pre><code>bool al_attach_mixer_to_voice(ALLEGRO_MIXER *mixer, ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Attaches a mixer to a voice. The same rules as <a href="audio.html#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a> apply, with the exception of the depth requirement.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_detach_voice">al_detach_voice</a></p>
+<h2 id="al_attach_sample_instance_to_voice"><a href="#TOC">al_attach_sample_instance_to_voice</a></h2>
+<pre><code>bool al_attach_sample_instance_to_voice(ALLEGRO_SAMPLE_INSTANCE *spl,
+   ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Attaches a sample to a voice, and allows it to play. The sample's volume and loop mode will be ignored, and it must have the same frequency and depth (including signed-ness) as the voice. This function may fail if the selected driver doesn't support preloading sample data.</p>
+<p>At this time, we don't recommend attaching samples directly to voices. Use a mixer in between.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_detach_voice">al_detach_voice</a></p>
+<h2 id="al_get_voice_frequency"><a href="#TOC">al_get_voice_frequency</a></h2>
+<pre><code>unsigned int al_get_voice_frequency(const ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Return the frequency of the voice, e.g. 44100.</p>
+<h2 id="al_get_voice_channels"><a href="#TOC">al_get_voice_channels</a></h2>
+<pre><code>ALLEGRO_CHANNEL_CONF al_get_voice_channels(const ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Return the channel configuration of the voice.</p>
+<p>See also: <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p>
+<h2 id="al_get_voice_depth"><a href="#TOC">al_get_voice_depth</a></h2>
+<pre><code>ALLEGRO_AUDIO_DEPTH al_get_voice_depth(const ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Return the audio depth of the voice.</p>
+<p>See also: <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p>
+<h2 id="al_get_voice_playing"><a href="#TOC">al_get_voice_playing</a></h2>
+<pre><code>bool al_get_voice_playing(const ALLEGRO_VOICE *voice)
+</code></pre>
+<p>Return true if the voice is currently playing.</p>
+<p>See also: <a href="audio.html#al_set_voice_playing">al_set_voice_playing</a></p>
+<h2 id="al_set_voice_playing"><a href="#TOC">al_set_voice_playing</a></h2>
+<pre><code>bool al_set_voice_playing(ALLEGRO_VOICE *voice, bool val)
+</code></pre>
+<p>Change whether a voice is playing or not. This can only work if the voice has a non-streaming object attached to it, e.g. a sample instance. On success the voice's current sample position is reset.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_voice_playing">al_get_voice_playing</a></p>
+<h2 id="al_get_voice_position"><a href="#TOC">al_get_voice_position</a></h2>
+<pre><code>unsigned int al_get_voice_position(const ALLEGRO_VOICE *voice)
+</code></pre>
+<p>When the voice has a non-streaming object attached to it, e.g. a sample, returns the voice's current sample position. Otherwise, returns zero.</p>
+<p>See also: <a href="audio.html#al_set_voice_position">al_set_voice_position</a>.</p>
+<h2 id="al_set_voice_position"><a href="#TOC">al_set_voice_position</a></h2>
+<pre><code>bool al_set_voice_position(ALLEGRO_VOICE *voice, unsigned int val)
+</code></pre>
+<p>Set the voice position. This can only work if the voice has a non-streaming object attached to it, e.g. a sample instance.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_voice_position">al_get_voice_position</a>.</p>
+<h1 id="sample-functions"><a href="#TOC">Sample functions</a></h1>
+<h2 id="al_create_sample"><a href="#TOC">al_create_sample</a></h2>
+<pre><code>ALLEGRO_SAMPLE *al_create_sample(void *buf, unsigned int samples,
+   unsigned int freq, ALLEGRO_AUDIO_DEPTH depth,
+   ALLEGRO_CHANNEL_CONF chan_conf, bool free_buf)
+</code></pre>
+<p>Create a sample data structure from the supplied buffer. If <code>free_buf</code> is true then the buffer will be freed with <a href="memory.html#al_free">al_free</a> when the sample data structure is destroyed. For portability (especially Windows), the buffer should have been allocated with <a href="memory.html#al_malloc">al_malloc</a>. Otherwise you should free the sample data yourself.</p>
+<p>To allocate a buffer of the correct size, you can use something like this:</p>
+<pre><code>sample_size = al_get_channel_count(chan_conf) * al_get_audio_depth_size(depth);
+bytes = samples * sample_size;
+buffer = al_malloc(bytes);
+</code></pre>
+<p>See also: <a href="audio.html#al_destroy_sample">al_destroy_sample</a>, <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>, <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a></p>
+<h2 id="al_destroy_sample"><a href="#TOC">al_destroy_sample</a></h2>
+<pre><code>void al_destroy_sample(ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Free the sample data structure. If it was created with the <code>free_buf</code> parameter set to true, then the buffer will be freed with <a href="memory.html#al_free">al_free</a>.</p>
+<p>This function will stop any sample instances which may be playing the buffer referenced by the <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a>.</p>
+<p>See also: <a href="audio.html#al_destroy_sample_instance">al_destroy_sample_instance</a>, <a href="audio.html#al_stop_sample">al_stop_sample</a>, <a href="audio.html#al_stop_samples">al_stop_samples</a></p>
+<h2 id="al_play_sample"><a href="#TOC">al_play_sample</a></h2>
+<pre><code>bool al_play_sample(ALLEGRO_SAMPLE *spl, float gain, float pan, float speed,
+   ALLEGRO_PLAYMODE loop, ALLEGRO_SAMPLE_ID *ret_id)
+</code></pre>
+<p>Plays a sample on one of the sample instances created by <a href="audio.html#al_reserve_samples">al_reserve_samples</a>. Returns true on success, false on failure. Playback may fail because all the reserved sample instances are currently used.</p>
+<p>Parameters:</p>
+<ul>
+<li>gain - relative volume at which the sample is played; 1.0 is normal.</li>
+<li>pan - 0.0 is centred, -1.0 is left, 1.0 is right, or ALLEGRO_AUDIO_PAN_NONE.</li>
+<li>speed - relative speed at which the sample is played; 1.0 is normal.</li>
+<li>loop - ALLEGRO_PLAYMODE_ONCE, ALLEGRO_PLAYMODE_LOOP, or ALLEGRO_PLAYMODE_BIDIR</li>
+<li>ret_id - if non-NULL the variable which this points to will be assigned an id representing the sample being played.</li>
+</ul>
+<p>See also: <a href="audio.html#allegro_playmode">ALLEGRO_PLAYMODE</a>, <a href="audio.html#allegro_audio_pan_none">ALLEGRO_AUDIO_PAN_NONE</a>, <a href="audio.html#allegro_sample_id">ALLEGRO_SAMPLE_ID</a>, <a href="audio.html#al_stop_sample">al_stop_sample</a>, <a href="audio.html#al_stop_samples">al_stop_samples</a>.</p>
+<h2 id="al_stop_sample"><a href="#TOC">al_stop_sample</a></h2>
+<pre><code>void al_stop_sample(ALLEGRO_SAMPLE_ID *spl_id)
+</code></pre>
+<p>Stop the sample started by <a href="audio.html#al_play_sample">al_play_sample</a>.</p>
+<p>See also: <a href="audio.html#al_stop_samples">al_stop_samples</a></p>
+<h2 id="al_stop_samples"><a href="#TOC">al_stop_samples</a></h2>
+<pre><code>void al_stop_samples(void)
+</code></pre>
+<p>Stop all samples started by <a href="audio.html#al_play_sample">al_play_sample</a>.</p>
+<p>See also: <a href="audio.html#al_stop_sample">al_stop_sample</a></p>
+<h2 id="al_get_sample_channels"><a href="#TOC">al_get_sample_channels</a></h2>
+<pre><code>ALLEGRO_CHANNEL_CONF al_get_sample_channels(const ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Return the channel configuration.</p>
+<p>See also: <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>, <a href="audio.html#al_get_sample_depth">al_get_sample_depth</a>, <a href="audio.html#al_get_sample_frequency">al_get_sample_frequency</a>, <a href="audio.html#al_get_sample_length">al_get_sample_length</a>, <a href="audio.html#al_get_sample_data">al_get_sample_data</a></p>
+<h2 id="al_get_sample_depth"><a href="#TOC">al_get_sample_depth</a></h2>
+<pre><code>ALLEGRO_AUDIO_DEPTH al_get_sample_depth(const ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Return the audio depth.</p>
+<p>See also: <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>, <a href="audio.html#al_get_sample_channels">al_get_sample_channels</a>, <a href="audio.html#al_get_sample_frequency">al_get_sample_frequency</a>, <a href="audio.html#al_get_sample_length">al_get_sample_length</a>, <a href="audio.html#al_get_sample_data">al_get_sample_data</a></p>
+<h2 id="al_get_sample_frequency"><a href="#TOC">al_get_sample_frequency</a></h2>
+<pre><code>unsigned int al_get_sample_frequency(const ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Return the frequency of the sample.</p>
+<p>See also: <a href="audio.html#al_get_sample_channels">al_get_sample_channels</a>, <a href="audio.html#al_get_sample_depth">al_get_sample_depth</a>, <a href="audio.html#al_get_sample_length">al_get_sample_length</a>, <a href="audio.html#al_get_sample_data">al_get_sample_data</a></p>
+<h2 id="al_get_sample_length"><a href="#TOC">al_get_sample_length</a></h2>
+<pre><code>unsigned int al_get_sample_length(const ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Return the length of the sample in sample values.</p>
+<p>See also: <a href="audio.html#al_get_sample_channels">al_get_sample_channels</a>, <a href="audio.html#al_get_sample_depth">al_get_sample_depth</a>, <a href="audio.html#al_get_sample_frequency">al_get_sample_frequency</a>, <a href="audio.html#al_get_sample_data">al_get_sample_data</a></p>
+<h2 id="al_get_sample_data"><a href="#TOC">al_get_sample_data</a></h2>
+<pre><code>void *al_get_sample_data(const ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Return a pointer to the raw sample data.</p>
+<p>See also: <a href="audio.html#al_get_sample_channels">al_get_sample_channels</a>, <a href="audio.html#al_get_sample_depth">al_get_sample_depth</a>, <a href="audio.html#al_get_sample_frequency">al_get_sample_frequency</a>, <a href="audio.html#al_get_sample_length">al_get_sample_length</a></p>
+<h1 id="sample-instance-functions"><a href="#TOC">Sample instance functions</a></h1>
+<h2 id="al_create_sample_instance"><a href="#TOC">al_create_sample_instance</a></h2>
+<pre><code>ALLEGRO_SAMPLE_INSTANCE *al_create_sample_instance(ALLEGRO_SAMPLE *sample_data)
+</code></pre>
+<p>Creates a sample stream, using the supplied data. This must be attached to a voice or mixer before it can be played. The argument may be NULL. You can then set the data later with <a href="audio.html#al_set_sample">al_set_sample</a>.</p>
+<p>See also: <a href="audio.html#al_destroy_sample_instance">al_destroy_sample_instance</a></p>
+<h2 id="al_destroy_sample_instance"><a href="#TOC">al_destroy_sample_instance</a></h2>
+<pre><code>void al_destroy_sample_instance(ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Detaches the sample stream from anything it may be attached to and frees it (the sample data is <em>not</em> freed!).</p>
+<p>See also: <a href="audio.html#al_create_sample_instance">al_create_sample_instance</a></p>
+<h2 id="al_play_sample_instance"><a href="#TOC">al_play_sample_instance</a></h2>
+<pre><code>bool al_play_sample_instance(ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Play an instance of a sample data. Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_stop_sample_instance">al_stop_sample_instance</a></p>
+<h2 id="al_stop_sample_instance"><a href="#TOC">al_stop_sample_instance</a></h2>
+<pre><code>bool al_stop_sample_instance(ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Stop an sample instance playing.</p>
+<p>See also: <a href="audio.html#al_play_sample_instance">al_play_sample_instance</a></p>
+<h2 id="al_get_sample_instance_channels"><a href="#TOC">al_get_sample_instance_channels</a></h2>
+<pre><code>ALLEGRO_CHANNEL_CONF al_get_sample_instance_channels(
+   const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the channel configuration.</p>
+<p>See also: <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p>
+<h2 id="al_get_sample_instance_depth"><a href="#TOC">al_get_sample_instance_depth</a></h2>
+<pre><code>ALLEGRO_AUDIO_DEPTH al_get_sample_instance_depth(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the audio depth.</p>
+<p>See also: <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p>
+<h2 id="al_get_sample_instance_frequency"><a href="#TOC">al_get_sample_instance_frequency</a></h2>
+<pre><code>unsigned int al_get_sample_instance_frequency(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the frequency of the sample instance.</p>
+<h2 id="al_get_sample_instance_length"><a href="#TOC">al_get_sample_instance_length</a></h2>
+<pre><code>unsigned int al_get_sample_instance_length(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the length of the sample instance in sample values.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_length">al_set_sample_instance_length</a>, <a href="audio.html#al_get_sample_instance_time">al_get_sample_instance_time</a></p>
+<h2 id="al_set_sample_instance_length"><a href="#TOC">al_set_sample_instance_length</a></h2>
+<pre><code>bool al_set_sample_instance_length(ALLEGRO_SAMPLE_INSTANCE *spl,
+   unsigned int val)
+</code></pre>
+<p>Set the length of the sample instance in sample values.</p>
+<p>Return true on success, false on failure. Will fail if the sample instance is currently playing.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_length">al_get_sample_instance_length</a></p>
+<h2 id="al_get_sample_instance_position"><a href="#TOC">al_get_sample_instance_position</a></h2>
+<pre><code>unsigned int al_get_sample_instance_position(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Get the playback position of a sample instance.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_position">al_set_sample_instance_position</a></p>
+<h2 id="al_set_sample_instance_position"><a href="#TOC">al_set_sample_instance_position</a></h2>
+<pre><code>bool al_set_sample_instance_position(ALLEGRO_SAMPLE_INSTANCE *spl,
+   unsigned int val)
+</code></pre>
+<p>Set the playback position of a sample instance.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_position">al_get_sample_instance_position</a></p>
+<h2 id="al_get_sample_instance_speed"><a href="#TOC">al_get_sample_instance_speed</a></h2>
+<pre><code>float al_get_sample_instance_speed(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the relative playback speed.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_speed">al_set_sample_instance_speed</a></p>
+<h2 id="al_set_sample_instance_speed"><a href="#TOC">al_set_sample_instance_speed</a></h2>
+<pre><code>bool al_set_sample_instance_speed(ALLEGRO_SAMPLE_INSTANCE *spl, float val)
+</code></pre>
+<p>Set the relative playback speed. 1.0 is normal speed.</p>
+<p>Return true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_speed">al_get_sample_instance_speed</a></p>
+<h2 id="al_get_sample_instance_gain"><a href="#TOC">al_get_sample_instance_gain</a></h2>
+<pre><code>float al_get_sample_instance_gain(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the playback gain.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_gain">al_set_sample_instance_gain</a></p>
+<h2 id="al_set_sample_instance_gain"><a href="#TOC">al_set_sample_instance_gain</a></h2>
+<pre><code>bool al_set_sample_instance_gain(ALLEGRO_SAMPLE_INSTANCE *spl, float val)
+</code></pre>
+<p>Set the playback gain.</p>
+<p>Returns true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_gain">al_get_sample_instance_gain</a></p>
+<h2 id="al_get_sample_instance_pan"><a href="#TOC">al_get_sample_instance_pan</a></h2>
+<pre><code>float al_get_sample_instance_pan(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Get the pan value.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_pan">al_set_sample_instance_pan</a>.</p>
+<h2 id="al_set_sample_instance_pan"><a href="#TOC">al_set_sample_instance_pan</a></h2>
+<pre><code>bool al_set_sample_instance_pan(ALLEGRO_SAMPLE_INSTANCE *spl, float val)
+</code></pre>
+<p>Set the pan value on a sample instance. A value of -1.0 means to play the sample only through the left speaker; +1.0 means only through the right speaker; 0.0 means the sample is centre balanced.</p>
+<p>A constant sound power level is maintained as the sample is panned from left to right. As a consequence, a pan value of 0.0 will play the sample 3 dB softer than the original level. To disable panning and play a sample at its original level, set the pan value to <a href="audio.html#allegro_audio_pan_none">ALLEGRO_AUDIO_PAN_NONE</a>.</p>
+<p>Returns true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<p>(A sound guy should explain that better; I only implemented it. Also this might be more properly called a balance control than pan. Also we don't attempt anything with more than two channels yet.)</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_pan">al_get_sample_instance_pan</a>.</p>
+<h2 id="al_get_sample_instance_time"><a href="#TOC">al_get_sample_instance_time</a></h2>
+<pre><code>float al_get_sample_instance_time(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the length of the sample instance in seconds, assuming a playback speed of 1.0.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_length">al_get_sample_instance_length</a></p>
+<h2 id="al_get_sample_instance_playmode"><a href="#TOC">al_get_sample_instance_playmode</a></h2>
+<pre><code>ALLEGRO_PLAYMODE al_get_sample_instance_playmode(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the playback mode.</p>
+<p>See also: <a href="audio.html#allegro_playmode">ALLEGRO_PLAYMODE</a>, <a href="audio.html#al_set_sample_instance_playmode">al_set_sample_instance_playmode</a></p>
+<h2 id="al_set_sample_instance_playmode"><a href="#TOC">al_set_sample_instance_playmode</a></h2>
+<pre><code>bool al_set_sample_instance_playmode(ALLEGRO_SAMPLE_INSTANCE *spl,
+   ALLEGRO_PLAYMODE val)
+</code></pre>
+<p>Set the playback mode.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#allegro_playmode">ALLEGRO_PLAYMODE</a>, <a href="audio.html#al_get_sample_instance_playmode">al_get_sample_instance_playmode</a></p>
+<h2 id="al_get_sample_instance_playing"><a href="#TOC">al_get_sample_instance_playing</a></h2>
+<pre><code>bool al_get_sample_instance_playing(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return true if the sample instance is playing.</p>
+<p>See also: <a href="audio.html#al_set_sample_instance_playing">al_set_sample_instance_playing</a></p>
+<h2 id="al_set_sample_instance_playing"><a href="#TOC">al_set_sample_instance_playing</a></h2>
+<pre><code>bool al_set_sample_instance_playing(ALLEGRO_SAMPLE_INSTANCE *spl, bool val)
+</code></pre>
+<p>Change whether the sample instance is playing.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_sample_instance_playing">al_get_sample_instance_playing</a></p>
+<h2 id="al_get_sample_instance_attached"><a href="#TOC">al_get_sample_instance_attached</a></h2>
+<pre><code>bool al_get_sample_instance_attached(const ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return whether the sample instance is attached to something.</p>
+<p>See also: <a href="audio.html#al_attach_sample_instance_to_mixer">al_attach_sample_instance_to_mixer</a>, <a href="audio.html#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a>, <a href="audio.html#al_detach_sample_instance">al_detach_sample_instance</a></p>
+<h2 id="al_detach_sample_instance"><a href="#TOC">al_detach_sample_instance</a></h2>
+<pre><code>bool al_detach_sample_instance(ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Detach the sample instance from whatever it's attached to, if anything.</p>
+<p>Returns true on success.</p>
+<p>See also: <a href="audio.html#al_attach_sample_instance_to_mixer">al_attach_sample_instance_to_mixer</a>, <a href="audio.html#al_attach_sample_instance_to_voice">al_attach_sample_instance_to_voice</a>, <a href="audio.html#al_get_sample_instance_attached">al_get_sample_instance_attached</a></p>
+<h2 id="al_get_sample"><a href="#TOC">al_get_sample</a></h2>
+<pre><code>ALLEGRO_SAMPLE *al_get_sample(ALLEGRO_SAMPLE_INSTANCE *spl)
+</code></pre>
+<p>Return the sample data that the sample instance plays.</p>
+<p>Note this returns a pointer to an internal structure, <em>not</em> the <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a> that you may have passed to <a href="audio.html#al_set_sample">al_set_sample</a>. You may, however, check which sample buffer is being played by the sample instance with <a href="audio.html#al_get_sample_data">al_get_sample_data</a>, and so on.</p>
+<p>See also: <a href="audio.html#al_set_sample">al_set_sample</a></p>
+<h2 id="al_set_sample"><a href="#TOC">al_set_sample</a></h2>
+<pre><code>bool al_set_sample(ALLEGRO_SAMPLE_INSTANCE *spl, ALLEGRO_SAMPLE *data)
+</code></pre>
+<p>Change the sample data that a sample instance plays. This can be quite an involved process.</p>
+<p>First, the sample is stopped if it is not already.</p>
+<p>Next, if data is NULL, the sample is detached from its parent (if any).</p>
+<p>If data is not NULL, the sample may be detached and reattached to its parent (if any). This is not necessary if the old sample data and new sample data have the same frequency, depth and channel configuration. Reattaching may not always succeed.</p>
+<p>On success, the sample remains stopped. The playback position and loop end points are reset to their default values. The loop mode remains unchanged.</p>
+<p>Returns true on success, false on failure. On failure, the sample will be stopped and detached from its parent.</p>
+<p>See also: <a href="audio.html#al_get_sample">al_get_sample</a></p>
+<h1 id="mixer-functions"><a href="#TOC">Mixer functions</a></h1>
+<h2 id="al_create_mixer"><a href="#TOC">al_create_mixer</a></h2>
+<pre><code>ALLEGRO_MIXER *al_create_mixer(unsigned int freq,
+   ALLEGRO_AUDIO_DEPTH depth, ALLEGRO_CHANNEL_CONF chan_conf)
+</code></pre>
+<p>Creates a mixer stream, to attach sample streams or other mixers to. It will mix into a buffer at the requested frequency and channel count.</p>
+<p>The only supported audio depths are ALLEGRO_AUDIO_DEPTH_FLOAT32 and ALLEGRO_AUDIO_DEPTH_INT16 (not yet complete).</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="audio.html#al_destroy_mixer">al_destroy_mixer</a></p>
+<h2 id="al_destroy_mixer"><a href="#TOC">al_destroy_mixer</a></h2>
+<pre><code>void al_destroy_mixer(ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Destroys the mixer stream.</p>
+<p>See also: <a href="audio.html#al_create_mixer">al_create_mixer</a></p>
+<h2 id="al_get_default_mixer"><a href="#TOC">al_get_default_mixer</a></h2>
+<pre><code>ALLEGRO_MIXER *al_get_default_mixer(void)
+</code></pre>
+<p>Return the default mixer, or NULL if one has not been set. Although different configurations of mixers and voices can be used, in most cases a single mixer attached to a voice is what you want. The default mixer is used by <a href="audio.html#al_play_sample">al_play_sample</a>.</p>
+<p>See also: <a href="audio.html#al_reserve_samples">al_reserve_samples</a>, <a href="audio.html#al_play_sample">al_play_sample</a>, <a href="audio.html#al_set_default_mixer">al_set_default_mixer</a>, <a href="audio.html#al_restore_default_mixer">al_restore_default_mixer</a></p>
+<h2 id="al_set_default_mixer"><a href="#TOC">al_set_default_mixer</a></h2>
+<pre><code>bool al_set_default_mixer(ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Sets the default mixer. All samples started with <a href="audio.html#al_play_sample">al_play_sample</a> will be stopped. If you are using your own mixer, this should be called before <a href="audio.html#al_reserve_samples">al_reserve_samples</a>.</p>
+<p>Returns true on success, false on error.</p>
+<p>See also: <a href="audio.html#al_reserve_samples">al_reserve_samples</a>, <a href="audio.html#al_play_sample">al_play_sample</a>, <a href="audio.html#al_get_default_mixer">al_get_default_mixer</a>, <a href="audio.html#al_restore_default_mixer">al_restore_default_mixer</a></p>
+<h2 id="al_restore_default_mixer"><a href="#TOC">al_restore_default_mixer</a></h2>
+<pre><code>bool al_restore_default_mixer(void)
+</code></pre>
+<p>Restores Allegro's default mixer. All samples started with <a href="audio.html#al_play_sample">al_play_sample</a> will be stopped. Returns true on success, false on error.</p>
+<p>See also: <a href="audio.html#al_get_default_mixer">al_get_default_mixer</a>, <a href="audio.html#al_set_default_mixer">al_set_default_mixer</a>, <a href="audio.html#al_reserve_samples">al_reserve_samples</a>.</p>
+<h2 id="al_attach_mixer_to_mixer"><a href="#TOC">al_attach_mixer_to_mixer</a></h2>
+<pre><code>bool al_attach_mixer_to_mixer(ALLEGRO_MIXER *stream, ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Attaches a mixer onto another mixer. The same rules as with <a href="audio.html#al_attach_sample_instance_to_mixer">al_attach_sample_instance_to_mixer</a> apply, with the added caveat that both mixers must be the same frequency. Returns true on success, false on error.</p>
+<p>Currently both mixers must have the same audio depth, otherwise the function fails.</p>
+<p>See also: <a href="audio.html#al_detach_mixer">al_detach_mixer</a>.</p>
+<h2 id="al_attach_sample_instance_to_mixer"><a href="#TOC">al_attach_sample_instance_to_mixer</a></h2>
+<pre><code>bool al_attach_sample_instance_to_mixer(ALLEGRO_SAMPLE_INSTANCE *spl,
+   ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Attach a sample instance to a mixer. The instance must not already be attached to anything.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_detach_sample_instance">al_detach_sample_instance</a>.</p>
+<h2 id="al_attach_audio_stream_to_mixer"><a href="#TOC">al_attach_audio_stream_to_mixer</a></h2>
+<pre><code>bool al_attach_audio_stream_to_mixer(ALLEGRO_AUDIO_STREAM *stream, ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Attach a stream to a mixer.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_detach_audio_stream">al_detach_audio_stream</a>.</p>
+<h2 id="al_get_mixer_frequency"><a href="#TOC">al_get_mixer_frequency</a></h2>
+<pre><code>unsigned int al_get_mixer_frequency(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return the mixer frequency.</p>
+<p>See also: <a href="audio.html#al_set_mixer_frequency">al_set_mixer_frequency</a></p>
+<h2 id="al_set_mixer_frequency"><a href="#TOC">al_set_mixer_frequency</a></h2>
+<pre><code>bool al_set_mixer_frequency(ALLEGRO_MIXER *mixer, unsigned int val)
+</code></pre>
+<p>Set the mixer frequency. This will only work if the mixer is not attached to anything.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_mixer_frequency">al_get_mixer_frequency</a></p>
+<h2 id="al_get_mixer_channels"><a href="#TOC">al_get_mixer_channels</a></h2>
+<pre><code>ALLEGRO_CHANNEL_CONF al_get_mixer_channels(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return the mixer channel configuration.</p>
+<p>See also: <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p>
+<h2 id="al_get_mixer_depth"><a href="#TOC">al_get_mixer_depth</a></h2>
+<pre><code>ALLEGRO_AUDIO_DEPTH al_get_mixer_depth(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return the mixer audio depth.</p>
+<p>See also: <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p>
+<h2 id="al_get_mixer_gain"><a href="#TOC">al_get_mixer_gain</a></h2>
+<pre><code>float al_get_mixer_gain(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return the mixer gain (amplification factor). The default is 1.0.</p>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="audio.html#al_set_mixer_gain">al_set_mixer_gain</a>.</p>
+<h2 id="al_set_mixer_gain"><a href="#TOC">al_set_mixer_gain</a></h2>
+<pre><code>bool al_set_mixer_gain(ALLEGRO_MIXER *mixer, float new_gain)
+</code></pre>
+<p>Set the mixer gain (amplification factor).</p>
+<p>Returns true on success, false on failure.</p>
+<p>Since: 5.0.6, 5.1.0</p>
+<p>See also: <a href="audio.html#al_get_mixer_gain">al_get_mixer_gain</a></p>
+<h2 id="al_get_mixer_quality"><a href="#TOC">al_get_mixer_quality</a></h2>
+<pre><code>ALLEGRO_MIXER_QUALITY al_get_mixer_quality(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return the mixer quality.</p>
+<p>See also: <a href="audio.html#allegro_mixer_quality">ALLEGRO_MIXER_QUALITY</a>, <a href="audio.html#al_set_mixer_quality">al_set_mixer_quality</a></p>
+<h2 id="al_set_mixer_quality"><a href="#TOC">al_set_mixer_quality</a></h2>
+<pre><code>bool al_set_mixer_quality(ALLEGRO_MIXER *mixer, ALLEGRO_MIXER_QUALITY new_quality)
+</code></pre>
+<p>Set the mixer quality. This can only succeed if the mixer does not have anything attached to it.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#allegro_mixer_quality">ALLEGRO_MIXER_QUALITY</a>, <a href="audio.html#al_get_mixer_quality">al_get_mixer_quality</a></p>
+<h2 id="al_get_mixer_playing"><a href="#TOC">al_get_mixer_playing</a></h2>
+<pre><code>bool al_get_mixer_playing(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return true if the mixer is playing.</p>
+<p>See also: <a href="audio.html#al_set_mixer_playing">al_set_mixer_playing</a>.</p>
+<h2 id="al_set_mixer_playing"><a href="#TOC">al_set_mixer_playing</a></h2>
+<pre><code>bool al_set_mixer_playing(ALLEGRO_MIXER *mixer, bool val)
+</code></pre>
+<p>Change whether the mixer is playing.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_mixer_playing">al_get_mixer_playing</a>.</p>
+<h2 id="al_get_mixer_attached"><a href="#TOC">al_get_mixer_attached</a></h2>
+<pre><code>bool al_get_mixer_attached(const ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Return true if the mixer is attached to something.</p>
+<p>See also: <a href="audio.html#al_attach_sample_instance_to_mixer">al_attach_sample_instance_to_mixer</a>, <a href="audio.html#al_attach_audio_stream_to_mixer">al_attach_audio_stream_to_mixer</a>, <a href="audio.html#al_attach_mixer_to_mixer">al_attach_mixer_to_mixer</a>, <a href="audio.html#al_detach_mixer">al_detach_mixer</a></p>
+<h2 id="al_detach_mixer"><a href="#TOC">al_detach_mixer</a></h2>
+<pre><code>bool al_detach_mixer(ALLEGRO_MIXER *mixer)
+</code></pre>
+<p>Detach the mixer from whatever it is attached to, if anything.</p>
+<p>See also: <a href="audio.html#al_attach_mixer_to_mixer">al_attach_mixer_to_mixer</a>.</p>
+<h2 id="al_set_mixer_postprocess_callback"><a href="#TOC">al_set_mixer_postprocess_callback</a></h2>
+<pre><code>bool al_set_mixer_postprocess_callback(ALLEGRO_MIXER *mixer,
+   void (*pp_callback)(void *buf, unsigned int samples, void *data),
+   void *pp_callback_userdata)
+</code></pre>
+<p>Sets a post-processing filter function that's called after the attached streams have been mixed. The buffer's format will be whatever the mixer was created with. The sample count and user-data pointer is also passed.</p>
+<h1 id="stream-functions"><a href="#TOC">Stream functions</a></h1>
+<h2 id="al_create_audio_stream"><a href="#TOC">al_create_audio_stream</a></h2>
+<pre><code>ALLEGRO_AUDIO_STREAM *al_create_audio_stream(size_t fragment_count,
+   unsigned int frag_samples, unsigned int freq, ALLEGRO_AUDIO_DEPTH depth,
+   ALLEGRO_CHANNEL_CONF chan_conf)
+</code></pre>
+<p>Creates an <a href="audio.html#allegro_audio_stream">ALLEGRO_AUDIO_STREAM</a>. The stream will be set to play by default. It will feed audio data from a buffer, which is split into a number of fragments.</p>
+<p>Parameters:</p>
+<ul>
+<li><p>fragment_count - How many fragments to use for the audio stream. Usually only two fragments are required - splitting the audio buffer in two halves. But it means that the only time when new data can be supplied is whenever one half has finished playing. When using many fragments, you usually will use fewer samples for one, so there always will be (small) fragments available to be filled with new data.</p></li>
+<li><p>frag_samples - The size of a fragment in samples. See note below.</p></li>
+<li><p>freq - The frequency, in Hertz.</p></li>
+<li><p>depth - Must be one of the values listed for <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p></li>
+<li><p>chan_conf - Must be one of the values listed for <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p></li>
+</ul>
+<p>The choice of <em>fragment_count</em>, <em>frag_samples</em> and <em>freq</em> directly influences the audio delay. The delay in seconds can be expressed as:</p>
+<pre><code>delay = fragment_count * frag_samples / freq
+</code></pre>
+<p>This is only the delay due to Allegro's streaming, there may be additional delay caused by sound drivers and/or hardware.</p>
+<blockquote>
+<p><em>Note:</em> If you know the fragment size in bytes, you can get the size in samples like this:</p>
+<pre><code>sample_size = al_get_channel_count(chan_conf) * al_get_audio_depth_size(depth);
+samples = bytes_per_fragment / sample_size;
+</code></pre>
+<p>The size of the complete buffer is:</p>
+<pre><code>buffer_size = bytes_per_fragment * fragment_count
+</code></pre>
+</blockquote>
+<blockquote>
+<p><em>Note:</em> unlike many Allegro objects, audio streams are not implicitly destroyed when Allegro is shut down. You must destroy them manually with <a href="audio.html#al_destroy_audio_stream">al_destroy_audio_stream</a> before the audio system is shut down.</p>
+</blockquote>
+<h2 id="al_destroy_audio_stream"><a href="#TOC">al_destroy_audio_stream</a></h2>
+<pre><code>void al_destroy_audio_stream(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Destroy an audio stream which was created with <a href="audio.html#al_create_audio_stream">al_create_audio_stream</a> or <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>.</p>
+<blockquote>
+<p><em>Note:</em> If the stream is still attached to a mixer or voice, <a href="audio.html#al_detach_audio_stream">al_detach_audio_stream</a> is automatically called on it first.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_drain_audio_stream">al_drain_audio_stream</a>.</p>
+<h2 id="al_get_audio_stream_event_source"><a href="#TOC">al_get_audio_stream_event_source</a></h2>
+<pre><code>ALLEGRO_EVENT_SOURCE *al_get_audio_stream_event_source(
+   ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Retrieve the associated event source.</p>
+<p>See <a href="audio.html#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a> for a description of the ALLEGRO_EVENT_AUDIO_STREAM_FRAGMENT event that audio streams emit.</p>
+<h2 id="al_drain_audio_stream"><a href="#TOC">al_drain_audio_stream</a></h2>
+<pre><code>void al_drain_audio_stream(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>You should call this to finalise an audio stream that you will no longer be feeding, to wait for all pending buffers to finish playing. The stream's playing state will change to false.</p>
+<p>See also: <a href="audio.html#al_destroy_audio_stream">al_destroy_audio_stream</a></p>
+<h2 id="al_rewind_audio_stream"><a href="#TOC">al_rewind_audio_stream</a></h2>
+<pre><code>bool al_rewind_audio_stream(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Set the streaming file playing position to the beginning. Returns true on success. Currently this can only be called on streams created with <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>, <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a> and the format-specific functions underlying those functions.</p>
+<h2 id="al_get_audio_stream_frequency"><a href="#TOC">al_get_audio_stream_frequency</a></h2>
+<pre><code>unsigned int al_get_audio_stream_frequency(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the stream frequency.</p>
+<h2 id="al_get_audio_stream_channels"><a href="#TOC">al_get_audio_stream_channels</a></h2>
+<pre><code>ALLEGRO_CHANNEL_CONF al_get_audio_stream_channels(
+   const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the stream channel configuration.</p>
+<p>See also: <a href="audio.html#allegro_channel_conf">ALLEGRO_CHANNEL_CONF</a>.</p>
+<h2 id="al_get_audio_stream_depth"><a href="#TOC">al_get_audio_stream_depth</a></h2>
+<pre><code>ALLEGRO_AUDIO_DEPTH al_get_audio_stream_depth(
+   const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the stream audio depth.</p>
+<p>See also: <a href="audio.html#allegro_audio_depth">ALLEGRO_AUDIO_DEPTH</a>.</p>
+<h2 id="al_get_audio_stream_length"><a href="#TOC">al_get_audio_stream_length</a></h2>
+<pre><code>unsigned int al_get_audio_stream_length(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the stream length in samples.</p>
+<h2 id="al_get_audio_stream_speed"><a href="#TOC">al_get_audio_stream_speed</a></h2>
+<pre><code>float al_get_audio_stream_speed(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the relative playback speed.</p>
+<p>See also: <a href="audio.html#al_set_audio_stream_speed">al_set_audio_stream_speed</a>.</p>
+<h2 id="al_set_audio_stream_speed"><a href="#TOC">al_set_audio_stream_speed</a></h2>
+<pre><code>bool al_set_audio_stream_speed(ALLEGRO_AUDIO_STREAM *stream, float val)
+</code></pre>
+<p>Set the relative playback speed. 1.0 is normal speed.</p>
+<p>Return true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_speed">al_get_audio_stream_speed</a>.</p>
+<h2 id="al_get_audio_stream_gain"><a href="#TOC">al_get_audio_stream_gain</a></h2>
+<pre><code>float al_get_audio_stream_gain(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the playback gain.</p>
+<p>See also: <a href="audio.html#al_set_audio_stream_gain">al_set_audio_stream_gain</a>.</p>
+<h2 id="al_set_audio_stream_gain"><a href="#TOC">al_set_audio_stream_gain</a></h2>
+<pre><code>bool al_set_audio_stream_gain(ALLEGRO_AUDIO_STREAM *stream, float val)
+</code></pre>
+<p>Set the playback gain.</p>
+<p>Returns true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_gain">al_get_audio_stream_gain</a>.</p>
+<h2 id="al_get_audio_stream_pan"><a href="#TOC">al_get_audio_stream_pan</a></h2>
+<pre><code>float al_get_audio_stream_pan(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Get the pan value.</p>
+<p>See also: <a href="audio.html#al_set_audio_stream_pan">al_set_audio_stream_pan</a>.</p>
+<h2 id="al_set_audio_stream_pan"><a href="#TOC">al_set_audio_stream_pan</a></h2>
+<pre><code>bool al_set_audio_stream_pan(ALLEGRO_AUDIO_STREAM *stream, float val)
+</code></pre>
+<p>Set the pan value on a sample instance. A value of -1.0 means to play the sample only through the left speaker; +1.0 means only through the right speaker; 0.0 means the sample is centre balanced.</p>
+<p>Returns true on success, false on failure. Will fail if the sample instance is attached directly to a voice.</p>
+<h2 id="al_get_audio_stream_playing"><a href="#TOC">al_get_audio_stream_playing</a></h2>
+<pre><code>bool al_get_audio_stream_playing(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return true if the stream is playing.</p>
+<p>See also: <a href="audio.html#al_set_audio_stream_playing">al_set_audio_stream_playing</a>.</p>
+<h2 id="al_set_audio_stream_playing"><a href="#TOC">al_set_audio_stream_playing</a></h2>
+<pre><code>bool al_set_audio_stream_playing(ALLEGRO_AUDIO_STREAM *stream, bool val)
+</code></pre>
+<p>Change whether the stream is playing.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_playing">al_get_audio_stream_playing</a></p>
+<h2 id="al_get_audio_stream_playmode"><a href="#TOC">al_get_audio_stream_playmode</a></h2>
+<pre><code>ALLEGRO_PLAYMODE al_get_audio_stream_playmode(
+   const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the playback mode.</p>
+<p>See also: <a href="audio.html#allegro_playmode">ALLEGRO_PLAYMODE</a>, <a href="audio.html#al_set_audio_stream_playmode">al_set_audio_stream_playmode</a>.</p>
+<h2 id="al_set_audio_stream_playmode"><a href="#TOC">al_set_audio_stream_playmode</a></h2>
+<pre><code>bool al_set_audio_stream_playmode(ALLEGRO_AUDIO_STREAM *stream,
+   ALLEGRO_PLAYMODE val)
+</code></pre>
+<p>Set the playback mode.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="audio.html#allegro_playmode">ALLEGRO_PLAYMODE</a>, <a href="audio.html#al_get_audio_stream_playmode">al_get_audio_stream_playmode</a>.</p>
+<h2 id="al_get_audio_stream_attached"><a href="#TOC">al_get_audio_stream_attached</a></h2>
+<pre><code>bool al_get_audio_stream_attached(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return whether the stream is attached to something.</p>
+<p>See also: <a href="audio.html#al_attach_audio_stream_to_mixer">al_attach_audio_stream_to_mixer</a>, <a href="audio.html#al_attach_audio_stream_to_voice">al_attach_audio_stream_to_voice</a>, <a href="audio.html#al_detach_audio_stream">al_detach_audio_stream</a>.</p>
+<h2 id="al_detach_audio_stream"><a href="#TOC">al_detach_audio_stream</a></h2>
+<pre><code>bool al_detach_audio_stream(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Detach the stream from whatever it's attached to, if anything.</p>
+<p>See also: <a href="audio.html#al_attach_audio_stream_to_mixer">al_attach_audio_stream_to_mixer</a>, <a href="audio.html#al_attach_audio_stream_to_voice">al_attach_audio_stream_to_voice</a>, <a href="audio.html#al_get_audio_stream_attached">al_get_audio_stream_attached</a>.</p>
+<h2 id="al_get_audio_stream_fragment"><a href="#TOC">al_get_audio_stream_fragment</a></h2>
+<pre><code>void *al_get_audio_stream_fragment(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>When using Allegro's audio streaming, you will use this function to continuously provide new sample data to a stream.</p>
+<p>If the stream is ready for new data, the function will return the address of an internal buffer to be filled with audio data. The length and format of the buffer are specified with <a href="audio.html#al_create_audio_stream">al_create_audio_stream</a> or can be queried with the various functions described here. Once the buffer is filled, you must signal this to Allegro by passing the buffer to <a href="audio.html#al_set_audio_stream_fragment">al_set_audio_stream_fragment</a>.</p>
+<p>If the stream is not ready for new data, the function will return NULL.</p>
+<blockquote>
+<p><em>Note:</em> If you listen to events from the stream, an ALLEGRO_EVENT_AUDIO_STREAM_FRAGMENT event will be generated whenever a new fragment is ready. However, getting an event is <em>not</em> a guarantee that <a href="audio.html#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a> will not return NULL, so you still must check for it.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_set_audio_stream_fragment">al_set_audio_stream_fragment</a>, <a href="audio.html#al_get_audio_stream_event_source">al_get_audio_stream_event_source</a>, <a href="audio.html#al_get_audio_stream_frequency">al_get_audio_stream_frequency</a>, <a href="audio.html#al_get_audio_stream_channels">al_get_audio_stream_channels</a>, <a href="audio.html#al_get_audio_stream_depth">al_get_audio_stream_depth</a>, <a href="audio.html#al_get_audio_stream_length">al_get_audio_stream_length</a></p>
+<h2 id="al_set_audio_stream_fragment"><a href="#TOC">al_set_audio_stream_fragment</a></h2>
+<pre><code>bool al_set_audio_stream_fragment(ALLEGRO_AUDIO_STREAM *stream, void *val)
+</code></pre>
+<p>This function needs to be called for every successful call of <a href="audio.html#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a> to indicate that the buffer is filled with new data.</p>
+<h2 id="al_get_audio_stream_fragments"><a href="#TOC">al_get_audio_stream_fragments</a></h2>
+<pre><code>unsigned int al_get_audio_stream_fragments(const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Returns the number of fragments this stream uses. This is the same value as passed to <a href="audio.html#al_create_audio_stream">al_create_audio_stream</a> when a new stream is created.</p>
+<h2 id="al_get_available_audio_stream_fragments"><a href="#TOC">al_get_available_audio_stream_fragments</a></h2>
+<pre><code>unsigned int al_get_available_audio_stream_fragments(
+   const ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Returns the number of available fragments in the stream, that is, fragments which are not currently filled with data for playback.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_fragment">al_get_audio_stream_fragment</a></p>
+<h2 id="al_seek_audio_stream_secs"><a href="#TOC">al_seek_audio_stream_secs</a></h2>
+<pre><code>bool al_seek_audio_stream_secs(ALLEGRO_AUDIO_STREAM *stream, double time)
+</code></pre>
+<p>Set the streaming file playing position to time. Returns true on success. Currently this can only be called on streams created with <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>, <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a> and the format-specific functions underlying those functions.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_position_secs">al_get_audio_stream_position_secs</a>, <a href="audio.html#al_get_audio_stream_length_secs">al_get_audio_stream_length_secs</a></p>
+<h2 id="al_get_audio_stream_position_secs"><a href="#TOC">al_get_audio_stream_position_secs</a></h2>
+<pre><code>double al_get_audio_stream_position_secs(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the position of the stream in seconds. Currently this can only be called on streams created with <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_length_secs">al_get_audio_stream_length_secs</a></p>
+<h2 id="al_get_audio_stream_length_secs"><a href="#TOC">al_get_audio_stream_length_secs</a></h2>
+<pre><code>double al_get_audio_stream_length_secs(ALLEGRO_AUDIO_STREAM *stream)
+</code></pre>
+<p>Return the length of the stream in seconds, if known. Otherwise returns zero.</p>
+<p>Currently this can only be called on streams created with <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>, <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a> and the format-specific functions underlying those functions.</p>
+<p>See also: <a href="audio.html#al_get_audio_stream_position_secs">al_get_audio_stream_position_secs</a></p>
+<h2 id="al_set_audio_stream_loop_secs"><a href="#TOC">al_set_audio_stream_loop_secs</a></h2>
+<pre><code>bool al_set_audio_stream_loop_secs(ALLEGRO_AUDIO_STREAM *stream,
+   double start, double end)
+</code></pre>
+<p>Sets the loop points for the stream in seconds. Currently this can only be called on streams created with <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>, <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a> and the format-specific functions underlying those functions.</p>
+<h1 id="audio-file-io"><a href="#TOC">Audio file I/O</a></h1>
+<h2 id="al_register_sample_loader"><a href="#TOC">al_register_sample_loader</a></h2>
+<pre><code>bool al_register_sample_loader(const char *ext,
+   ALLEGRO_SAMPLE *(*loader)(const char *filename))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_load_sample">al_load_sample</a>. The given function will be used to handle the loading of sample files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_sample_loader_f">al_register_sample_loader_f</a>, <a href="audio.html#al_register_sample_saver">al_register_sample_saver</a></p>
+<h2 id="al_register_sample_loader_f"><a href="#TOC">al_register_sample_loader_f</a></h2>
+<pre><code>bool al_register_sample_loader_f(const char *ext,
+   ALLEGRO_SAMPLE *(*loader)(ALLEGRO_FILE* fp))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_load_sample_f">al_load_sample_f</a>. The given function will be used to handle the loading of sample files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_sample_loader">al_register_sample_loader</a></p>
+<h2 id="al_register_sample_saver"><a href="#TOC">al_register_sample_saver</a></h2>
+<pre><code>bool al_register_sample_saver(const char *ext,
+   bool (*saver)(const char *filename, ALLEGRO_SAMPLE *spl))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_save_sample">al_save_sample</a>. The given function will be used to handle the saving of sample files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>saver</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_sample_saver_f">al_register_sample_saver_f</a>, <a href="audio.html#al_register_sample_loader">al_register_sample_loader</a></p>
+<h2 id="al_register_sample_saver_f"><a href="#TOC">al_register_sample_saver_f</a></h2>
+<pre><code>bool al_register_sample_saver_f(const char *ext,
+   bool (*saver)(ALLEGRO_FILE* fp, ALLEGRO_SAMPLE *spl))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_save_sample_f">al_save_sample_f</a>. The given function will be used to handle the saving of sample files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>saver</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_sample_saver">al_register_sample_saver</a></p>
+<h2 id="al_register_audio_stream_loader"><a href="#TOC">al_register_audio_stream_loader</a></h2>
+<pre><code>bool al_register_audio_stream_loader(const char *ext,
+   ALLEGRO_AUDIO_STREAM *(*stream_loader)(const char *filename,
+      size_t buffer_count, unsigned int samples))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>. The given function will be used to open streams from files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>stream_loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_audio_stream_loader_f">al_register_audio_stream_loader_f</a></p>
+<h2 id="al_register_audio_stream_loader_f"><a href="#TOC">al_register_audio_stream_loader_f</a></h2>
+<pre><code>bool al_register_audio_stream_loader_f(const char *ext,
+   ALLEGRO_AUDIO_STREAM *(*stream_loader)(ALLEGRO_FILE* fp,
+      size_t buffer_count, unsigned int samples))
+</code></pre>
+<p>Register a handler for <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a>. The given function will be used to open streams from files with the given extension.</p>
+<p>The extension should include the leading dot ('.') character. It will be matched case-insensitively.</p>
+<p>The <code>stream_loader</code> argument may be NULL to unregister an entry.</p>
+<p>Returns true on success, false on error. Returns false if unregistering an entry that doesn't exist.</p>
+<p>See also: <a href="audio.html#al_register_audio_stream_loader">al_register_audio_stream_loader</a></p>
+<h2 id="al_load_sample"><a href="#TOC">al_load_sample</a></h2>
+<pre><code>ALLEGRO_SAMPLE *al_load_sample(const char *filename)
+</code></pre>
+<p>Loads a few different audio file formats based on their extension.</p>
+<p>Note that this stores the entire file in memory at once, which may be time consuming. To read the file as it is needed, use <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>.</p>
+<p>Returns the sample on success, NULL on failure.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_register_sample_loader">al_register_sample_loader</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_load_sample_f"><a href="#TOC">al_load_sample_f</a></h2>
+<pre><code>ALLEGRO_SAMPLE *al_load_sample_f(ALLEGRO_FILE* fp, const char *ident)
+</code></pre>
+<p>Loads an audio file from an <a href="file.html#allegro_file">ALLEGRO_FILE</a> stream into an <a href="audio.html#allegro_sample">ALLEGRO_SAMPLE</a>. The file type is determined by the passed 'ident' parameter, which is a file name extension including the leading dot.</p>
+<p>Note that this stores the entire file in memory at once, which may be time consuming. To read the file as it is needed, use <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a>.</p>
+<p>Returns the sample on success, NULL on failure. The file remains open afterwards.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_register_sample_loader_f">al_register_sample_loader_f</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_load_audio_stream"><a href="#TOC">al_load_audio_stream</a></h2>
+<pre><code>ALLEGRO_AUDIO_STREAM *al_load_audio_stream(const char *filename,
+   size_t buffer_count, unsigned int samples)
+</code></pre>
+<p>Loads an audio file from disk as it is needed.</p>
+<p>Unlike regular streams, the one returned by this function need not be fed by the user; the library will automatically read more of the file as it is needed. The stream will contain <em>buffer_count</em> buffers with <em>samples</em> samples.</p>
+<p>The audio stream will start in the playing state. It should be attached to a voice or mixer to generate any output. See <a href="audio.html#allegro_audio_stream">ALLEGRO_AUDIO_STREAM</a> for more details.</p>
+<p>Returns the stream on success, NULL on failure.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_load_audio_stream_f">al_load_audio_stream_f</a>, <a href="audio.html#al_register_audio_stream_loader">al_register_audio_stream_loader</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_load_audio_stream_f"><a href="#TOC">al_load_audio_stream_f</a></h2>
+<pre><code>ALLEGRO_AUDIO_STREAM *al_load_audio_stream_f(ALLEGRO_FILE* fp, const char *ident,
+   size_t buffer_count, unsigned int samples)
+</code></pre>
+<p>Loads an audio file from <a href="file.html#allegro_file">ALLEGRO_FILE</a> stream as it is needed.</p>
+<p>Unlike regular streams, the one returned by this function need not be fed by the user; the library will automatically read more of the file as it is needed. The stream will contain <em>buffer_count</em> buffers with <em>samples</em> samples.</p>
+<p>The file type is determined by the passed 'ident' parameter, which is a file name extension including the leading dot.</p>
+<p>The audio stream will start in the playing state. It should be attached to a voice or mixer to generate any output. See <a href="audio.html#allegro_audio_stream">ALLEGRO_AUDIO_STREAM</a> for more details.</p>
+<p>Returns the stream on success, NULL on failure. On success the file should be considered owned by the audio stream, and will be closed when the audio stream is destroyed. On failure the file will be closed.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_load_audio_stream">al_load_audio_stream</a>, <a href="audio.html#al_register_audio_stream_loader_f">al_register_audio_stream_loader_f</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_save_sample"><a href="#TOC">al_save_sample</a></h2>
+<pre><code>bool al_save_sample(const char *filename, ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Writes a sample into a file. Currently, wav is the only supported format, and the extension must be &quot;.wav&quot;.</p>
+<p>Returns true on success, false on error.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_save_sample_f">al_save_sample_f</a>, <a href="audio.html#al_register_sample_saver">al_register_sample_saver</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<h2 id="al_save_sample_f"><a href="#TOC">al_save_sample_f</a></h2>
+<pre><code>bool al_save_sample_f(ALLEGRO_FILE *fp, const char *ident, ALLEGRO_SAMPLE *spl)
+</code></pre>
+<p>Writes a sample into a <a href="file.html#allegro_file">ALLEGRO_FILE</a> filestream. Currently, wav is the only supported format, and the extension must be &quot;.wav&quot;.</p>
+<p>Returns true on success, false on error. The file remains open afterwards.</p>
+<blockquote>
+<p><em>Note:</em> the allegro_audio library does not support any audio file formats by default. You must use the allegro_acodec addon, or register your own format handler.</p>
+</blockquote>
+<p>See also: <a href="audio.html#al_save_sample">al_save_sample</a>, <a href="audio.html#al_register_sample_saver_f">al_register_sample_saver_f</a>, <a href="acodec.html#al_init_acodec_addon">al_init_acodec_addon</a></p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

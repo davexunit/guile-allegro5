@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Timer routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Timer routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_timer">ALLEGRO_TIMER</a></li>
+<li><a href="#allegro_usecs_to_secs">ALLEGRO_USECS_TO_SECS</a></li>
+<li><a href="#allegro_msecs_to_secs">ALLEGRO_MSECS_TO_SECS</a></li>
+<li><a href="#allegro_bps_to_secs">ALLEGRO_BPS_TO_SECS</a></li>
+<li><a href="#allegro_bpm_to_secs">ALLEGRO_BPM_TO_SECS</a></li>
+<li><a href="#al_create_timer">al_create_timer</a></li>
+<li><a href="#al_start_timer">al_start_timer</a></li>
+<li><a href="#al_stop_timer">al_stop_timer</a></li>
+<li><a href="#al_get_timer_started">al_get_timer_started</a></li>
+<li><a href="#al_destroy_timer">al_destroy_timer</a></li>
+<li><a href="#al_get_timer_count">al_get_timer_count</a></li>
+<li><a href="#al_set_timer_count">al_set_timer_count</a></li>
+<li><a href="#al_add_timer_count">al_add_timer_count</a></li>
+<li><a href="#al_get_timer_speed">al_get_timer_speed</a></li>
+<li><a href="#al_set_timer_speed">al_set_timer_speed</a></li>
+<li><a href="#al_get_timer_event_source">al_get_timer_event_source</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="allegro_timer"><a href="#TOC">ALLEGRO_TIMER</a></h1>
+<pre><code>typedef struct ALLEGRO_TIMER ALLEGRO_TIMER;
+</code></pre>
+<p>This is an abstract data type representing a timer object.</p>
+<h1 id="allegro_usecs_to_secs"><a href="#TOC">ALLEGRO_USECS_TO_SECS</a></h1>
+<pre><code>#define ALLEGRO_USECS_TO_SECS(x)      ((x) / 1000000.0)
+</code></pre>
+<p>Convert microseconds to seconds.</p>
+<h1 id="allegro_msecs_to_secs"><a href="#TOC">ALLEGRO_MSECS_TO_SECS</a></h1>
+<pre><code>#define ALLEGRO_MSECS_TO_SECS(x)      ((x) / 1000.0)
+</code></pre>
+<p>Convert milliseconds to seconds.</p>
+<h1 id="allegro_bps_to_secs"><a href="#TOC">ALLEGRO_BPS_TO_SECS</a></h1>
+<pre><code>#define ALLEGRO_BPS_TO_SECS(x)        (1.0 / (x))
+</code></pre>
+<p>Convert beats per second to seconds.</p>
+<h1 id="allegro_bpm_to_secs"><a href="#TOC">ALLEGRO_BPM_TO_SECS</a></h1>
+<pre><code>#define ALLEGRO_BPM_TO_SECS(x)        (60.0 / (x))
+</code></pre>
+<p>Convert beats per minute to seconds.</p>
+<h1 id="al_create_timer"><a href="#TOC">al_create_timer</a></h1>
+<pre><code>ALLEGRO_TIMER *al_create_timer(double speed_secs)
+</code></pre>
+<p>Install a new timer. If successful, a pointer to a new timer object is returned, otherwise NULL is returned. <em>speed_secs</em> is in seconds per &quot;tick&quot;, and must be positive. The new timer is initially stopped.</p>
+<p>The system driver must be installed before this function can be called.</p>
+<p>Usage note: typical granularity is on the order of microseconds, but with some drivers might only be milliseconds.</p>
+<p>See also: <a href="timer.html#al_start_timer">al_start_timer</a>, <a href="timer.html#al_destroy_timer">al_destroy_timer</a></p>
+<h1 id="al_start_timer"><a href="#TOC">al_start_timer</a></h1>
+<pre><code>void al_start_timer(ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Start the timer specified. From then, the timer's counter will increment at a constant rate, and it will begin generating events. Starting a timer that is already started does nothing.</p>
+<p>See also: <a href="timer.html#al_stop_timer">al_stop_timer</a>, <a href="timer.html#al_get_timer_started">al_get_timer_started</a></p>
+<h1 id="al_stop_timer"><a href="#TOC">al_stop_timer</a></h1>
+<pre><code>void al_stop_timer(ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Stop the timer specified. The timer's counter will stop incrementing and it will stop generating events. Stopping a timer that is already stopped does nothing.</p>
+<p>See also: <a href="timer.html#al_start_timer">al_start_timer</a>, <a href="timer.html#al_get_timer_started">al_get_timer_started</a></p>
+<h1 id="al_get_timer_started"><a href="#TOC">al_get_timer_started</a></h1>
+<pre><code>bool al_get_timer_started(const ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Return true if the timer specified is currently started.</p>
+<h1 id="al_destroy_timer"><a href="#TOC">al_destroy_timer</a></h1>
+<pre><code>void al_destroy_timer(ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Uninstall the timer specified. If the timer is started, it will automatically be stopped before uninstallation. It will also automatically unregister the timer with any event queues.</p>
+<p>Does nothing if passed the NULL pointer.</p>
+<p>See also: <a href="timer.html#al_create_timer">al_create_timer</a></p>
+<h1 id="al_get_timer_count"><a href="#TOC">al_get_timer_count</a></h1>
+<pre><code>int64_t al_get_timer_count(const ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Return the timer's counter value. The timer can be started or stopped.</p>
+<p>See also: <a href="timer.html#al_set_timer_count">al_set_timer_count</a></p>
+<h1 id="al_set_timer_count"><a href="#TOC">al_set_timer_count</a></h1>
+<pre><code>void al_set_timer_count(ALLEGRO_TIMER *timer, int64_t new_count)
+</code></pre>
+<p>Set the timer's counter value. The timer can be started or stopped. The count value may be positive or negative, but will always be incremented by +1 at each tick.</p>
+<p>See also: <a href="timer.html#al_get_timer_count">al_get_timer_count</a>, <a href="timer.html#al_add_timer_count">al_add_timer_count</a></p>
+<h1 id="al_add_timer_count"><a href="#TOC">al_add_timer_count</a></h1>
+<pre><code>void al_add_timer_count(ALLEGRO_TIMER *timer, int64_t diff)
+</code></pre>
+<p>Add <em>diff</em> to the timer's counter value. This is similar to writing:</p>
+<pre><code>al_set_timer_count(timer, al_get_timer_count(timer) + diff);
+</code></pre>
+<p>except that the addition is performed atomically, so no ticks will be lost.</p>
+<p>See also: <a href="timer.html#al_set_timer_count">al_set_timer_count</a></p>
+<h1 id="al_get_timer_speed"><a href="#TOC">al_get_timer_speed</a></h1>
+<pre><code>double al_get_timer_speed(const ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Return the timer's speed, in seconds.</p>
+<p>See also: <a href="timer.html#al_set_timer_speed">al_set_timer_speed</a></p>
+<h1 id="al_set_timer_speed"><a href="#TOC">al_set_timer_speed</a></h1>
+<pre><code>void al_set_timer_speed(ALLEGRO_TIMER *timer, double new_speed_secs)
+</code></pre>
+<p>Set the timer's speed, i.e. the rate at which its counter will be incremented when it is started. This can be done when the timer is started or stopped. If the timer is currently running, it is made to look as though the speed change occured precisely at the last tick.</p>
+<p><em>speed_secs</em> has exactly the same meaning as with <a href="timer.html#al_create_timer">al_create_timer</a>.</p>
+<p>See also: <a href="timer.html#al_get_timer_speed">al_get_timer_speed</a></p>
+<h1 id="al_get_timer_event_source"><a href="#TOC">al_get_timer_event_source</a></h1>
+<pre><code>ALLEGRO_EVENT_SOURCE *al_get_timer_event_source(ALLEGRO_TIMER *timer)
+</code></pre>
+<p>Retrieve the associated event source.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

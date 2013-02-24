@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>OpenGL integration</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">OpenGL integration</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_get_opengl_extension_list">al_get_opengl_extension_list</a></li>
+<li><a href="#al_get_opengl_proc_address">al_get_opengl_proc_address</a></li>
+<li><a href="#al_get_opengl_texture">al_get_opengl_texture</a></li>
+<li><a href="#al_get_opengl_texture_size">al_get_opengl_texture_size</a></li>
+<li><a href="#al_get_opengl_texture_position">al_get_opengl_texture_position</a></li>
+<li><a href="#al_get_opengl_fbo">al_get_opengl_fbo</a></li>
+<li><a href="#al_remove_opengl_fbo">al_remove_opengl_fbo</a></li>
+<li><a href="#al_have_opengl_extension">al_have_opengl_extension</a></li>
+<li><a href="#al_get_opengl_version">al_get_opengl_version</a></li>
+<li><a href="#al_get_opengl_variant">al_get_opengl_variant</a></li>
+<li><a href="#al_set_current_opengl_context">al_set_current_opengl_context</a></li>
+<li><a href="#opengl-configuration">OpenGL configuration</a></li>
+</ul>
+</div>
+<p>These functions are declared in the following header file:</p>
+<pre><code>#include &lt;allegro5/allegro_opengl.h&gt;
+</code></pre>
+<h1 id="al_get_opengl_extension_list"><a href="#TOC">al_get_opengl_extension_list</a></h1>
+<pre><code>ALLEGRO_OGL_EXT_LIST *al_get_opengl_extension_list(void)
+</code></pre>
+<p>Returns the list of OpenGL extensions supported by Allegro, for the given display.</p>
+<p>Allegro will keep information about all extensions it knows about in a structure returned by <code>al_get_opengl_extension_list</code>.</p>
+<p>For example:</p>
+<pre><code>if (al_get_opengl_extension_list()-&gt;ALLEGRO_GL_ARB_multitexture) {
+    use it
+}
+</code></pre>
+<p>The extension will be set to true if available for the given display and false otherwise. This means to use the definitions and functions from an OpenGL extension, all you need to do is to check for it as above at run time, after acquiring the OpenGL display from Allegro.</p>
+<p>Under Windows, this will also work with WGL extensions, and under Unix with GLX extensions.</p>
+<p>In case you want to manually check for extensions and load function pointers yourself (say, in case the Allegro developers did not include it yet), you can use the <a href="opengl.html#al_have_opengl_extension">al_have_opengl_extension</a> and <a href="opengl.html#al_get_opengl_proc_address">al_get_opengl_proc_address</a> functions instead.</p>
+<h1 id="al_get_opengl_proc_address"><a href="#TOC">al_get_opengl_proc_address</a></h1>
+<pre><code>void *al_get_opengl_proc_address(const char *name)
+</code></pre>
+<p>Helper to get the address of an OpenGL symbol</p>
+<p>Example:</p>
+<p>How to get the function <em>glMultiTexCoord3fARB</em> that comes with ARB's Multitexture extension:</p>
+<pre><code>// define the type of the function
+   ALLEGRO_DEFINE_PROC_TYPE(void, MULTI_TEX_FUNC,
+      (GLenum, GLfloat, GLfloat, GLfloat));
+// declare the function pointer
+   MULTI_TEX_FUNC glMultiTexCoord3fARB;
+// get the address of the function
+   glMultiTexCoord3fARB = (MULTI_TEX_FUNC) al_get_opengl_proc_address(
+      &quot;glMultiTexCoord3fARB&quot;);
+</code></pre>
+<p>If <em>glMultiTexCoord3fARB</em> is not NULL then it can be used as if it has been defined in the OpenGL core library.</p>
+<blockquote>
+<p><em>Note:</em> Under Windows, OpenGL functions may need a special calling convention, so it's best to always use the ALLEGRO_DEFINE_PROC_TYPE macro when declaring function pointer types for OpenGL functions.</p>
+</blockquote>
+<p>Parameters:</p>
+<p>name - The name of the symbol you want to link to.</p>
+<p><em>Return value:</em></p>
+<p>A pointer to the symbol if available or NULL otherwise.</p>
+<h1 id="al_get_opengl_texture"><a href="#TOC">al_get_opengl_texture</a></h1>
+<pre><code>GLuint al_get_opengl_texture(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the OpenGL texture id internally used by the given bitmap if it uses one, else 0.</p>
+<p>Example:</p>
+<pre><code>bitmap = al_load_bitmap(&quot;my_texture.png&quot;);
+texture = al_get_opengl_texture(bitmap);
+if (texture != 0)
+    glBindTexture(GL_TEXTURE_2D, texture);
+</code></pre>
+<h1 id="al_get_opengl_texture_size"><a href="#TOC">al_get_opengl_texture_size</a></h1>
+<pre><code>void al_get_opengl_texture_size(ALLEGRO_BITMAP *bitmap, int *w, int *h)
+</code></pre>
+<p>Retrieves the size of the texture used for the bitmap. This can be different from the bitmap size if OpenGL only supports power-of-two sizes or if it is a sub-bitmap. 0's are returned if the bitmap is not an OpenGL bitmap.</p>
+<h1 id="al_get_opengl_texture_position"><a href="#TOC">al_get_opengl_texture_position</a></h1>
+<pre><code>void al_get_opengl_texture_position(ALLEGRO_BITMAP *bitmap, int *u, int *v)
+</code></pre>
+<p>Returns the u/v coordinates for the top/left corner of the bitmap within the used texture, in pixels.</p>
+<h1 id="al_get_opengl_fbo"><a href="#TOC">al_get_opengl_fbo</a></h1>
+<pre><code>GLuint al_get_opengl_fbo(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Returns the OpenGL FBO id internally used by the given bitmap if it uses one, otherwise returns zero. No attempt will be made to create an FBO if the bitmap is not owned by the current display.</p>
+<p>The FBO returned by this function will only be freed when the bitmap is destroyed, or if you call <a href="opengl.html#al_remove_opengl_fbo">al_remove_opengl_fbo</a> on the bitmap.</p>
+<blockquote>
+<p><em>Note:</em> In Allegro 5.0.0 this function only returned an FBO which had previously been created by calling <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a>. It would not attempt to create an FBO itself. This has since been changed.</p>
+</blockquote>
+<p>See also: <a href="opengl.html#al_remove_opengl_fbo">al_remove_opengl_fbo</a>, <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a></p>
+<h1 id="al_remove_opengl_fbo"><a href="#TOC">al_remove_opengl_fbo</a></h1>
+<pre><code>void al_remove_opengl_fbo(ALLEGRO_BITMAP *bitmap)
+</code></pre>
+<p>Explicitly free an OpenGL FBO created for a bitmap, if it has one. Usually you do not need to worry about freeing FBOs, unless you use <a href="opengl.html#al_get_opengl_fbo">al_get_opengl_fbo</a>.</p>
+<p>See also: <a href="opengl.html#al_get_opengl_fbo">al_get_opengl_fbo</a>, <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a></p>
+<h1 id="al_have_opengl_extension"><a href="#TOC">al_have_opengl_extension</a></h1>
+<pre><code>bool al_have_opengl_extension(const char *extension)
+</code></pre>
+<p>This function is a helper to determine whether an OpenGL extension is available on the given display or not.</p>
+<p>Example:</p>
+<pre><code>bool packedpixels = al_have_opengl_extension(&quot;GL_EXT_packed_pixels&quot;);
+</code></pre>
+<p>If <em>packedpixels</em> is true then you can safely use the constants related to the packed pixels extension.</p>
+<p>Returns true if the extension is available; false otherwise.</p>
+<h1 id="al_get_opengl_version"><a href="#TOC">al_get_opengl_version</a></h1>
+<pre><code>uint32_t al_get_opengl_version(void)
+</code></pre>
+<p>Returns the OpenGL or OpenGL ES version number of the client (the computer the program is running on), for the current display. &quot;1.0&quot; is returned as 0x01000000, &quot;1.2.1&quot; is returned as 0x01020100, and &quot;1.2.2&quot; as 0x01020200, etc.</p>
+<p>A valid OpenGL context must exist for this function to work, which means you may <em>not</em> call it before <a href="display.html#al_create_display">al_create_display</a>.</p>
+<p>See also: <a href="opengl.html#al_get_opengl_variant">al_get_opengl_variant</a></p>
+<h1 id="al_get_opengl_variant"><a href="#TOC">al_get_opengl_variant</a></h1>
+<pre><code>int al_get_opengl_variant(void)
+</code></pre>
+<p>Returns the variant or type of OpenGL used on the running platform. This function can be called before creating a display or setting properties for new displays. Possible values are:</p>
+<dl>
+<dt>ALLEGRO_DESKTOP_OPENGL</dt>
+<dd><p>Regular OpenGL as seen on desktop/laptop computers.</p>
+</dd>
+<dt>ALLEGRO_OPENGL_ES</dt>
+<dd><p>Trimmed down version of OpenGL used on many small consumer electronic devices such as handheld (and sometimes full size) consoles.</p>
+</dd>
+</dl>
+<p>See also: <a href="opengl.html#al_get_opengl_version">al_get_opengl_version</a></p>
+<h1 id="al_set_current_opengl_context"><a href="#TOC">al_set_current_opengl_context</a></h1>
+<pre><code>void al_set_current_opengl_context(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Make the OpenGL context associated with the given display current for the calling thread. If there is a current target bitmap which belongs to a different OpenGL context, the target bitmap will be changed to NULL.</p>
+<p>Normally you do not need to use this function, as the context will be made current when you call <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a> or <a href="graphics.html#al_set_target_backbuffer">al_set_target_backbuffer</a>. You might need if it you created an OpenGL &quot;forward compatible&quot; context. Then <a href="display.html#al_get_backbuffer">al_get_backbuffer</a> only returns NULL, so it would not work to pass that to <a href="graphics.html#al_set_target_bitmap">al_set_target_bitmap</a>.</p>
+<h1 id="opengl-configuration"><a href="#TOC">OpenGL configuration</a></h1>
+<p>You can disable the detection of any OpenGL extension by Allegro with a section like this in allegro5.cfg:</p>
+<pre><code>[opengl_disabled_extensions]
+GL_ARB_texture_non_power_of_two=0
+GL_EXT_framebuffer_object=0
+</code></pre>
+<p>Any extension which appears in the section is treated as not available (it does not matter if you set it to 0 or any other value).</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:47 UTC
+</p>
+</div>
+
+
+</body>
+</html>

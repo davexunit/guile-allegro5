@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Mouse routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Mouse routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_mouse_state">ALLEGRO_MOUSE_STATE</a></li>
+<li><a href="#al_install_mouse">al_install_mouse</a></li>
+<li><a href="#al_is_mouse_installed">al_is_mouse_installed</a></li>
+<li><a href="#al_uninstall_mouse">al_uninstall_mouse</a></li>
+<li><a href="#al_get_mouse_num_axes">al_get_mouse_num_axes</a></li>
+<li><a href="#al_get_mouse_num_buttons">al_get_mouse_num_buttons</a></li>
+<li><a href="#al_get_mouse_state">al_get_mouse_state</a></li>
+<li><a href="#al_get_mouse_state_axis">al_get_mouse_state_axis</a></li>
+<li><a href="#al_mouse_button_down">al_mouse_button_down</a></li>
+<li><a href="#al_set_mouse_xy">al_set_mouse_xy</a></li>
+<li><a href="#al_set_mouse_z">al_set_mouse_z</a></li>
+<li><a href="#al_set_mouse_w">al_set_mouse_w</a></li>
+<li><a href="#al_set_mouse_axis">al_set_mouse_axis</a></li>
+<li><a href="#al_get_mouse_event_source">al_get_mouse_event_source</a></li>
+<li><a href="#mouse-cursors">Mouse cursors</a><ul>
+<li><a href="#al_create_mouse_cursor">al_create_mouse_cursor</a></li>
+<li><a href="#al_destroy_mouse_cursor">al_destroy_mouse_cursor</a></li>
+<li><a href="#al_set_mouse_cursor">al_set_mouse_cursor</a></li>
+<li><a href="#al_set_system_mouse_cursor">al_set_system_mouse_cursor</a></li>
+<li><a href="#al_get_mouse_cursor_position">al_get_mouse_cursor_position</a></li>
+<li><a href="#al_hide_mouse_cursor">al_hide_mouse_cursor</a></li>
+<li><a href="#al_show_mouse_cursor">al_show_mouse_cursor</a></li>
+<li><a href="#al_grab_mouse">al_grab_mouse</a></li>
+<li><a href="#al_ungrab_mouse">al_ungrab_mouse</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="allegro_mouse_state"><a href="#TOC">ALLEGRO_MOUSE_STATE</a></h1>
+<pre><code>typedef struct ALLEGRO_MOUSE_STATE ALLEGRO_MOUSE_STATE;
+</code></pre>
+<p>Public fields (read only):</p>
+<ul>
+<li>x - mouse x position</li>
+<li>y - mouse y position</li>
+<li>w, z - mouse wheel position (2D 'ball')</li>
+<li>buttons - mouse buttons bitfield</li>
+</ul>
+<p>The zeroth bit is set if the primary mouse button is held down, the first bit is set if the secondary mouse button is held down, and so on.</p>
+<p>See also: <a href="mouse.html#al_get_mouse_state">al_get_mouse_state</a>, <a href="mouse.html#al_get_mouse_state_axis">al_get_mouse_state_axis</a>, <a href="mouse.html#al_mouse_button_down">al_mouse_button_down</a></p>
+<h1 id="al_install_mouse"><a href="#TOC">al_install_mouse</a></h1>
+<pre><code>bool al_install_mouse(void)
+</code></pre>
+<p>Install a mouse driver.</p>
+<p>Returns true if successful. If a driver was already installed, nothing happens and true is returned.</p>
+<h1 id="al_is_mouse_installed"><a href="#TOC">al_is_mouse_installed</a></h1>
+<pre><code>bool al_is_mouse_installed(void)
+</code></pre>
+<p>Returns true if <a href="mouse.html#al_install_mouse">al_install_mouse</a> was called successfully.</p>
+<h1 id="al_uninstall_mouse"><a href="#TOC">al_uninstall_mouse</a></h1>
+<pre><code>void al_uninstall_mouse(void)
+</code></pre>
+<p>Uninstalls the active mouse driver, if any. This will automatically unregister the mouse event source with any event queues.</p>
+<p>This function is automatically called when Allegro is shut down.</p>
+<h1 id="al_get_mouse_num_axes"><a href="#TOC">al_get_mouse_num_axes</a></h1>
+<pre><code>unsigned int al_get_mouse_num_axes(void)
+</code></pre>
+<p>Return the number of buttons on the mouse. The first axis is 0.</p>
+<p>See also: <a href="mouse.html#al_get_mouse_num_buttons">al_get_mouse_num_buttons</a></p>
+<h1 id="al_get_mouse_num_buttons"><a href="#TOC">al_get_mouse_num_buttons</a></h1>
+<pre><code>unsigned int al_get_mouse_num_buttons(void)
+</code></pre>
+<p>Return the number of buttons on the mouse. The first button is 1.</p>
+<p>See also: <a href="mouse.html#al_get_mouse_num_axes">al_get_mouse_num_axes</a></p>
+<h1 id="al_get_mouse_state"><a href="#TOC">al_get_mouse_state</a></h1>
+<pre><code>void al_get_mouse_state(ALLEGRO_MOUSE_STATE *ret_state)
+</code></pre>
+<p>Save the state of the mouse specified at the time the function is called into the given structure.</p>
+<p>Example:</p>
+<pre><code>ALLEGRO_MOUSE_STATE state;
+
+al_get_mouse_state(&amp;state);
+if (state.buttons &amp; 1) {
+    /* Primary (e.g. left) mouse button is held. */
+    printf(&quot;Mouse position: (%d, %d)\n&quot;, state.x, state.y);
+}
+if (state.buttons &amp; 2) {
+    /* Secondary (e.g. right) mouse button is held. */
+}
+if (state.buttons &amp; 4) {
+    /* Tertiary (e.g. middle) mouse button is held. */
+}
+</code></pre>
+<p>See also: <a href="mouse.html#allegro_mouse_state">ALLEGRO_MOUSE_STATE</a>, <a href="mouse.html#al_get_mouse_state_axis">al_get_mouse_state_axis</a>, <a href="mouse.html#al_mouse_button_down">al_mouse_button_down</a></p>
+<h1 id="al_get_mouse_state_axis"><a href="#TOC">al_get_mouse_state_axis</a></h1>
+<pre><code>int al_get_mouse_state_axis(const ALLEGRO_MOUSE_STATE *state, int axis)
+</code></pre>
+<p>Extract the mouse axis value from the saved state. The axes are numbered from 0, in this order: x-axis, y-axis, z-axis, w-axis.</p>
+<p>See also: <a href="mouse.html#allegro_mouse_state">ALLEGRO_MOUSE_STATE</a>, <a href="mouse.html#al_get_mouse_state">al_get_mouse_state</a>, <a href="mouse.html#al_mouse_button_down">al_mouse_button_down</a></p>
+<h1 id="al_mouse_button_down"><a href="#TOC">al_mouse_button_down</a></h1>
+<pre><code>bool al_mouse_button_down(const ALLEGRO_MOUSE_STATE *state, int button)
+</code></pre>
+<p>Return true if the mouse button specified was held down in the state specified. Unlike most things, the first mouse button is numbered 1.</p>
+<p>See also: <a href="mouse.html#allegro_mouse_state">ALLEGRO_MOUSE_STATE</a>, <a href="mouse.html#al_get_mouse_state">al_get_mouse_state</a>, <a href="mouse.html#al_get_mouse_state_axis">al_get_mouse_state_axis</a></p>
+<h1 id="al_set_mouse_xy"><a href="#TOC">al_set_mouse_xy</a></h1>
+<pre><code>bool al_set_mouse_xy(ALLEGRO_DISPLAY *display, int x, int y)
+</code></pre>
+<p>Try to position the mouse at the given coordinates on the given display. The mouse movement resulting from a successful move will generate an ALLEGRO_EVENT_MOUSE_WARPED event.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_z">al_set_mouse_z</a>, <a href="mouse.html#al_set_mouse_w">al_set_mouse_w</a></p>
+<h1 id="al_set_mouse_z"><a href="#TOC">al_set_mouse_z</a></h1>
+<pre><code>bool al_set_mouse_z(int z)
+</code></pre>
+<p>Set the mouse wheel position to the given value.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_w">al_set_mouse_w</a></p>
+<h1 id="al_set_mouse_w"><a href="#TOC">al_set_mouse_w</a></h1>
+<pre><code>bool al_set_mouse_w(int w)
+</code></pre>
+<p>Set the second mouse wheel position to the given value.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_z">al_set_mouse_z</a></p>
+<h1 id="al_set_mouse_axis"><a href="#TOC">al_set_mouse_axis</a></h1>
+<pre><code>bool al_set_mouse_axis(int which, int value)
+</code></pre>
+<p>Set the given mouse axis to the given value.</p>
+<p>The axis number must not be 0 or 1, which are the X and Y axes. Use <a href="mouse.html#al_set_mouse_xy">al_set_mouse_xy</a> for that.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_xy">al_set_mouse_xy</a>, <a href="mouse.html#al_set_mouse_z">al_set_mouse_z</a>, <a href="mouse.html#al_set_mouse_w">al_set_mouse_w</a></p>
+<h1 id="al_get_mouse_event_source"><a href="#TOC">al_get_mouse_event_source</a></h1>
+<pre><code>ALLEGRO_EVENT_SOURCE *al_get_mouse_event_source(void)
+</code></pre>
+<p>Retrieve the mouse event source.</p>
+<p>Returns NULL if the mouse subsystem was not installed.</p>
+<h1 id="mouse-cursors"><a href="#TOC">Mouse cursors</a></h1>
+<h2 id="al_create_mouse_cursor"><a href="#TOC">al_create_mouse_cursor</a></h2>
+<pre><code>ALLEGRO_MOUSE_CURSOR *al_create_mouse_cursor(ALLEGRO_BITMAP *bmp,
+   int x_focus, int y_focus)
+</code></pre>
+<p>Create a mouse cursor from the bitmap provided.</p>
+<p>Returns a pointer to the cursor on success, or NULL on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_cursor">al_set_mouse_cursor</a>, <a href="mouse.html#al_destroy_mouse_cursor">al_destroy_mouse_cursor</a></p>
+<h2 id="al_destroy_mouse_cursor"><a href="#TOC">al_destroy_mouse_cursor</a></h2>
+<pre><code>void al_destroy_mouse_cursor(ALLEGRO_MOUSE_CURSOR *cursor)
+</code></pre>
+<p>Free the memory used by the given cursor.</p>
+<p>Has no effect if <code>cursor</code> is NULL.</p>
+<p>See also: <a href="mouse.html#al_create_mouse_cursor">al_create_mouse_cursor</a></p>
+<h2 id="al_set_mouse_cursor"><a href="#TOC">al_set_mouse_cursor</a></h2>
+<pre><code>bool al_set_mouse_cursor(ALLEGRO_DISPLAY *display, ALLEGRO_MOUSE_CURSOR *cursor)
+</code></pre>
+<p>Set the given mouse cursor to be the current mouse cursor for the given display.</p>
+<p>If the cursor is currently 'shown' (as opposed to 'hidden') the change is immediately visible.</p>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_system_mouse_cursor">al_set_system_mouse_cursor</a>, <a href="mouse.html#al_show_mouse_cursor">al_show_mouse_cursor</a>, <a href="mouse.html#al_hide_mouse_cursor">al_hide_mouse_cursor</a></p>
+<h2 id="al_set_system_mouse_cursor"><a href="#TOC">al_set_system_mouse_cursor</a></h2>
+<pre><code>bool al_set_system_mouse_cursor(ALLEGRO_DISPLAY *display,
+   ALLEGRO_SYSTEM_MOUSE_CURSOR cursor_id)
+</code></pre>
+<p>Set the given system mouse cursor to be the current mouse cursor for the given display. If the cursor is currently 'shown' (as opposed to 'hidden') the change is immediately visible.</p>
+<p>If the cursor doesn't exist on the current platform another cursor will be silently be substituted.</p>
+<p>The cursors are:</p>
+<ul>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_ARROW</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_QUESTION</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_EDIT</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_MOVE</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_N</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_W</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_S</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_E</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_NW</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_SW</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_SE</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_NE</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_PROGRESS</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_PRECISION</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_ALT_SELECT</li>
+<li>ALLEGRO_SYSTEM_MOUSE_CURSOR_UNAVAILABLE</li>
+</ul>
+<p>Returns true on success, false on failure.</p>
+<p>See also: <a href="mouse.html#al_set_mouse_cursor">al_set_mouse_cursor</a>, <a href="mouse.html#al_show_mouse_cursor">al_show_mouse_cursor</a>, <a href="mouse.html#al_hide_mouse_cursor">al_hide_mouse_cursor</a></p>
+<h2 id="al_get_mouse_cursor_position"><a href="#TOC">al_get_mouse_cursor_position</a></h2>
+<pre><code>bool al_get_mouse_cursor_position(int *ret_x, int *ret_y)
+</code></pre>
+<p>On platforms where this information is available, this function returns the global location of the mouse cursor, relative to the desktop. You should not normally use this function, as the information is not useful except for special scenarios as moving a window.</p>
+<p>Returns true on success, false on failure.</p>
+<h2 id="al_hide_mouse_cursor"><a href="#TOC">al_hide_mouse_cursor</a></h2>
+<pre><code>bool al_hide_mouse_cursor(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Hide the mouse cursor in the given display. This has no effect on what the current mouse cursor looks like; it just makes it disappear.</p>
+<p>Returns true on success (or if the cursor already was hidden), false otherwise.</p>
+<p>See also: <a href="mouse.html#al_show_mouse_cursor">al_show_mouse_cursor</a></p>
+<h2 id="al_show_mouse_cursor"><a href="#TOC">al_show_mouse_cursor</a></h2>
+<pre><code>bool al_show_mouse_cursor(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Make a mouse cursor visible in the given display.</p>
+<p>Returns true if a mouse cursor is shown as a result of the call (or one already was visible), false otherwise.</p>
+<p>See also: <a href="mouse.html#al_hide_mouse_cursor">al_hide_mouse_cursor</a></p>
+<h2 id="al_grab_mouse"><a href="#TOC">al_grab_mouse</a></h2>
+<pre><code>bool al_grab_mouse(ALLEGRO_DISPLAY *display)
+</code></pre>
+<p>Confine the mouse cursor to the given display. The mouse cursor can only be confined to one display at a time.</p>
+<p>Returns true if successful, otherwise returns false. Do not assume that the cursor will remain confined until you call <a href="mouse.html#al_ungrab_mouse">al_ungrab_mouse</a>. It may lose the confined status at any time for other reasons.</p>
+<blockquote>
+<p><em>Note:</em> not yet implemented on Mac OS X.</p>
+</blockquote>
+<p>See also: <a href="mouse.html#al_ungrab_mouse">al_ungrab_mouse</a></p>
+<h2 id="al_ungrab_mouse"><a href="#TOC">al_ungrab_mouse</a></h2>
+<pre><code>bool al_ungrab_mouse(void)
+</code></pre>
+<p>Stop confining the mouse cursor to any display belonging to the program.</p>
+<blockquote>
+<p><em>Note:</em> not yet implemented on Mac OS X.</p>
+</blockquote>
+<p>See also: <a href="mouse.html#al_grab_mouse">al_grab_mouse</a></p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

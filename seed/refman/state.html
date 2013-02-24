@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>State</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">State</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_state">ALLEGRO_STATE</a></li>
+<li><a href="#allegro_state_flags">ALLEGRO_STATE_FLAGS</a></li>
+<li><a href="#al_restore_state">al_restore_state</a></li>
+<li><a href="#al_store_state">al_store_state</a></li>
+<li><a href="#al_get_errno">al_get_errno</a></li>
+<li><a href="#al_set_errno">al_set_errno</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="allegro_state"><a href="#TOC">ALLEGRO_STATE</a></h1>
+<pre><code>typedef struct ALLEGRO_STATE ALLEGRO_STATE;
+</code></pre>
+<p>Opaque type which is passed to <a href="state.html#al_store_state">al_store_state</a>/<a href="state.html#al_restore_state">al_restore_state</a>.</p>
+<p>The various state kept internally by Allegro can be displayed like this:</p>
+<pre><code>  global
+      active system driver
+          current config
+  per thread
+      new bitmap params
+      new display params
+      active file interface
+      errno
+      current blending mode
+      current display
+          deferred drawing
+      current target bitmap
+          current transformation
+          current clipping rectangle
+          bitmap locking
+</code></pre>
+<p>In general, the only real global state is the active system driver. All other global state is per-thread, so if your application has multiple separate threads they never will interfere with each other. (Except if there are objects accessed by multiple threads of course. Usually you want to minimize that though and for the remaining cases use synchronization primitives described in the threads section or events described in the events section to control inter-thread communication.)</p>
+<h1 id="allegro_state_flags"><a href="#TOC">ALLEGRO_STATE_FLAGS</a></h1>
+<pre><code>typedef enum ALLEGRO_STATE_FLAGS
+</code></pre>
+<p>Flags which can be passed to <a href="state.html#al_store_state">al_store_state</a>/<a href="state.html#al_restore_state">al_restore_state</a> as bit combinations. See <a href="state.html#al_store_state">al_store_state</a> for the list of flags.</p>
+<h1 id="al_restore_state"><a href="#TOC">al_restore_state</a></h1>
+<pre><code>void al_restore_state(ALLEGRO_STATE const *state)
+</code></pre>
+<p>Restores part of the state of the current thread from the given <a href="state.html#allegro_state">ALLEGRO_STATE</a> object.</p>
+<p>See also: <a href="state.html#al_store_state">al_store_state</a>, <a href="state.html#allegro_state_flags">ALLEGRO_STATE_FLAGS</a></p>
+<h1 id="al_store_state"><a href="#TOC">al_store_state</a></h1>
+<pre><code>void al_store_state(ALLEGRO_STATE *state, int flags)
+</code></pre>
+<p>Stores part of the state of the current thread in the given <a href="state.html#allegro_state">ALLEGRO_STATE</a> objects. The flags parameter can take any bit-combination of these flags:</p>
+<ul>
+<li>ALLEGRO_STATE_NEW_DISPLAY_PARAMETERS - new_display_format, new_display_refresh_rate, new_display_flags</li>
+<li>ALLEGRO_STATE_NEW_BITMAP_PARAMETERS - new_bitmap_format, new_bitmap_flags</li>
+<li>ALLEGRO_STATE_DISPLAY - current_display</li>
+<li>ALLEGRO_STATE_TARGET_BITMAP - target_bitmap</li>
+<li>ALLEGRO_STATE_BLENDER - blender</li>
+<li>ALLEGRO_STATE_TRANSFORM - current_transformation</li>
+<li>ALLEGRO_STATE_NEW_FILE_INTERFACE - new_file_interface</li>
+<li>ALLEGRO_STATE_BITMAP - same as ALLEGRO_STATE_NEW_BITMAP_PARAMETERS and ALLEGRO_STATE_TARGET_BITMAP</li>
+<li>ALLEGRO_STATE_ALL - all of the above</li>
+</ul>
+<p>See also: <a href="state.html#al_restore_state">al_restore_state</a>, <a href="state.html#allegro_state">ALLEGRO_STATE</a></p>
+<h1 id="al_get_errno"><a href="#TOC">al_get_errno</a></h1>
+<pre><code>int al_get_errno(void)
+</code></pre>
+<p>Some Allegro functions will set an error number as well as returning an error code. Call this function to retrieve the last error number set for the calling thread.</p>
+<h1 id="al_set_errno"><a href="#TOC">al_set_errno</a></h1>
+<pre><code>void al_set_errno(int errnum)
+</code></pre>
+<p>Set the error number for for the calling thread.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>

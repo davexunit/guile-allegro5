@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Fixed point math routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Fixed point math routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#al_fixed">al_fixed</a></li>
+<li><a href="#al_itofix">al_itofix</a></li>
+<li><a href="#al_fixtoi">al_fixtoi</a></li>
+<li><a href="#al_fixfloor">al_fixfloor</a></li>
+<li><a href="#al_fixceil">al_fixceil</a></li>
+<li><a href="#al_ftofix">al_ftofix</a></li>
+<li><a href="#al_fixtof">al_fixtof</a></li>
+<li><a href="#al_fixmul">al_fixmul</a></li>
+<li><a href="#al_fixdiv">al_fixdiv</a></li>
+<li><a href="#al_fixadd">al_fixadd</a></li>
+<li><a href="#al_fixsub">al_fixsub</a></li>
+<li><a href="#fixed-point-trig">Fixed point trig</a><ul>
+<li><a href="#al_fixtorad_r">al_fixtorad_r</a></li>
+<li><a href="#al_radtofix_r">al_radtofix_r</a></li>
+<li><a href="#al_fixsin">al_fixsin</a></li>
+<li><a href="#al_fixcos">al_fixcos</a></li>
+<li><a href="#al_fixtan">al_fixtan</a></li>
+<li><a href="#al_fixasin">al_fixasin</a></li>
+<li><a href="#al_fixacos">al_fixacos</a></li>
+<li><a href="#al_fixatan">al_fixatan</a></li>
+<li><a href="#al_fixatan2">al_fixatan2</a></li>
+<li><a href="#al_fixsqrt">al_fixsqrt</a></li>
+<li><a href="#al_fixhypot">al_fixhypot</a></li>
+</ul></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="al_fixed"><a href="#TOC">al_fixed</a></h1>
+<pre><code>typedef int32_t al_fixed;
+</code></pre>
+<p>A fixed point number.</p>
+<p>Allegro provides some routines for working with fixed point numbers, and defines the type <code>al_fixed</code> to be a signed 32-bit integer. The high word is used for the integer part and the low word for the fraction, giving a range of -32768 to 32767 and an accuracy of about four or five decimal places. Fixed point numbers can be assigned, compared, added, subtracted, negated and shifted (for multiplying or dividing by powers of two) using the normal integer operators, but you should take care to use the appropriate conversion routines when mixing fixed point with integer or floating point values. Writing <code>fixed_point_1 + fixed_point_2</code> is OK, but <code>fixed_point + integer</code> is not.</p>
+<p>The only advantage of fixed point math routines is that you don't require a floating point coprocessor to use them. This was great in the time period of i386 and i486 machines, but stopped being so useful with the coming of the Pentium class of processors. From Pentium onwards, CPUs have increased their strength in floating point operations, equaling or even surpassing integer math performance.</p>
+<p>Depending on the type of operations your program may need, using floating point types may be faster than fixed types if you are targeting a specific machine class. Many embedded processors have no FPUs so fixed point maths can be useful there.</p>
+<h1 id="al_itofix"><a href="#TOC">al_itofix</a></h1>
+<pre><code>al_fixed al_itofix(int x);
+</code></pre>
+<p>Converts an integer to fixed point. This is the same thing as x&lt;&lt;16. Remember that overflows (trying to convert an integer greater than 32767) and underflows (trying to convert an integer lesser than -32768) are not detected even in debug builds! The values simply &quot;wrap around&quot;.</p>
+<p>Example:</p>
+<pre><code>    al_fixed number;
+
+    /* This conversion is OK. */
+    number = al_itofix(100);
+    assert(al_fixtoi(number) == 100);
+
+    number = al_itofix(64000);
+
+    /* This check will fail in debug builds. */
+    assert(al_fixtoi(number) == 64000);
+</code></pre>
+<p>Return value: Returns the value of the integer converted to fixed point ignoring overflows.</p>
+<p>See also: <a href="fixed.html#al_fixtoi">al_fixtoi</a>, <a href="fixed.html#al_ftofix">al_ftofix</a>, <a href="fixed.html#al_fixtof">al_fixtof</a>.</p>
+<h1 id="al_fixtoi"><a href="#TOC">al_fixtoi</a></h1>
+<pre><code>int al_fixtoi(al_fixed x);
+</code></pre>
+<p>Converts fixed point to integer, rounding as required to the nearest integer.</p>
+<p>Example:</p>
+<pre><code>    int result;
+
+    /* This will put 33 into `result'. */
+    result = al_fixtoi(al_itofix(100) / 3);
+
+    /* But this will round up to 17. */
+    result = al_fixtoi(al_itofix(100) / 6);
+</code></pre>
+<p>See also: <a href="fixed.html#al_itofix">al_itofix</a>, <a href="fixed.html#al_ftofix">al_ftofix</a>, <a href="fixed.html#al_fixtof">al_fixtof</a>, <a href="fixed.html#al_fixfloor">al_fixfloor</a>, <a href="fixed.html#al_fixceil">al_fixceil</a>.</p>
+<h1 id="al_fixfloor"><a href="#TOC">al_fixfloor</a></h1>
+<pre><code>int al_fixfloor(al_fixed x);
+</code></pre>
+<p>Returns the greatest integer not greater than x. That is, it rounds towards negative infinity.</p>
+<p>Example:</p>
+<pre><code>    int result;
+
+    /* This will put 33 into `result'. */
+    result = al_fixfloor(al_itofix(100) / 3);
+
+    /* And this will round down to 16. */
+    result = al_fixfloor(al_itofix(100) / 6);
+</code></pre>
+<p>See also: <a href="fixed.html#al_fixtoi">al_fixtoi</a>, <a href="fixed.html#al_fixceil">al_fixceil</a>.</p>
+<h1 id="al_fixceil"><a href="#TOC">al_fixceil</a></h1>
+<pre><code>int al_fixceil(al_fixed x);
+</code></pre>
+<p>Returns the smallest integer not less than x. That is, it rounds towards positive infinity.</p>
+<p>Example:</p>
+<pre><code>    int result;
+
+    /* This will put 34 into `result'. */
+    result = al_fixceil(al_itofix(100) / 3);
+
+    /* This will round up to 17. */
+    result = al_fixceil(al_itofix(100) / 6);
+</code></pre>
+<p>See also: <a href="fixed.html#al_fixtoi">al_fixtoi</a>, <a href="fixed.html#al_fixfloor">al_fixfloor</a>.</p>
+<h1 id="al_ftofix"><a href="#TOC">al_ftofix</a></h1>
+<pre><code>al_fixed al_ftofix(double x);
+</code></pre>
+<p>Converts a floating point value to fixed point. Unlike <a href="fixed.html#al_itofix">al_itofix</a>, this function clamps values which could overflow the type conversion, setting Allegro's errno to ERANGE in the process if this happens.</p>
+<p>Example:</p>
+<pre><code>    al_fixed number;
+
+    number = al_itofix(-40000);
+    assert(al_fixfloor(number) == -32768);
+
+    number = al_itofix(64000);
+    assert(al_fixfloor(number) == 32767);
+    assert(!al_get_errno()); /* This will fail. */
+</code></pre>
+<p>Return value: Returns the value of the floating point value converted to fixed point clamping overflows (and setting Allegro's errno).</p>
+<p>See also: <a href="fixed.html#al_fixtof">al_fixtof</a>, <a href="fixed.html#al_itofix">al_itofix</a>, <a href="fixed.html#al_fixtoi">al_fixtoi</a>, <a href="state.html#al_get_errno">al_get_errno</a></p>
+<h1 id="al_fixtof"><a href="#TOC">al_fixtof</a></h1>
+<pre><code>double al_fixtof(al_fixed x);
+</code></pre>
+<p>Converts fixed point to floating point.</p>
+<p>Example:</p>
+<pre><code>    float result;
+
+    /* This will put 33.33333 into `result'. */
+    result = al_fixtof(al_itofix(100) / 3);
+
+    /* This will put 16.66666 into `result'. */
+    result = al_fixtof(al_itofix(100) / 6);
+</code></pre>
+<p>See also: <a href="fixed.html#al_ftofix">al_ftofix</a>, <a href="fixed.html#al_itofix">al_itofix</a>, <a href="fixed.html#al_fixtoi">al_fixtoi</a>.</p>
+<h1 id="al_fixmul"><a href="#TOC">al_fixmul</a></h1>
+<pre><code>al_fixed al_fixmul(al_fixed x, al_fixed y);
+</code></pre>
+<p>A fixed point value can be multiplied or divided by an integer with the normal <code>*</code> and <code>/</code> operators. To multiply two fixed point values, though, you must use this function.</p>
+<p>If an overflow occurs, Allegro's errno will be set and the maximum possible value will be returned, but errno is not cleared if the operation is successful. This means that if you are going to test for overflow you should call <code>al_set_errno(0)</code> before calling <a href="fixed.html#al_fixmul">al_fixmul</a>.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* This will put 30000 into `result'. */
+    result = al_fixmul(al_itofix(10), al_itofix(3000));
+
+    /* But this overflows, and sets errno. */
+    result = al_fixmul(al_itofix(100), al_itofix(3000));
+    assert(!al_get_errno());
+</code></pre>
+<p>Return value: Returns the clamped result of multiplying <code>x</code> by <code>y</code>, setting Allegro's errno to ERANGE if there was an overflow.</p>
+<p>See also: <a href="fixed.html#al_fixadd">al_fixadd</a>, <a href="fixed.html#al_fixsub">al_fixsub</a>, <a href="fixed.html#al_fixdiv">al_fixdiv</a>, <a href="state.html#al_get_errno">al_get_errno</a>.</p>
+<h1 id="al_fixdiv"><a href="#TOC">al_fixdiv</a></h1>
+<pre><code>al_fixed al_fixdiv(al_fixed x, al_fixed y);
+</code></pre>
+<p>A fixed point value can be divided by an integer with the normal <code>/</code> operator. To divide two fixed point values, though, you must use this function. If a division by zero occurs, Allegro's errno will be set and the maximum possible value will be returned, but errno is not cleared if the operation is successful. This means that if you are going to test for division by zero you should call <code>al_set_errno(0)</code> before calling <a href="fixed.html#al_fixdiv">al_fixdiv</a>.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* This will put 0.06060 `result'. */
+    result = al_fixdiv(al_itofix(2), al_itofix(33));
+
+    /* This will put 0 into `result'. */
+    result = al_fixdiv(0, al_itofix(-30));
+
+    /* Sets errno and puts -32768 into `result'. */
+    result = al_fixdiv(al_itofix(-100), al_itofix(0));
+    assert(!al_get_errno()); /* This will fail. */
+</code></pre>
+<p>Return value: Returns the result of dividing <code>x</code> by <code>y</code>. If <code>y</code> is zero, returns the maximum possible fixed point value and sets Allegro's errno to ERANGE.</p>
+<p>See also: <a href="fixed.html#al_fixadd">al_fixadd</a>, <a href="fixed.html#al_fixsub">al_fixsub</a>, <a href="fixed.html#al_fixmul">al_fixmul</a>, <a href="state.html#al_get_errno">al_get_errno</a>.</p>
+<h1 id="al_fixadd"><a href="#TOC">al_fixadd</a></h1>
+<pre><code>al_fixed al_fixadd(al_fixed x, al_fixed y);
+</code></pre>
+<p>Although fixed point numbers can be added with the normal <code>+</code> integer operator, that doesn't provide any protection against overflow. If overflow is a problem, you should use this function instead. It is slower than using integer operators, but if an overflow occurs it will set Allegro's errno and clamp the result, rather than just letting it wrap.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* This will put 5035 into `result'. */
+    result = al_fixadd(al_itofix(5000), al_itofix(35));
+
+    /* Sets errno and puts -32768 into `result'. */
+    result = al_fixadd(al_itofix(-31000), al_itofix(-3000));
+    assert(!al_get_errno()); /* This will fail. */
+</code></pre>
+<p>Return value: Returns the clamped result of adding <code>x</code> to <code>y</code>, setting Allegro's errno to ERANGE if there was an overflow.</p>
+<p>See also: <a href="fixed.html#al_fixsub">al_fixsub</a>, <a href="fixed.html#al_fixmul">al_fixmul</a>, <a href="fixed.html#al_fixdiv">al_fixdiv</a>.</p>
+<h1 id="al_fixsub"><a href="#TOC">al_fixsub</a></h1>
+<pre><code>al_fixed al_fixsub(al_fixed x, al_fixed y);
+</code></pre>
+<p>Although fixed point numbers can be subtracted with the normal <code>-</code> integer operator, that doesn't provide any protection against overflow. If overflow is a problem, you should use this function instead. It is slower than using integer operators, but if an overflow occurs it will set Allegro's errno and clamp the result, rather than just letting it wrap.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* This will put 4965 into `result'. */
+    result = al_fixsub(al_itofix(5000), al_itofix(35));
+
+    /* Sets errno and puts -32768 into `result'. */
+    result = al_fixsub(al_itofix(-31000), al_itofix(3000));
+    assert(!al_get_errno()); /* This will fail. */
+</code></pre>
+<p>Return value: Returns the clamped result of subtracting <code>y</code> from <code>x</code>, setting Allegro's errno to ERANGE if there was an overflow.</p>
+<p>See also: <a href="fixed.html#al_fixadd">al_fixadd</a>, <a href="fixed.html#al_fixmul">al_fixmul</a>, <a href="fixed.html#al_fixdiv">al_fixdiv</a>, <a href="state.html#al_get_errno">al_get_errno</a>.</p>
+<h1 id="fixed-point-trig"><a href="#TOC">Fixed point trig</a></h1>
+<p>The fixed point square root, sin, cos, tan, inverse sin, and inverse cos functions are implemented using lookup tables, which are very fast but not particularly accurate. At the moment the inverse tan uses an iterative search on the tan table, so it is a lot slower than the others. On machines with good floating point processors using these functions could be slower Always profile your code.</p>
+<p>Angles are represented in a binary format with 256 equal to a full circle, 64 being a right angle and so on. This has the advantage that a simple bitwise 'and' can be used to keep the angle within the range zero to a full circle.</p>
+<h2 id="al_fixtorad_r"><a href="#TOC">al_fixtorad_r</a></h2>
+<pre><code>const al_fixed al_fixtorad_r = (al_fixed)1608;
+</code></pre>
+<p>This constant gives a ratio which can be used to convert a fixed point number in binary angle format to a fixed point number in radians.</p>
+<p>Example:</p>
+<pre><code>    al_fixed rad_angle, binary_angle;
+
+    /* Set the binary angle to 90 degrees. */
+    binary_angle = 64;
+
+    /* Now convert to radians (about 1.57). */
+    rad_angle = al_fixmul(binary_angle, al_fixtorad_r);
+</code></pre>
+<p>See also: <a href="fixed.html#al_fixmul">al_fixmul</a>, <a href="fixed.html#al_radtofix_r">al_radtofix_r</a>.</p>
+<h2 id="al_radtofix_r"><a href="#TOC">al_radtofix_r</a></h2>
+<pre><code>const al_fixed al_radtofix_r = (al_fixed)2670177;
+</code></pre>
+<p>This constant gives a ratio which can be used to convert a fixed point number in radians to a fixed point number in binary angle format.</p>
+<p>Example:</p>
+<pre><code>    al_fixed rad_angle, binary_angle;
+    ...
+    binary_angle = al_fixmul(rad_angle, radtofix_r);
+</code></pre>
+<p>See also: <a href="fixed.html#al_fixmul">al_fixmul</a>, <a href="fixed.html#al_fixtorad_r">al_fixtorad_r</a>.</p>
+<h2 id="al_fixsin"><a href="#TOC">al_fixsin</a></h2>
+<pre><code>al_fixed al_fixsin(al_fixed x);
+</code></pre>
+<p>This function finds the sine of a value using a lookup table. The input value must be a fixed point binary angle.</p>
+<p>Example:</p>
+<pre><code>    al_fixed angle;
+    int result;
+
+    /* Set the binary angle to 90 degrees. */
+    angle = al_itofix(64);
+
+    /* The sine of 90 degrees is one. */
+    result = al_fixtoi(al_fixsin(angle));
+    assert(result == 1);
+</code></pre>
+<p>Return value: Returns the sine of a fixed point binary format angle. The return value will be in radians.</p>
+<h2 id="al_fixcos"><a href="#TOC">al_fixcos</a></h2>
+<pre><code>al_fixed al_fixcos(al_fixed x);
+</code></pre>
+<p>This function finds the cosine of a value using a lookup table. The input value must be a fixed point binary angle.</p>
+<p>Example:</p>
+<pre><code>    al_fixed angle;
+    float result;
+
+    /* Set the binary angle to 45 degrees. */
+    angle = al_itofix(32);
+
+    /* The cosine of 45 degrees is about 0.7071. */
+    result = al_fixtof(al_fixcos(angle));
+    assert(result &gt; 0.7 &amp;&amp; result &lt; 0.71);
+</code></pre>
+<p>Return value: Returns the cosine of a fixed point binary format angle. The return value will be in radians.</p>
+<h2 id="al_fixtan"><a href="#TOC">al_fixtan</a></h2>
+<pre><code>al_fixed al_fixtan(al_fixed x);
+</code></pre>
+<p>This function finds the tangent of a value using a lookup table. The input value must be a fixed point binary angle.</p>
+<p>Example:</p>
+<pre><code>    al_fixed angle, res_a, res_b;
+    float dif;
+
+    angle = al_itofix(37);
+    /* Prove that tan(angle) == sin(angle) / cos(angle). */
+    res_a = al_fixdiv(al_fixsin(angle), al_fixcos(angle));
+    res_b = al_fixtan(angle);
+    dif = al_fixtof(al_fixsub(res_a, res_b));
+    printf(&quot;Precision error: %f\n&quot;, dif);
+</code></pre>
+<p>Return value: Returns the tangent of a fixed point binary format angle. The return value will be in radians.</p>
+<h2 id="al_fixasin"><a href="#TOC">al_fixasin</a></h2>
+<pre><code>al_fixed al_fixasin(al_fixed x);
+</code></pre>
+<p>This function finds the inverse sine of a value using a lookup table. The input value must be a fixed point value. The inverse sine is defined only in the domain from -1 to 1. Outside of this input range, the function will set Allegro's errno to EDOM and return zero.</p>
+<p>Example:</p>
+<pre><code>    float angle;
+    al_fixed val;
+
+    /* Sets `val' to a right binary angle (64). */
+    val = al_fixasin(al_itofix(1));
+
+    /* Sets `angle' to 0.2405. */
+    angle = al_fixtof(al_fixmul(al_fixasin(al_ftofix(0.238)), al_fixtorad_r));
+
+    /* This will trigger the assert. */
+    val = al_fixasin(al_ftofix(-1.09));
+    assert(!al_get_errno());
+</code></pre>
+<p>Return value: Returns the inverse sine of a fixed point value, measured as fixed point binary format angle, or zero if the input was out of the range. All return values of this function will be in the range -64 to 64.</p>
+<h2 id="al_fixacos"><a href="#TOC">al_fixacos</a></h2>
+<pre><code>al_fixed al_fixacos(al_fixed x);
+</code></pre>
+<p>This function finds the inverse cosine of a value using a lookup table. The input value must be a fixed point radian. The inverse cosine is defined only in the domain from -1 to 1. Outside of this input range, the function will set Allegro's errno to EDOM and return zero.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* Sets result to binary angle 128. */
+    result = al_fixacos(al_itofix(-1));
+</code></pre>
+<p>Return value: Returns the inverse sine of a fixed point value, measured as fixed point binary format angle, or zero if the input was out of range. All return values of this function will be in the range 0 to 128.</p>
+<h2 id="al_fixatan"><a href="#TOC">al_fixatan</a></h2>
+<pre><code>al_fixed al_fixatan(al_fixed x)
+</code></pre>
+<p>This function finds the inverse tangent of a value using a lookup table. The input value must be a fixed point radian. The inverse tangent is the value whose tangent is <code>x</code>.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* Sets result to binary angle 13. */
+    result = al_fixatan(al_ftofix(0.326));
+</code></pre>
+<p>Return value: Returns the inverse tangent of a fixed point value, measured as a fixed point binary format angle.</p>
+<h2 id="al_fixatan2"><a href="#TOC">al_fixatan2</a></h2>
+<pre><code>al_fixed al_fixatan2(al_fixed y, al_fixed x)
+</code></pre>
+<p>This is a fixed point version of the libc atan2() routine. It computes the arc tangent of <code>y / x</code>, but the signs of both arguments are used to determine the quadrant of the result, and <code>x</code> is permitted to be zero. This function is useful to convert Cartesian coordinates to polar coordinates.</p>
+<p>Example:</p>
+<pre><code>    al_fixed result;
+
+    /* Sets `result' to binary angle 64. */
+    result = al_fixatan2(al_itofix(1), 0);
+
+    /* Sets `result' to binary angle -109. */
+    result = al_fixatan2(al_itofix(-1), al_itofix(-2));
+
+    /* Fails the assert. */
+    result = al_fixatan2(0, 0);
+    assert(!al_get_errno());
+</code></pre>
+<p>Return value: Returns the arc tangent of <code>y / x</code> in fixed point binary format angle, from -128 to 128. If both <code>x</code> and <code>y</code> are zero, returns zero and sets Allegro's errno to EDOM.</p>
+<h2 id="al_fixsqrt"><a href="#TOC">al_fixsqrt</a></h2>
+<pre><code>al_fixed al_fixsqrt(al_fixed x)
+</code></pre>
+<p>This finds out the non negative square root of <code>x</code>. If <code>x</code> is negative, Allegro's errno is set to EDOM and the function returns zero.</p>
+<h2 id="al_fixhypot"><a href="#TOC">al_fixhypot</a></h2>
+<pre><code>al_fixed al_fixhypot(al_fixed x, al_fixed y)
+</code></pre>
+<p>Fixed point hypotenuse (returns the square root of <code>x*x + y*y</code>). This should be better than calculating the formula yourself manually, since the error is much smaller.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:45 UTC
+</p>
+</div>
+
+
+</body>
+</html>

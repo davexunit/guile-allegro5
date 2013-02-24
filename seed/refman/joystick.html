@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <title>Joystick routines</title>
+  <link rel="stylesheet" href="pandoc.css" type="text/css" />
+  <script type="text/javascript" src="autosuggest.js"></script>
+  <script type="text/javascript" src="search_index.js"></script>
+</head>
+<body>
+<div class="sidebar">
+
+<div>
+<ul>
+<li><a href="index.html"><strong>Contents</strong></a></li>
+<li><a href="config.html">Configuration files</a></li>
+<li><a href="display.html">Display</a></li>
+<li><a href="events.html">Events</a></li>
+<li><a href="file.html">File I/O</a></li>
+<li><a href="fshook.html">Filesystem</a></li>
+<li><a href="fixed.html">Fixed point math</a></li>
+<li><a href="graphics.html">Graphics</a></li>
+<li><a href="joystick.html">Joystick</a></li>
+<li><a href="keyboard.html">Keyboard</a></li>
+<li><a href="memory.html">Memory</a></li>
+<li><a href="mouse.html">Mouse</a></li>
+<li><a href="path.html">Path</a></li>
+<li><a href="state.html">State</a></li>
+<li><a href="system.html">System</a></li>
+<li><a href="threads.html">Threads</a></li>
+<li><a href="time.html">Time</a></li>
+<li><a href="timer.html">Timer</a></li>
+<li><a href="transformations.html">Transformations</a></li>
+<li><a href="utf8.html">UTF-8</a></li>
+<li><a href="misc.html">Miscellaneous</a></li>
+<li><a href="platform.html">Platform-specific</a></li>
+<li><a href="direct3d.html">Direct3D</a></li>
+<li><a href="opengl.html">OpenGL</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index.html#addons"><strong>Addons</strong></a></li>
+<li><a href="audio.html">Audio addon</a></li>
+<li><a href="acodec.html">Audio codecs</a></li>
+<li><a href="color.html">Color addon</a></li>
+<li><a href="font.html">Font addons</a></li>
+<li><a href="image.html">Image I/O addon</a></li>
+<li><a href="main.html">Main addon</a></li>
+<li><a href="memfile.html">Memfile addon</a></li>
+<li><a href="native_dialog.html">Native dialogs addon</a></li>
+<li><a href="physfs.html">PhysicsFS addon</a></li>
+<li><a href="primitives.html">Primitives addon</a>
+</div>
+</li>
+</ul>
+<div>
+<ul>
+<li><a href="index_all.html"><strong>Index</strong></a>
+</div>
+</li>
+</ul>
+<div class="searchbox">
+<script type="text/javascript">
+function on_search(index, control) {
+    for (i = 0; i < search_index.length; i++) {
+        if (search_index[i] == control.keywords[index]) {
+            break;
+        }
+    }
+    location.href = search_urls[i];
+}
+</script>
+Search<br/> <input type="text" name="q" id="q" size="15" autocomplete="off"/><br/>
+<script type="text/javascript"> new autosuggest("q", search_index, null, on_search); </script>
+</div>
+
+</div>
+
+<div class="content">
+
+
+
+<div id="header">
+<h1 class="title">Joystick routines</h1>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#allegro_joystick">ALLEGRO_JOYSTICK</a></li>
+<li><a href="#allegro_joystick_state">ALLEGRO_JOYSTICK_STATE</a></li>
+<li><a href="#allegro_joyflags">ALLEGRO_JOYFLAGS</a></li>
+<li><a href="#al_install_joystick">al_install_joystick</a></li>
+<li><a href="#al_uninstall_joystick">al_uninstall_joystick</a></li>
+<li><a href="#al_is_joystick_installed">al_is_joystick_installed</a></li>
+<li><a href="#al_reconfigure_joysticks">al_reconfigure_joysticks</a></li>
+<li><a href="#al_get_num_joysticks">al_get_num_joysticks</a></li>
+<li><a href="#al_get_joystick">al_get_joystick</a></li>
+<li><a href="#al_release_joystick">al_release_joystick</a></li>
+<li><a href="#al_get_joystick_active">al_get_joystick_active</a></li>
+<li><a href="#al_get_joystick_name">al_get_joystick_name</a></li>
+<li><a href="#al_get_joystick_stick_name">al_get_joystick_stick_name</a></li>
+<li><a href="#al_get_joystick_axis_name">al_get_joystick_axis_name</a></li>
+<li><a href="#al_get_joystick_button_name">al_get_joystick_button_name</a></li>
+<li><a href="#al_get_joystick_stick_flags">al_get_joystick_stick_flags</a></li>
+<li><a href="#al_get_joystick_num_sticks">al_get_joystick_num_sticks</a></li>
+<li><a href="#al_get_joystick_num_axes">al_get_joystick_num_axes</a></li>
+<li><a href="#al_get_joystick_num_buttons">al_get_joystick_num_buttons</a></li>
+<li><a href="#al_get_joystick_state">al_get_joystick_state</a></li>
+<li><a href="#al_get_joystick_event_source">al_get_joystick_event_source</a></li>
+</ul>
+</div>
+<p>These functions are declared in the main Allegro header file:</p>
+<pre><code>#include &lt;allegro5/allegro.h&gt;
+</code></pre>
+<h1 id="allegro_joystick"><a href="#TOC">ALLEGRO_JOYSTICK</a></h1>
+<pre><code>typedef struct ALLEGRO_JOYSTICK ALLEGRO_JOYSTICK;
+</code></pre>
+<p>This is an abstract data type representing a physical joystick.</p>
+<p>See also: <a href="joystick.html#al_get_joystick">al_get_joystick</a></p>
+<h1 id="allegro_joystick_state"><a href="#TOC">ALLEGRO_JOYSTICK_STATE</a></h1>
+<pre><code>typedef struct ALLEGRO_JOYSTICK_STATE ALLEGRO_JOYSTICK_STATE;
+</code></pre>
+<p>This is a structure that is used to hold a &quot;snapshot&quot; of a joystick's axes and buttons at a particular instant. All fields public and read-only.</p>
+<pre><code>struct {
+      float axis[num_axes];             // -1.0 to 1.0 
+} stick[num_sticks];
+int button[num_buttons];                // 0 to 32767
+</code></pre>
+<p>See also: <a href="joystick.html#al_get_joystick_state">al_get_joystick_state</a></p>
+<h1 id="allegro_joyflags"><a href="#TOC">ALLEGRO_JOYFLAGS</a></h1>
+<pre><code>enum ALLEGRO_JOYFLAGS
+</code></pre>
+<ul>
+<li>ALLEGRO_JOYFLAG_DIGITAL - the stick provides digital input</li>
+<li>ALLEGRO_JOYFLAG_ANALOGUE - the stick provides analogue input</li>
+</ul>
+<p>(this enum is a holdover from the old API and may be removed)</p>
+<p>See also: <a href="joystick.html#al_get_joystick_stick_flags">al_get_joystick_stick_flags</a></p>
+<h1 id="al_install_joystick"><a href="#TOC">al_install_joystick</a></h1>
+<pre><code>bool al_install_joystick(void)
+</code></pre>
+<p>Install a joystick driver, returning true if successful. If a joystick driver was already installed, returns true immediately.</p>
+<p>See also: <a href="joystick.html#al_uninstall_joystick">al_uninstall_joystick</a></p>
+<h1 id="al_uninstall_joystick"><a href="#TOC">al_uninstall_joystick</a></h1>
+<pre><code>void al_uninstall_joystick(void)
+</code></pre>
+<p>Uninstalls the active joystick driver. All outstanding <a href="joystick.html#allegro_joystick">ALLEGRO_JOYSTICK</a> structures are invalidated. If no joystick driver was active, this function does nothing.</p>
+<p>This function is automatically called when Allegro is shut down.</p>
+<p>See also: <a href="joystick.html#al_install_joystick">al_install_joystick</a></p>
+<h1 id="al_is_joystick_installed"><a href="#TOC">al_is_joystick_installed</a></h1>
+<pre><code>bool al_is_joystick_installed(void)
+</code></pre>
+<p>Returns true if <a href="joystick.html#al_install_joystick">al_install_joystick</a> was called successfully.</p>
+<h1 id="al_reconfigure_joysticks"><a href="#TOC">al_reconfigure_joysticks</a></h1>
+<pre><code>bool al_reconfigure_joysticks(void)
+</code></pre>
+<p>Allegro is able to cope with users connecting and disconnected joystick devices on-the-fly. On existing platforms, the joystick event source will generate an event of type <code>ALLEGRO_EVENT_JOYSTICK_CONFIGURATION</code> when a device is plugged in or unplugged. In response, you should call <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a>.</p>
+<p>Afterwards, the number returned by <a href="joystick.html#al_get_num_joysticks">al_get_num_joysticks</a> may be different, and the handles returned by <a href="joystick.html#al_get_joystick">al_get_joystick</a> may be different or be ordered differently.</p>
+<p>All <a href="joystick.html#allegro_joystick">ALLEGRO_JOYSTICK</a> handles remain valid, but handles for disconnected devices become inactive: their states will no longer update, and <a href="joystick.html#al_get_joystick">al_get_joystick</a> will not return the handle. Handles for devices which remain connected will continue to represent the same devices. Previously inactive handles may become active again, being reused to represent newly connected devices.</p>
+<p>Returns true if the joystick configuration changed, otherwise returns false.</p>
+<p>It is possible that on some systems, Allegro won't be able to generate <code>ALLEGRO_EVENT_JOYSTICK_CONFIGURATION</code> events. If your game has an input configuration screen or similar, you may wish to call <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a> when entering that screen.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_event_source">al_get_joystick_event_source</a>, <a href="events.html#allegro_event">ALLEGRO_EVENT</a></p>
+<h1 id="al_get_num_joysticks"><a href="#TOC">al_get_num_joysticks</a></h1>
+<pre><code>int al_get_num_joysticks(void)
+</code></pre>
+<p>Return the number of joysticks currently on the system (or potentially on the system). This number can change after <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a> is called, in order to support hotplugging.</p>
+<p>Returns 0 if there is no joystick driver installed.</p>
+<p>See also: <a href="joystick.html#al_get_joystick">al_get_joystick</a>, <a href="joystick.html#al_get_joystick_active">al_get_joystick_active</a></p>
+<h1 id="al_get_joystick"><a href="#TOC">al_get_joystick</a></h1>
+<pre><code>ALLEGRO_JOYSTICK * al_get_joystick(int num)
+</code></pre>
+<p>Get a handle for a joystick on the system. The number may be from 0 to <a href="joystick.html#al_get_num_joysticks">al_get_num_joysticks</a>-1. If successful a pointer to a joystick object is returned, which represents a physical device. Otherwise NULL is returned.</p>
+<p>The handle and the index are only incidentally linked. After <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a> is called, <a href="joystick.html#al_get_joystick">al_get_joystick</a> may return handles in a different order, and handles which represent disconnected devices will not be returned.</p>
+<p>See also: <a href="joystick.html#al_get_num_joysticks">al_get_num_joysticks</a>, <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a>, <a href="joystick.html#al_get_joystick_active">al_get_joystick_active</a></p>
+<h1 id="al_release_joystick"><a href="#TOC">al_release_joystick</a></h1>
+<pre><code>void al_release_joystick(ALLEGRO_JOYSTICK *joy)
+</code></pre>
+<p>This function currently does nothing.</p>
+<p>See also: <a href="joystick.html#al_get_joystick">al_get_joystick</a></p>
+<h1 id="al_get_joystick_active"><a href="#TOC">al_get_joystick_active</a></h1>
+<pre><code>bool al_get_joystick_active(ALLEGRO_JOYSTICK *joy)
+</code></pre>
+<p>Return if the joystick handle is &quot;active&quot;, i.e. in the current configuration, the handle represents some physical device plugged into the system. <a href="joystick.html#al_get_joystick">al_get_joystick</a> returns active handles. After reconfiguration, active handles may become inactive, and vice versa.</p>
+<p>See also: <a href="joystick.html#al_reconfigure_joysticks">al_reconfigure_joysticks</a></p>
+<h1 id="al_get_joystick_name"><a href="#TOC">al_get_joystick_name</a></h1>
+<pre><code>const char *al_get_joystick_name(ALLEGRO_JOYSTICK *joy)
+</code></pre>
+<p>Return the name of the given joystick.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_stick_name">al_get_joystick_stick_name</a>, <a href="joystick.html#al_get_joystick_axis_name">al_get_joystick_axis_name</a>, <a href="joystick.html#al_get_joystick_button_name">al_get_joystick_button_name</a></p>
+<h1 id="al_get_joystick_stick_name"><a href="#TOC">al_get_joystick_stick_name</a></h1>
+<pre><code>const char *al_get_joystick_stick_name(ALLEGRO_JOYSTICK *joy, int stick)
+</code></pre>
+<p>Return the name of the given &quot;stick&quot;. If the stick doesn't exist, NULL is returned.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_axis_name">al_get_joystick_axis_name</a>, <a href="joystick.html#al_get_joystick_num_sticks">al_get_joystick_num_sticks</a></p>
+<h1 id="al_get_joystick_axis_name"><a href="#TOC">al_get_joystick_axis_name</a></h1>
+<pre><code>const char *al_get_joystick_axis_name(ALLEGRO_JOYSTICK *joy, int stick, int axis)
+</code></pre>
+<p>Return the name of the given axis. If the axis doesn't exist, NULL is returned. Indices begin from 0.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_stick_name">al_get_joystick_stick_name</a>, <a href="joystick.html#al_get_joystick_num_axes">al_get_joystick_num_axes</a></p>
+<h1 id="al_get_joystick_button_name"><a href="#TOC">al_get_joystick_button_name</a></h1>
+<pre><code>const char *al_get_joystick_button_name(ALLEGRO_JOYSTICK *joy, int button)
+</code></pre>
+<p>Return the name of the given button. If the button doesn't exist, NULL is returned. Indices begin from 0.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_stick_name">al_get_joystick_stick_name</a>, <a href="joystick.html#al_get_joystick_axis_name">al_get_joystick_axis_name</a>, <a href="joystick.html#al_get_joystick_num_buttons">al_get_joystick_num_buttons</a></p>
+<h1 id="al_get_joystick_stick_flags"><a href="#TOC">al_get_joystick_stick_flags</a></h1>
+<pre><code>int al_get_joystick_stick_flags(ALLEGRO_JOYSTICK *joy, int stick)
+</code></pre>
+<p>Return the flags of the given &quot;stick&quot;. If the stick doesn't exist, NULL is returned. Indices begin from 0.</p>
+<p>See also: <a href="joystick.html#allegro_joyflags">ALLEGRO_JOYFLAGS</a></p>
+<h1 id="al_get_joystick_num_sticks"><a href="#TOC">al_get_joystick_num_sticks</a></h1>
+<pre><code>int al_get_joystick_num_sticks(ALLEGRO_JOYSTICK *joy)
+</code></pre>
+<p>Return the number of &quot;sticks&quot; on the given joystick. A stick has one or more axes.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_num_axes">al_get_joystick_num_axes</a>, <a href="joystick.html#al_get_joystick_num_buttons">al_get_joystick_num_buttons</a></p>
+<h1 id="al_get_joystick_num_axes"><a href="#TOC">al_get_joystick_num_axes</a></h1>
+<pre><code>int al_get_joystick_num_axes(ALLEGRO_JOYSTICK *joy, int stick)
+</code></pre>
+<p>Return the number of axes on the given &quot;stick&quot;. If the stick doesn't exist, 0 is returned.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_num_sticks">al_get_joystick_num_sticks</a></p>
+<h1 id="al_get_joystick_num_buttons"><a href="#TOC">al_get_joystick_num_buttons</a></h1>
+<pre><code>int al_get_joystick_num_buttons(ALLEGRO_JOYSTICK *joy)
+</code></pre>
+<p>Return the number of buttons on the joystick.</p>
+<p>See also: <a href="joystick.html#al_get_joystick_num_sticks">al_get_joystick_num_sticks</a></p>
+<h1 id="al_get_joystick_state"><a href="#TOC">al_get_joystick_state</a></h1>
+<pre><code>void al_get_joystick_state(ALLEGRO_JOYSTICK *joy, ALLEGRO_JOYSTICK_STATE *ret_state)
+</code></pre>
+<p>Get the current joystick state.</p>
+<p>See also: <a href="joystick.html#allegro_joystick_state">ALLEGRO_JOYSTICK_STATE</a>, <a href="joystick.html#al_get_joystick_num_buttons">al_get_joystick_num_buttons</a>, <a href="joystick.html#al_get_joystick_num_axes">al_get_joystick_num_axes</a></p>
+<h1 id="al_get_joystick_event_source"><a href="#TOC">al_get_joystick_event_source</a></h1>
+<pre><code>ALLEGRO_EVENT_SOURCE *al_get_joystick_event_source(void)
+</code></pre>
+<p>Returns the global joystick event source. All joystick events are generated by this event source.</p>
+<p class="timestamp">
+Allegro version 5.0.7
+ - Last updated: 2012-06-24 06:32:46 UTC
+</p>
+</div>
+
+
+</body>
+</html>
