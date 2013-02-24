@@ -21,8 +21,8 @@
 
 (define (format-al-func-params params)
   (define (build-params-list)
-    (let ((param-list (reduce (lambda (l p)
-                                (string-append l " " p))
+    (let ((param-list (reduce (lambda (param prev)
+                                (string-append prev " " param))
                               "" params)))
       (string-append "(list " param-list ")")))
 
@@ -39,9 +39,19 @@
           (al-func-c-name func)
           (format-al-func-params (al-func-params func))))
 
+(define (print-export-list funcs)
+  (display "#:export (")
+  (for-each (lambda (func)
+              (when (al-func? func)
+                (display (al-func-name func))
+                (newline)))
+            funcs)
+  (display ")\n"))
+
 (define regex "al_[[:alnum:]_]+")
 
-(define types '(("^bool" . "uint8")
+(define types '(("^[:word:]+\\*" . "'*")
+                ("^bool" . "uint8")
                 ("^int" . "int")
                 ("^float" . "float")
                 ("^double" . "double")
@@ -49,7 +59,8 @@
                 ("^const char *" . "'*")
                 ("^char const *" . "'*")
                 ("^void" . "void")
-                ("^ALLEGRO_" . "'*")))
+                ("^ALLEGRO_" . "'*")
+                ("^const ALLEGRO_" . "'*")))
 
 (define (make-procedure-name c-name)
   (regexp-substitute/global #f "_" c-name 'pre "-" 'post))
@@ -77,14 +88,21 @@
                       substring
                       (parse-parameters suffix))))))
 
+(define (merge-lines lst)
+  (reduce string-concatenate "" lst))
+
 (call-with-input-file (second (program-arguments))
   (lambda (port)
     (let* ((declarations ((sxpath '(// pre code)) (html->sxml port)))
           (funcs (map (lambda (func)
-                        (generate-binding (cadr func)))
+                        (generate-binding (string-concatenate (cdr func))))
                       declarations)))
+      (print-export-list funcs)
+      (newline)
       (for-each (lambda (func)
                   (when (al-func? func)
                     (print-al-func func)
                     (newline)))
                 funcs))))
+
+(generate-binding "void al_register_event_source(ALLEGRO_EVENT_QUEUE *queue,\nALLEGRO_EVENT_SOURCE *source)")
