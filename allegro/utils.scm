@@ -1,7 +1,10 @@
 (define-module (allegro utils)
   #:use-module (system foreign)
   #:use-module (ice-9 regex)
+  #:use-module (rnrs bytevectors)
   #:export (number->boolean
+            boolean->number
+            bytevector->int
             define-foreign))
 
 (define liballegro (dynamic-link "liballegro"))
@@ -12,3 +15,9 @@
 
 (define (number->boolean n)
   (not (zero? n)))
+
+(define (boolean->number b)
+  (if b 1 0))
+
+(define (bytevector->int bv)
+  (bytevector-sint-ref bv 0 (native-endianness) (sizeof int)))
