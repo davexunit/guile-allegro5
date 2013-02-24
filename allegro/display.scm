@@ -153,40 +153,40 @@
   int "al_get_num_video_adapters" '())
 
 ;; Wrappers
-(define-wrapped-pointer-type al-display
-  al-display?
-  wrap-al-display unwrap-al-display
+(define-wrapped-pointer-type <allegro-display>
+  allegro-display?
+  wrap-allegro-display unwrap-allegro-display
   (lambda (d port)
-    (format port "#<al-display ~d ~d ~x>"
+    (format port "#<allegro-display ~d ~d ~x>"
             (al-get-display-width d)
             (al-get-display-height d)
-            (pointer-address d))))
+            (pointer-address (unwrap-allegro-display d)))))
 
 (define (al-create-display width height)
-  (wrap-al-display (%al-create-display width height)))
+  (wrap-allegro-display (%al-create-display width height)))
 
 (define (al-destroy-display display)
-  (%al-destroy-display (unwrap-al-display display)))
+  (%al-destroy-display (unwrap-allegro-display display)))
 
 (define (al-get-display-flags display)
-  (%al-get-display-flags (unwrap-al-display display)))
+  (%al-get-display-flags (unwrap-allegro-display display)))
 
 (define (al-get-display-format display)
-  (%al-get-display-format (unwrap-al-display display)))
+  (%al-get-display-format (unwrap-allegro-display display)))
 
 (define (al-get-display-width display)
-  (%al-get-display-width (unwrap-al-display display)))
+  (%al-get-display-width (unwrap-allegro-display display)))
 
 (define (al-get-display-height display)
-  (%al-get-display-height (unwrap-al-display display)))
+  (%al-get-display-height (unwrap-allegro-display display)))
 
 (define (al-get-display-refresh-rate display)
-  (%al-get-display-refresh-rate (unwrap-al-display display)))
+  (%al-get-display-refresh-rate (unwrap-allegro-display display)))
 
 (define (al-get-window-position display)
   (let ((x (make-bytevector (sizeof int)))
         (y (make-bytevector (sizeof int))))
-    (%al-get-window-position (unwrap-al-display display)
+    (%al-get-window-position (unwrap-allegro-display display)
                              (bytevector->pointer x)
                              (bytevector->pointer y))
     (values (bytevector->int x)
@@ -196,13 +196,13 @@
   (number->boolean (%al-inhibit-screensaver (boolean->number inhibit))))
 
 (define (al-resize-display display width height)
-  (number->boolean (%al-resize-display (unwrap-al-display display) width height)))
+  (number->boolean (%al-resize-display (unwrap-allegro-display display) width height)))
 
 (define (al-get-display-option display option)
-  (%al-get-display-option (unwrap-al-display display) option))
+  (%al-get-display-option (unwrap-allegro-display display) option))
 
 (define (al-set-window-position display x y)
-  (%al-set-window-position (unwrap-al-display display) x y))
+  (%al-set-window-position (unwrap-allegro-display display) x y))
 
 (define (al-set-window-title display title)
-  (%al-set-window-title (unwrap-al-display display) (string->pointer title)))
+  (%al-set-window-title (unwrap-allegro-display display) (string->pointer title)))
