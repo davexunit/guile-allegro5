@@ -1,6 +1,7 @@
 (define-module (allegro display)
   #:use-module (system foreign)
   #:use-module (allegro utils)
+  #:use-module (rnrs bytevectors)
   #:export (al-create-display
             al-destroy-display
             al-get-new-display-flags
@@ -53,9 +54,9 @@
   int "al_get_new_display_refresh_rate" '())
 
 (define-foreign %al-get-new-window-position
-  void "al_get_new_window_position" (list int int))
+  void "al_get_new_window_position" (list '* '*))
 
-(define-foreign %al-set-new-display-option
+(define-foreign al-set-new-display-option
   void "al_set_new_display_option" (list int int int))
 
 (define-foreign %al-get-new-display-option
@@ -64,13 +65,13 @@
 (define-foreign al-reset-new-display-options
   void "al_reset_new_display_options" '())
 
-(define-foreign %al-set-new-display-flags
+(define-foreign al-set-new-display-flags
   void "al_set_new_display_flags" (list int))
 
-(define-foreign %al-set-new-display-refresh-rate
+(define-foreign al-set-new-display-refresh-rate
   void "al_set_new_display_refresh_rate" (list int))
 
-(define-foreign %al-set-new-window-position
+(define-foreign al-set-new-window-position
   void "al_set_new_window_position" (list int int))
 
 (define-foreign %al-acknowledge-resize
@@ -98,22 +99,22 @@
   int "al_get_display_width" (list '*))
 
 (define-foreign %al-get-window-position
-  void "al_get_window_position" (list int int '*))
+  void "al_get_window_position" (list '* '* '*))
 
 (define-foreign %al-inhibit-screensaver
   uint8 "al_inhibit_screensaver" (list uint8))
 
 (define-foreign %al-resize-display
-  uint8 "al_resize_display" (list int int '*))
+  uint8 "al_resize_display" (list '* int int))
 
 (define-foreign %al-set-display-icon
   void "al_set_display_icon" (list '* '*))
 
 (define-foreign %al-get-display-option
-  int "al_get_display_option" (list int '*))
+  int "al_get_display_option" (list '* int))
 
 (define-foreign %al-set-window-position
-  void "al_set_window_position" (list int int '*))
+  void "al_set_window_position" (list '* int int))
 
 (define-foreign %al-set-window-title
   void "al_set_window_title" (list '* '*))
@@ -151,6 +152,7 @@
 (define-foreign %al-get-num-video-adapters
   int "al_get_num_video_adapters" '())
 
+;; Wrappers
 (define-wrapped-pointer-type al-display
   al-display?
   wrap-al-display unwrap-al-display
@@ -165,3 +167,42 @@
 
 (define (al-destroy-display display)
   (%al-destroy-display (unwrap-al-display display)))
+
+(define (al-get-display-flags display)
+  (%al-get-display-flags (unwrap-al-display display)))
+
+(define (al-get-display-format display)
+  (%al-get-display-format (unwrap-al-display display)))
+
+(define (al-get-display-width display)
+  (%al-get-display-width (unwrap-al-display display)))
+
+(define (al-get-display-height display)
+  (%al-get-display-height (unwrap-al-display display)))
+
+(define (al-get-display-refresh-rate display)
+  (%al-get-display-refresh-rate (unwrap-al-display display)))
+
+(define (al-get-window-position display)
+  (let ((x (make-bytevector (sizeof int)))
+        (y (make-bytevector (sizeof int))))
+    (%al-get-window-position (unwrap-al-display display)
+                             (bytevector->pointer x)
+                             (bytevector->pointer y))
+    (values (bytevector->int x)
+            (bytevector->int y))))
+
+(define (al-inhibit-screensaver inhibit)
+  (number->boolean (%al-inhibit-screensaver (boolean->number inhibit))))
+
+(define (al-resize-display display width height)
+  (number->boolean (%al-resize-display (unwrap-al-display display) width height)))
+
+(define (al-get-display-option display option)
+  (%al-get-display-option (unwrap-al-display display) option))
+
+(define (al-set-window-position display x y)
+  (%al-set-window-position (unwrap-al-display display) x y))
+
+(define (al-set-window-title display title)
+  (%al-set-window-title (unwrap-al-display display) (string->pointer title)))
