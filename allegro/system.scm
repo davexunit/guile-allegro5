@@ -70,6 +70,3 @@
 
 (define (al-get-org-name)
   (pointer->string (%al-get-org-name)))
-
-(al-define al-install-system
-         bool "al_install_system" (list int pointer))
