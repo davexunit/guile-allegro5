@@ -24,10 +24,37 @@
             al-set-event-source-data
             wrap-allegro-event-source
             allegro-event?
-            allegro-event-type
-            allegro-event-event-source
-            allegro-event-timestamp
-            allegro-event-build))
+            al-get-event-type
+            al-get-event-source
+            al-get-event-timestamp
+            al-get-timer-event
+            allegro-timer-event?
+            al-get-timer-event-source
+            al-get-timer-event-timestamp
+            al-get-timer-event-count
+            al-get-timer-event-error
+            allegro-event-joystick-axis
+            allegro-event-joystick-button-down
+            allegro-event-joystick-button-up
+            allegro-event-joystick-configuration
+            allegro-event-key-down
+            allegro-event-key-char
+            allegro-event-key-up
+            allegro-event-mouse-axes
+            allegro-event-mouse-button-down
+            allegro-event-mouse-button-up
+            allegro-event-mouse-enter-display
+            allegro-event-mouse-leave-display
+            allegro-event-mouse-warped
+            allegro-event-timer
+            allegro-event-display-expose
+            allegro-event-display-resize
+            allegro-event-display-close
+            allegro-event-display-lost
+            allegro-event-display-found
+            allegro-event-display-switch-in
+            allegro-event-display-switch-out
+            allegro-event-display-orientation))
 
 ;; Foreign function bindings
 (define-foreign %al-create-event-queue
@@ -84,6 +111,18 @@
 (define-foreign %al-set-event-source-data
   void "al_set_event_source_data" (list '* int))
 
+;; Type lists to convert bytevectors to event data.
+(define (build-event-types types)
+  (append types-event-any types))
+
+(define types-event-any      (list int '* double))
+(define types-event-display  (build-event-types (list int int int int int)))
+(define types-event-keyboard (build-event-types (list int '*)))
+(define types-event-mouse    (build-event-types (list int int int int
+                                                      int int int int
+                                                      unsigned-int float)))
+(define types-event-timer    (build-event-types (list int64 double)))
+
 ;; Wrappers
 (define-wrapped-pointer-type <allegro-event-queue>
   allegro-event-queue?
@@ -101,32 +140,39 @@
 
 ;; Event record
 (define-record-type <allegro-event>
-  (make-allegro-event type source timestamp pointer)
+  (%make-allegro-event type source timestamp pointer)
   allegro-event?
   (type al-get-event-type)
   (source %al-get-event-source)
   (timestamp al-get-event-timestamp)
   (pointer al-get-event-pointer))
 
-(define (al-get-event-event-source event)
+(define (make-allegro-event pointer)
+  (let ((data (parse-c-struct pointer types-event-any)))
+    (%make-allegro-event (first data)
+                         (second data)
+                         (third data)
+                         pointer)))
+
+(define (al-get-event-source event)
   (wrap-allegro-event-source (%al-get-event-source event)))
 
-;; (define (al-build-event event)
-;;   (let ((constructor (hash-ref event-constructors
-;;                                (allegro-event-type event))))
-;;     (apply constructor (allegro-event-data event))))
+(define (al-get-timer-event event)
+  (make-allegro-timer-event (al-get-event-pointer event)))
 
-;; Type lists to convert bytevectors to event data.
-(define (build-event-types types)
-  (append types-event-any types))
+;; Timer event
+(define-record-type <allegro-timer-event>
+  (%make-allegro-timer-event source timestamp count error)
+  allegro-timer-event?
+  (source al-get-timer-event-source)
+  (timestamp al-get-timer-event-timestamp)
+  (count al-get-timer-event-count)
+  (error al-get-timer-event-error))
 
-(define types-event-any      (list int '* double))
-(define types-event-display  (build-event-types (list int int int int int)))
-(define types-event-keyboard (build-event-types (list int '*)))
-(define types-event-mouse    (build-event-types (list int int int int
-                                                      int int int int
-                                                      unsigned-int float)))
-(define types-event-timer    (build-event-types (list int64 double)))
+(define (make-allegro-timer-event pointer)
+  (let ((data (parse-c-struct pointer types-event-timer)))
+    ;; Leave off event type
+    (apply %make-allegro-timer-event (cdr data))))
 
 ;; Event type enumeration.
 (define allegro-event-joystick-axis           1)
@@ -156,45 +202,9 @@
 (define allegro-event-display-switch-out      46)
 (define allegro-event-display-orientation     47)
 
-;; Register event types with their associated constuctor procedures.
-(define event-constructors (make-hash-table))
-
-(define (register-event-constuctor type constructor)
-  (hash-set! event-constructors type constructor))
-
-;; Register event constructors for the built in event types.
-;; (register-event-constuctor allegro-event-key-down
-;;                            make-allegro-key-event)
-;; (register-event-constuctor allegro-event-key-char
-;;                            make-allegro-key-event)
-;; (register-event-constuctor allegro-event-key-up
-;;                            make-allegro-key-event)
-
-;; (register-event-constuctor allegro-event-mouse-axes
-;;                            make-allegro-mouse-event)
-;; (register-event-constuctor allegro-event-mouse-button-down
-;;                            make-allegro-mouse-event)
-;; (register-event-constuctor allegro-event-mouse-button-up
-;;                            make-allegro-mouse-event)
-;; (register-event-constuctor allegro-event-mouse-enter-display
-;;                            make-allegro-mouse-event)
-;; (register-event-constuctor allegro-event-mouse-leave-display
-;;                            make-allegro-mouse-event)
-;; (register-event-constuctor allegro-event-mouse-warped
-;;                            make-allegro-mouse-event)
-
-;; (register-event-constuctor allegro-event-timer
-;;                            make-al-timer-event)
-
 ;; 72 is the size of the ALLEGRO_EVENT struct.
 (define (make-event-bytevector)
   (make-bytevector 72))
-
-;; (define (make-event pointer)
-;;   (let* ((event (parse-c-struct pointer types-event-any))
-;;          (type (car event))
-;;          (constructor (hash-ref event-constructors type)))
-;;     (apply constructor event)))
 
 (define (al-create-event-queue)
   (wrap-allegro-event-queue (%al-create-event-queue)))
@@ -212,13 +222,26 @@
 
 (define (al-is-event-queue-empty? event-queue)
   (number->boolean (%al-is-event-queue-empty? (unwrap-allegro-event-queue event-queue))))
-
-(define (al-get-next-event event-queue)
+(define (al-get-event event-queue proc . args)
   (let* ((event (make-event-bytevector))
          (pointer (bytevector->pointer event)))
-    (%al-get-next-event (unwrap-allegro-event-queue event-queue) pointer)
-    (let ((data (parse-c-struct pointer types-event-any)))
-      (make-allegro-event (first data)
-                          (second data)
-                          (third data)
-                          pointer))))
+    (apply proc (unwrap-allegro-event-queue event-queue) pointer args)
+    (make-allegro-event pointer)))
+
+(define (al-get-next-event event-queue)
+  (al-get-event event-queue %al-get-next-event))
+
+(define (al-peek-next-event event-queue)
+  (al-get-event event-queue %al-peek-next-event))
+
+(define (al-drop-next-event event-queue)
+  (number->boolean (%al-drop-next-event (unwrap-allegro-event-queue event-queue))))
+
+(define (al-flush-event-queue event-queue)
+  (%al-flush-event-queue (unwrap-allegro-event-queue event-queue)))
+
+(define (al-wait-for-event event-queue)
+  (al-get-event event-queue %al-wait-for-event))
+
+(define (al-wait-for-event-timed event-queue timeout)
+  (al-get-event event-queue %al-wait-for-event-timed timeout))
