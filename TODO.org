@@ -1,0 +1,25 @@
+* Things to do
+** TODO Add basic bindings for important allegro modules.
+    - [X] Display
+    - [ ] Events
+    - [ ] Filesystem
+    - [ ] Fullscreen modes
+    - [ ] Graphics
+    - [ ] Joystick
+    - [ ] Keyboard
+    - [ ] Monitor
+    - [ ] Mouse
+    - [ ] Path
+    - [ ] State
+    - [X] System
+    - [ ] Time
+    - [X] Timer
+    - [ ] Transformations
+    - [ ] Miscellaneous
+    - [ ] Platform-specific
+    - [ ] Audio addon
+    - [ ] Audio codecs
+    - [ ] Color addon
+    - [ ] Font addons
+    - [ ] Image I/O addon
+    - [ ] Primitives addon
