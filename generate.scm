@@ -77,7 +77,7 @@
                       substring
                       (parse-parameters suffix))))))
 
-(call-with-input-file "/home/dave/Code/guile-allegro5/seed/refman/system.html"
+(call-with-input-file (second (program-arguments))
   (lambda (port)
     (let* ((declarations ((sxpath '(// pre code)) (html->sxml port)))
           (funcs (map (lambda (func)
