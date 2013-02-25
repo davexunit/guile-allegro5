@@ -38,7 +38,9 @@
             al-get-new-display-adapter
             al-set-new-display-adapter
             al-get-monitor-info
-            al-get-num-video-adapters))
+            al-get-num-video-adapters
+            unwrap-allegro-display
+            wrap-allegro-display))
 
 ;; Foreign function bindings
 (define-foreign %al-create-display
