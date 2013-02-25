@@ -51,7 +51,7 @@
 
 ;; Wrappers
 (define (al-init)
-  (number->boolean (%al-install-system (%al-get-allegro-version) %null-pointer)))
+  (number->boolean (%al-install-system (al-get-allegro-version) %null-pointer)))
 
 (define (al-is-system-installed?)
   (number->boolean (%al-is-system-installed?)))
