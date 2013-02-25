@@ -56,6 +56,7 @@
                 ("^float" . "float")
                 ("^double" . "double")
                 ("^uint32_t" . "uint32")
+                ("^unsigned char" . "uint8")
                 ("^const char *" . "'*")
                 ("^char const *" . "'*")
                 ("^void" . "void")
