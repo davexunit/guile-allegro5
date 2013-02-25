@@ -29,7 +29,7 @@
             al-get-event-timestamp
             al-get-timer-event
             allegro-timer-event?
-            al-get-timer-event-source
+            al-get-timer-event-src
             al-get-timer-event-timestamp
             al-get-timer-event-count
             al-get-timer-event-error
@@ -138,7 +138,7 @@
     (format port "#<allegro-event-source ~x>"
             (pointer-address (unwrap-allegro-event-source s)))))
 
-;; Event record
+;; Base event
 (define-record-type <allegro-event>
   (%make-allegro-event type source timestamp pointer)
   allegro-event?
@@ -160,19 +160,38 @@
 (define (al-get-timer-event event)
   (make-allegro-timer-event (al-get-event-pointer event)))
 
+(define (%make-event pointer types constructor)
+  (let ((data (parse-c-struct pointer types)))
+    ;; Leave off event type
+    (apply constructor (cdr data))))
+
 ;; Timer event
 (define-record-type <allegro-timer-event>
   (%make-allegro-timer-event source timestamp count error)
   allegro-timer-event?
-  (source al-get-timer-event-source)
+  (source al-get-timer-event-src)
   (timestamp al-get-timer-event-timestamp)
   (count al-get-timer-event-count)
   (error al-get-timer-event-error))
 
 (define (make-allegro-timer-event pointer)
-  (let ((data (parse-c-struct pointer types-event-timer)))
-    ;; Leave off event type
-    (apply %make-allegro-timer-event (cdr data))))
+  (%make-event pointer types-event-timer %make-allegro-timer-event))
+
+;; Keyboard event
+(define-record-type <allegro-key-event>
+  (%make-allegro-key-event source timestamp display keycode unichar
+                   modifiers repeat)
+  allegro-key-event?
+  (source al-get-key-event-source)
+  (timestamp al-get-key-event-timestamp)
+  (display al-get-key-event-display)
+  (keycode al-get-key-event-keycode)
+  (unichar al-get-key-event-unichar)
+  (modifiers al-get-key-event-modifiers)
+  (repeat al-get-key-event-repeat))
+
+(define (make-allegro-key-event pointer)
+  (%make-event pointer types-event-keyboard %make-allegro-key-event))
 
 ;; Event type enumeration.
 (define allegro-event-joystick-axis           1)
