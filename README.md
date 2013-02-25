@@ -10,22 +10,52 @@ Example
 ```scheme
 (use-modules (allegro system)
              (allegro display)
+             (allegro events)
+             (allegro keyboard)
+             (allegro timer)
              (allegro graphics)
              (allegro addons image))
 
-(define *display* #f)
-(define *image* #f)
+(define timer #f)
+(define events #f)
+(define running #t)
+(define redraw #t)
+(define image #f)
+(define window #f)
 
 (al-init)
 (al-init-image-addon)
-(set! *display* (al-create-display 640 480))
-(set! *image* (al-load-bitmap "foo.png"))
-(al-clear-to-color .5 .5 .5)
-(al-draw-bitmap *image* 100 100 0)
-(al-flip-display)
-```
+(al-install-keyboard)
 
-This example isn't so useful as there is no game loop, but it works for now.
+(define (game-loop)
+  (set! window (al-create-display 640 480))
+  (set! timer (al-create-timer (/ 1 60)))
+  (set! events (al-create-event-queue))
+  (set! image (al-load-bitmap "player.png"))
+  (al-register-event-source events (al-get-timer-event-source timer))
+  (al-register-event-source events (al-get-keyboard-event-source))
+
+  (set! running #t)
+  (set! redraw #t)
+  (al-start-timer timer)
+  (while running
+    (let ((event (al-wait-for-event events)))
+      (cond ((= (al-get-event-type event) allegro-event-key-up)
+             (set! running #f))
+            ((= (al-get-event-type event) allegro-event-timer)
+             (set! redraw #t)))
+      (when (and redraw (al-is-event-queue-empty? events))
+        (set! redraw #f)
+        (al-clear-to-color 0 0 0)
+        (al-draw-bitmap image 100 100 0)
+        (al-flip-display))))
+  (al-destroy-bitmap image)
+  (al-destroy-event-queue events)
+  (al-destroy-timer timer)
+  (al-destroy-display window))
+
+(game-loop)
+```
 
 Hacking
 -------
