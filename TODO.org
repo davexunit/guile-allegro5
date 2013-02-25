@@ -4,7 +4,7 @@
     - [ ] Events
     - [ ] Filesystem
     - [ ] Fullscreen modes
-    - [ ] Graphics
+    - [X] Graphics
     - [ ] Joystick
     - [ ] Keyboard
     - [ ] Monitor
