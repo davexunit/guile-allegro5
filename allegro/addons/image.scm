@@ -1,5 +1,6 @@
 (define-module (allegro addons image)
   #:use-module (system foreign)
+  #:use-module (allegro utils)
   #:export (al-init-image-addon
             al-shutdown-image-addon
             al-get-allegro-image-version))
