@@ -1,5 +1,6 @@
 (define-module (allegro keyboard)
   #:use-module (system foreign)
+  #:use-module (rnrs bytevectors)
   #:use-module (allegro utils)
   #:use-module (allegro events)
   #:export (al-install-keyboard
@@ -287,6 +288,15 @@
 (define allegro-keymod-accent3    #x04000)
 (define allegro-keymod-accent4    #x08000)
 
+;; Keyboard state
+(define-wrapped-pointer-type <allegro-keyboard-state>
+  allegro-keyboard-state?
+  wrap-allegro-keyboard-state unwrap-allegro-keyboard-state
+  (lambda (ks port)
+    (format port "#<allegro-keyboard-state ~x>"
+            (pointer-address (unwrap-allegro-keyboard-state ks)))))
+
+;; Foreign function bindings
 (define-foreign %al-install-keyboard
   uint8 "al_install_keyboard" '())
 
@@ -318,10 +328,19 @@
   (number->boolean (%al-is-keyboard-installed?)))
 
 (define (al-get-keyboard-state)
-  #f)
+  ;; sizeof (ALLEGRO_KEYBOARD_STATE) is 40
+  (let* ((ks (make-bytevector 40))
+         (pointer (bytevector->pointer ks)))
+    (%al-get-keyboard-state pointer)
+    (wrap-allegro-keyboard-state pointer)))
 
 (define (al-key-down? keyboard-state keycode)
-  #f)
+  (number->boolean
+   (%al-key-down? (unwrap-allegro-keyboard-state keyboard-state)
+                  keycode)))
+
+(define (al-keycode-to-name keycode)
+  (pointer->string (%al-keycode-to-name keycode)))
 
 (define (al-set-keyboard-leds leds)
   (number->boolean (%al-set-keyboard-leds leds)))
