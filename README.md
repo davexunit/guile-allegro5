@@ -3,7 +3,7 @@ Guile Bindings for Allegro 5
 
 Allegro 5 is a cross-platform, open source, game programming library
 written in C. Guile-allegro5 is a collection of modules that provides
-Allegro 5 bindings for Guile.
+bindings for Guile.
 
 Example
 -------
@@ -63,4 +63,4 @@ The bindings are incomplete. Please help fill in the gaps.
 
 License
 -------
-BSD 2-Clause License
+GNU LGPL v3
