@@ -15,13 +15,13 @@
             al-flush-event-queue
             al-wait-for-event
             al-wait-for-event-timed
-            al-wait-for-event-until
-            al-init-user-event-source
-            al-destroy-user-event-source
-            al-emit-user-event
-            al-unref-user-event
-            al-get-event-source-data
-            al-set-event-source-data
+            ;; al-wait-for-event-until
+            ;; al-init-user-event-source
+            ;; al-destroy-user-event-source
+            ;; al-emit-user-event
+            ;; al-unref-user-event
+            ;; al-get-event-source-data
+            ;; al-set-event-source-data
             wrap-allegro-event-source
             allegro-event?
             al-get-event-type
@@ -55,6 +55,34 @@
             allegro-event-display-switch-in
             allegro-event-display-switch-out
             allegro-event-display-orientation))
+
+;; Event type enumeration.
+(define allegro-event-joystick-axis           1)
+(define allegro-event-joystick-button-down    2)
+(define allegro-event-joystick-button-up      3)
+(define allegro-event-joystick-configuration  4)
+
+(define allegro-event-key-down                10)
+(define allegro-event-key-char                11)
+(define allegro-event-key-up                  12)
+
+(define allegro-event-mouse-axes              20)
+(define allegro-event-mouse-button-down       21)
+(define allegro-event-mouse-button-up         22)
+(define allegro-event-mouse-enter-display     23)
+(define allegro-event-mouse-leave-display     24)
+(define allegro-event-mouse-warped            25)
+
+(define allegro-event-timer                   30)
+
+(define allegro-event-display-expose          40)
+(define allegro-event-display-resize          41)
+(define allegro-event-display-close           42)
+(define allegro-event-display-lost            43)
+(define allegro-event-display-found           44)
+(define allegro-event-display-switch-in       45)
+(define allegro-event-display-switch-out      46)
+(define allegro-event-display-orientation     47)
 
 ;; Foreign function bindings
 (define-foreign %al-create-event-queue
@@ -192,34 +220,6 @@
 
 (define (make-allegro-key-event pointer)
   (%make-event pointer types-event-keyboard %make-allegro-key-event))
-
-;; Event type enumeration.
-(define allegro-event-joystick-axis           1)
-(define allegro-event-joystick-button-down    2)
-(define allegro-event-joystick-button-up      3)
-(define allegro-event-joystick-configuration  4)
-
-(define allegro-event-key-down                10)
-(define allegro-event-key-char                11)
-(define allegro-event-key-up                  12)
-
-(define allegro-event-mouse-axes              20)
-(define allegro-event-mouse-button-down       21)
-(define allegro-event-mouse-button-up         22)
-(define allegro-event-mouse-enter-display     23)
-(define allegro-event-mouse-leave-display     24)
-(define allegro-event-mouse-warped            25)
-
-(define allegro-event-timer                   30)
-
-(define allegro-event-display-expose          40)
-(define allegro-event-display-resize          41)
-(define allegro-event-display-close           42)
-(define allegro-event-display-lost            43)
-(define allegro-event-display-found           44)
-(define allegro-event-display-switch-in       45)
-(define allegro-event-display-switch-out      46)
-(define allegro-event-display-orientation     47)
 
 ;; 72 is the size of the ALLEGRO_EVENT struct.
 (define (make-event-bytevector)
