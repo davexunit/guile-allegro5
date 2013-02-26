@@ -2,7 +2,6 @@
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
   #:use-module (allegro utils)
-  #:use-module (allegro display)
   #:export (allegro-pixel-format-any
             allegro-pixel-format-any-no-alpha
             allegro-pixel-format-any-with-alpha
@@ -102,8 +101,6 @@
             al-set-target-bitmap
             al-lock-bitmap
             al-set-target-bitmap
-            al-set-target-backbuffer
-            al-get-current-display
             al-get-blender
             al-get-separate-blender
             al-set-blender
@@ -114,14 +111,15 @@
             al-convert-mask-to-alpha
             al-hold-bitmap-drawing
             al-is-bitmap-drawing-held
-            al-register-bitmap-loader
-            al-register-bitmap-saver
-            al-register-bitmap-loader-f
-            al-register-bitmap-saver-f
+            ;; al-register-bitmap-loader
+            ;; al-register-bitmap-saver
+            ;; al-register-bitmap-loader-f
+            ;; al-register-bitmap-saver-f
             al-load-bitmap
-            al-load-bitmap-f
+            ;; al-load-bitmap-f
             al-save-bitmap
-            al-save-bitmap-f
+            ;; al-save-bitmap-f
+            unwrap-allegro-bitmap
             pointer->color
             color->pointer))
 
@@ -341,12 +339,6 @@
 (define-foreign %al-set-target-bitmap
   void "al_set_target_bitmap" (list '*))
 
-(define-foreign %al-set-target-backbuffer
-  void "al_set_target_backbuffer" (list '*))
-
-(define-foreign %al-get-current-display
-  '* "al_get_current_display" '())
-
 (define-foreign %al-get-blender
   void "al_get_blender" (list '* '* '*))
 
@@ -540,12 +532,6 @@
 
 (define (al-set-target-bitmap bitmap)
   (%al-set-target-bitmap (unwrap-allegro-bitmap bitmap)))
-
-(define (al-set-target-backbuffer display)
-  (%al-set-target-backbuffer (unwrap-allegro-display display)))
-
-(define (al-get-current-display)
-  (wrap-allegro-display (%al-get-current-display)))
 
 (define (make-bytevector-int)
   (make-bytevector (sizeof int)))

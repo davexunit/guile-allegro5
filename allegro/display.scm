@@ -1,7 +1,8 @@
 (define-module (allegro display)
   #:use-module (system foreign)
-  #:use-module (allegro utils)
   #:use-module (rnrs bytevectors)
+  #:use-module (allegro utils)
+  #:use-module (allegro graphics)
   #:export (al-create-display
             al-destroy-display
             al-get-new-display-flags
@@ -39,8 +40,8 @@
             al-set-new-display-adapter
             al-get-monitor-info
             al-get-num-video-adapters
-            unwrap-allegro-display
-            wrap-allegro-display))
+            al-set-target-backbuffer
+            al-get-current-display))
 
 ;; Foreign function bindings
 (define-foreign %al-create-display
@@ -154,6 +155,12 @@
 (define-foreign %al-get-num-video-adapters
   int "al_get_num_video_adapters" '())
 
+(define-foreign %al-set-target-backbuffer
+  void "al_set_target_backbuffer" (list '*))
+
+(define-foreign %al-get-current-display
+  '* "al_get_current_display" '())
+
 ;; Wrappers
 (define-wrapped-pointer-type <allegro-display>
   allegro-display?
@@ -207,3 +214,13 @@
 
 (define (al-set-window-title display title)
   (%al-set-window-title (unwrap-allegro-display display) (string->pointer title)))
+
+(define (al-set-display-icon display icon)
+  (%al-set-display-icon (unwrap-allegro-display display)
+                        (unwrap-allegro-bitmap icon)))
+
+(define (al-set-target-backbuffer display)
+  (%al-set-target-backbuffer (unwrap-allegro-display display)))
+
+(define (al-get-current-display)
+  (wrap-allegro-display (%al-get-current-display)))
