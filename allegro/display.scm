@@ -186,13 +186,12 @@
   (%al-get-display-refresh-rate (unwrap-allegro-display display)))
 
 (define (al-get-window-position display)
-  (let ((x (make-bytevector (sizeof int)))
-        (y (make-bytevector (sizeof int))))
+  (let ((v (make-bytevector (* (sizeof int) 2))))
     (%al-get-window-position (unwrap-allegro-display display)
-                             (bytevector->pointer x)
-                             (bytevector->pointer y))
-    (values (bytevector->int x)
-            (bytevector->int y))))
+                             (bytevector->pointer v)
+                             (bytevector->pointer v (sizeof int)))
+    (values (bytevector->int v)
+            (bytevector->int v (sizeof int)))))
 
 (define (al-inhibit-screensaver inhibit)
   (number->boolean (%al-inhibit-screensaver (boolean->number inhibit))))
