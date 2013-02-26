@@ -121,7 +121,9 @@
             al-load-bitmap
             al-load-bitmap-f
             al-save-bitmap
-            al-save-bitmap-f))
+            al-save-bitmap-f
+            pointer->color
+            color->pointer))
 
 ;; Pixel formats
 (define allegro-pixel-format-any               0)
@@ -358,12 +360,12 @@
   void "al_set_separate_blender" (list int int int int int int))
 
 (define-foreign %al-get-clipping-rectangle
-  void "al_get_clipping_rectangle" (list int int int int))
+  void "al_get_clipping_rectangle" (list '* '* '* '*))
 
-(define-foreign %al-set-clipping-rectangle
+(define-foreign al-set-clipping-rectangle
   void "al_set_clipping_rectangle" (list int int int int))
 
-(define-foreign %al-reset-clipping-rectangle
+(define-foreign al-reset-clipping-rectangle
   void "al_reset_clipping_rectangle" '())
 
 (define-foreign %al-convert-mask-to-alpha
@@ -579,7 +581,19 @@
             (bytevector->int v alpha-src-offset)
             (bytevector->int v alpha-dst-offset))))
 
-;; TODO: Clipping
+(define (al-get-clipping-rectangle)
+  (let ((v (make-bytevector (* (sizeof int) 4)))
+        (y-offset      (sizeof int))
+        (width-offset  (* (sizeof int) 2))
+        (height-offset (* (sizeof int) 3)))
+    (%al-get-clipping-rectangle (bytevector->pointer v)
+                                (bytevector->pointer v y-offset)
+                                (bytevector->pointer v width-offset)
+                                (bytevector->pointer v height-offset))
+    (values (bytevector->int v)
+            (bytevector->int v y-offset)
+            (bytevector->int v width-offset)
+            (bytevector->int v height-offset))))
 
 (define (al-hold-bitmap-drawing hold)
   (%al-hold-bitmap-drawing (boolean->number hold)))
