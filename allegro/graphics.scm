@@ -595,6 +595,10 @@
             (bytevector->int v width-offset)
             (bytevector->int v height-offset))))
 
+(define (al-convert-mask-to-alpha bitmap color)
+  (%al-convert-mask-to-alpha (unwrap-allegro-bitmap bitmap)
+                             (apply color->pointer color)))
+
 (define (al-hold-bitmap-drawing hold)
   (%al-hold-bitmap-drawing (boolean->number hold)))
 
