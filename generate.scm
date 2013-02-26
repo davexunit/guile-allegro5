@@ -50,13 +50,14 @@
 
 (define regex "al_[[:alnum:]_]+")
 
-(define types '(("^[:word:]+\\*" . "'*")
+(define types '(("^[:word:]+ \\*" . "'*")
                 ("^bool" . "uint8")
                 ("^int" . "int")
                 ("^float" . "float")
                 ("^double" . "double")
                 ("^uint32_t" . "uint32")
                 ("^unsigned char" . "uint8")
+                ("^unsigned int" . "unsigned-int")
                 ("^const char *" . "'*")
                 ("^char const *" . "'*")
                 ("^void" . "void")
