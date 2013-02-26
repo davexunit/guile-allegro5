@@ -19,5 +19,5 @@
 (define (boolean->number b)
   (if b 1 0))
 
-(define (bytevector->int bv)
-  (bytevector-sint-ref bv 0 (native-endianness) (sizeof int)))
+(define* (bytevector->int bv #:optional (offset 0))
+  (bytevector-sint-ref bv offset (native-endianness) (sizeof int)))
