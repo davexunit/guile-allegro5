@@ -145,6 +145,7 @@
 
 (define types-event-any      (list int '* double))
 (define types-event-display  (build-event-types (list int int int int int)))
+(define types-event-joystick (build-event-types (list '* int int float int)))
 (define types-event-keyboard (build-event-types (list int '*)))
 (define types-event-mouse    (build-event-types (list int int int int
                                                       int int int int
@@ -185,6 +186,18 @@
 (define (al-get-event-source event)
   (wrap-allegro-event-source (%al-get-event-source event)))
 
+(define (al-get-display-event event)
+  (make-allegro-display-event (al-get-event-pointer event)))
+
+(define (al-get-joystick-event event)
+  (make-allegro-joystick-event (al-get-event-pointer event)))
+
+(define (al-get-key-event event)
+  (make-allegro-key-event (al-get-event-pointer event)))
+
+(define (al-get-mouse-event event)
+  (make-allegro-mouse-event (al-get-event-pointer event)))
+
 (define (al-get-timer-event event)
   (make-allegro-timer-event (al-get-event-pointer event)))
 
@@ -193,17 +206,34 @@
     ;; Leave off event type
     (apply constructor (cdr data))))
 
-;; Timer event
-(define-record-type <allegro-timer-event>
-  (%make-allegro-timer-event source timestamp count error)
-  allegro-timer-event?
-  (source al-get-timer-event-src)
-  (timestamp al-get-timer-event-timestamp)
-  (count al-get-timer-event-count)
-  (error al-get-timer-event-error))
+;; Display event
+(define-record-type <allegro-display-event>
+  (%make-allegro-display-event source timestamp x y width height)
+  allegro-display-event?
+  (source al-get-display-event-src)
+  (timestamp al-get-display-event-timestamp)
+  (x al-get-display-event-x)
+  (y al-get-display-event-y)
+  (width al-get-display-event-width)
+  (height al-get-display-event-height))
 
-(define (make-allegro-timer-event pointer)
-  (%make-event pointer types-event-timer %make-allegro-timer-event))
+(define (make-allegro-display-event pointer)
+  (%make-event pointer types-event-display %make-allegro-display-event))
+
+;; Joystick event
+(define-record-type <allegro-joystick-event>
+  (%make-allegro-joystick-event source timestamp id stick axis pos button)
+  allegro-joystick-event?
+  (source al-get-joystick-event-src)
+  (timestamp al-get-joystick-event-timestamp)
+  (id al-get-joystick-event-id)
+  (stick al-get-joystick-event-stick)
+  (axis al-get-joystick-event-axis)
+  (pos al-get-joystick-event-pos)
+  (button al-get-joystick-event-button))
+
+(define (make-allegro-joystick-event pointer)
+  (%make-event pointer types-event-joystick %make-allegro-joystick-event))
 
 ;; Keyboard event
 (define-record-type <allegro-key-event>
@@ -220,6 +250,39 @@
 
 (define (make-allegro-key-event pointer)
   (%make-event pointer types-event-keyboard %make-allegro-key-event))
+
+;; Mouse event
+(define-record-type <allegro-mouse-event>
+  (%make-allegro-mouse-event source timestamp x y z wdx dy dz dw
+                             button pressure)
+  allegro-mouse-event?
+  (source al-get-mouse-event-src)
+  (timestamp al-get-mouse-event-timestamp)
+  (x al-get-mouse-event-x)
+  (y al-get-mouse-event-y)
+  (z al-get-mouse-event-z)
+  (w al-get-mouse-event-w)
+  (dx al-get-mouse-event-dx)
+  (dy al-get-mouse-event-dy)
+  (dz al-get-mouse-event-dz)
+  (dw al-get-mouse-event-dw)
+  (button al-get-mouse-event-button)
+  (pressure al-get-mouse-event-pressure))
+
+(define (make-allegro-mouse-event pointer)
+  (%make-event pointer types-event-mouse %make-allegro-mouse-event))
+
+;; Timer event
+(define-record-type <allegro-timer-event>
+  (%make-allegro-timer-event source timestamp count error)
+  allegro-timer-event?
+  (source al-get-timer-event-src)
+  (timestamp al-get-timer-event-timestamp)
+  (count al-get-timer-event-count)
+  (error al-get-timer-event-error))
+
+(define (make-allegro-timer-event pointer)
+  (%make-event pointer types-event-timer %make-allegro-timer-event))
 
 ;; 72 is the size of the ALLEGRO_EVENT struct.
 (define (make-event-bytevector)
