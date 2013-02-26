@@ -1,7 +1,8 @@
 (define-module (allegro system)
   #:use-module (system foreign)
   #:use-module (allegro utils)
-  #:export (al-install-system
+  #:export (allegro-pi
+            al-install-system
             al-init
             al-uninstall-system
             al-is-system-installed?
@@ -11,6 +12,8 @@
             al-set-org-name
             al-get-app-name
             al-get-org-name))
+
+(define allegro-pi 3.14159265358979323846)
 
 ;; Foreign function bindings
 (define-foreign %al-install-system
