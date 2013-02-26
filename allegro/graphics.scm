@@ -3,7 +3,56 @@
   #:use-module (rnrs bytevectors)
   #:use-module (allegro utils)
   #:use-module (allegro display)
-  #:export (al-map-rgb
+  #:export (allegro-pixel-format-any
+            allegro-pixel-format-any-no-alpha
+            allegro-pixel-format-any-with-alpha
+            allegro-pixel-format-any-15-no-alpha
+            allegro-pixel-format-any-16-no-alpha
+            allegro-pixel-format-any-16-with-alpha
+            allegro-pixel-format-any-24-no-alpha
+            allegro-pixel-format-any-32-no-alpha
+            allegro-pixel-format-any-32-with-alpha
+            allegro-pixel-format-argb-8888
+            allegro-pixel-format-rgba-8888
+            allegro-pixel-format-argb-4444
+            allegro-pixel-format-rgb-888
+            allegro-pixel-format-rgb-565
+            allegro-pixel-format-rgb-555
+            allegro-pixel-format-rgba-5551
+            allegro-pixel-format-argb-1555
+            allegro-pixel-format-abgr-8888
+            allegro-pixel-format-xbgr-8888
+            allegro-pixel-format-bgr-888
+            allegro-pixel-format-bgr-565
+            allegro-pixel-format-bgr-555
+            allegro-pixel-format-rgbx-8888
+            allegro-pixel-format-xrgb-8888
+            allegro-pixel-format-abgr-f32
+            allegro-pixel-format-abgr-8888-le
+            allegro-pixel-format-rgba-4444
+            allegro-memory-bitmap
+            allegro-keep-bitmap-format
+            allegro-force-locking
+            allegro-no-preserve-texture
+            allegro-alpha-test
+            allegro-min-linear
+            allegro-mag-linear
+            allegro-mipmap
+            allegro-no-premultiplied-alpha
+            allegro-video-bitmap
+            allegro-flip-horizontal
+            allegro-flip-vertical
+            allegro-lock-readwrite
+            allegro-lock-readonly
+            allegro-lock-writeonly
+            allegro-zero
+            allegro-one
+            allegro-alpha
+            allegro-inverse-alpha
+            allegro-add
+            allegro-src-minus-dest
+            allegro-dest-minus-src
+            al-map-rgb
             al-map-rgb-f
             al-map-rgba
             al-map-rgba-f
@@ -74,6 +123,67 @@
             al-save-bitmap
             al-save-bitmap-f))
 
+;; Pixel formats
+(define allegro-pixel-format-any               0)
+(define allegro-pixel-format-any-no-alpha      1)
+(define allegro-pixel-format-any-with-alpha    2)
+(define allegro-pixel-format-any-15-no-alpha   3)
+(define allegro-pixel-format-any-16-no-alpha   4)
+(define allegro-pixel-format-any-16-with-alpha 5)
+(define allegro-pixel-format-any-24-no-alpha   6)
+(define allegro-pixel-format-any-32-no-alpha   7)
+(define allegro-pixel-format-any-32-with-alpha 8)
+(define allegro-pixel-format-argb-8888         9)
+(define allegro-pixel-format-rgba-8888         10)
+(define allegro-pixel-format-argb-4444         11)
+(define allegro-pixel-format-rgb-888           12)
+(define allegro-pixel-format-rgb-565           13)
+(define allegro-pixel-format-rgb-555           14)
+(define allegro-pixel-format-rgba-5551         15)
+(define allegro-pixel-format-argb-1555         16)
+(define allegro-pixel-format-abgr-8888         17)
+(define allegro-pixel-format-xbgr-8888         18)
+(define allegro-pixel-format-bgr-888           19)
+(define allegro-pixel-format-bgr-565           20)
+(define allegro-pixel-format-bgr-555           21)
+(define allegro-pixel-format-rgbx-8888         22)
+(define allegro-pixel-format-xrgb-8888         23)
+(define allegro-pixel-format-abgr-f32          24)
+(define allegro-pixel-format-abgr-8888-le      25)
+(define allegro-pixel-format-rgba-4444         26)
+
+;; Bitmap flags
+(define allegro-memory-bitmap          #x0001)
+(define allegro-keep-bitmap-format     #x0002)
+(define allegro-force-locking          #x0004)
+(define allegro-no-preserve-texture    #x0008)
+(define allegro-alpha-test             #x0010)
+(define allegro-min-linear             #x0040)
+(define allegro-mag-linear             #x0080)
+(define allegro-mipmap                 #x0100)
+(define allegro-no-premultiplied-alpha #x0200)
+(define allegro-video-bitmap           #x0400)
+
+;; Flags for blitting procedures
+(define allegro-flip-horizontal #x00001)
+(define allegro-flip-vertical   #x00002)
+
+;; Locking flags
+(define allegro-lock-readwrite 0)
+(define allegro-lock-readonly  1)
+(define allegro-lock-writeonly 2)
+
+;; Blending modes
+(define allegro-zero          0)
+(define allegro-one           1)
+(define allegro-alpha         2)
+(define allegro-inverse-alpha 3)
+
+(define allegro-add            0)
+(define allegro-src-minus-dest 1)
+(define allegro-dest-minus-src 2)
+
+;; ALLEGRO_COLOR type
 (define allegro-color (list float float float float))
 
 (define-foreign %al-map-rgb
@@ -236,15 +346,15 @@
   '* "al_get_current_display" '())
 
 (define-foreign %al-get-blender
-  void "al_get_blender" (list int int int))
+  void "al_get_blender" (list '* '* '*))
 
 (define-foreign %al-get-separate-blender
-  void "al_get_separate_blender" (list int int int int int int))
+  void "al_get_separate_blender" (list '* '* '* '* '* '*))
 
-(define-foreign %al-set-blender
+(define-foreign al-set-blender
   void "al_set_blender" (list int int int))
 
-(define-foreign %al-set-separate-blender
+(define-foreign al-set-separate-blender
   void "al_set_separate_blender" (list int int int int int int))
 
 (define-foreign %al-get-clipping-rectangle
@@ -296,6 +406,7 @@
 (define* (color->pointer r g b #:optional (a 1.0))
   (make-c-struct allegro-color (list r g b a)))
 
+;; Why does this always return #000000?
 (define (al-map-rgb r g b)
   (pointer->color (%al-map-rgb r g b)))
 
@@ -381,33 +492,36 @@
 (define* (al-clear-to-color r g b #:optional (a 1.0))
   (%al-clear-to-color (color->pointer r g b a)))
 
-(define (al-draw-bitmap bitmap x y flags)
+(define* (al-draw-bitmap bitmap x y #:optional (flags 0))
   (%al-draw-bitmap (unwrap-allegro-bitmap bitmap) x y flags))
 
-(define (al-draw-tinted-bitmap bitmap tint x y flags)
+(define* (al-draw-tinted-bitmap bitmap tint x y #:optional (flags 0))
   (%al-draw-tinted-bitmap (unwrap-allegro-bitmap bitmap)
                           (apply color->pointer tint)
                           x y flags))
 
-(define (al-draw-bitmap-region bitmap sx sy sw sh dx dy flags)
+(define* (al-draw-bitmap-region bitmap sx sy sw sh dx dy #:optional (flags 0))
   (%al-draw-bitmap-region (unwrap-allegro-bitmap bitmap)
                           sx sy sw sh dx dy flags))
 
-(define (al-draw-tinted-bitmap-region bitmap tint sx sy sw sh dx dy flags)
+(define* (al-draw-tinted-bitmap-region bitmap tint sx sy sw sh dx dy
+                                       #:optional (flags 0))
   (%al-draw-tinted-bitmap-region (unwrap-allegro-bitmap bitmap)
                                  (apply color->pointer tint)
                                  sx sy sw sh dx dy flags))
 
-(define (al-draw-rotated-bitmap bitmap cx cy dx dy angle flags)
+(define* (al-draw-rotated-bitmap bitmap cx cy dx dy angle #:optional (flags 0))
   (%al-draw-rotated-bitmap (unwrap-allegro-bitmap bitmap)
                            cx cy dx dy angle flags))
 
-(define (al-draw-tinted-rotated-bitmap bitmap tint cx cy dx dy angle flags)
+(define* (al-draw-tinted-rotated-bitmap bitmap tint cx cy dx dy angle
+                                        #:optional (flags 0))
   (%al-draw-tinted-rotated-bitmap (unwrap-allegro-bitmap bitmap)
                                   (apply color->pointer tint)
                                   cx cy dx dy angle flags))
 
-(define (al-draw-scaled-rotated-bitmap bitmap cx cy dx dy xscale yscale angle flags)
+(define* (al-draw-scaled-rotated-bitmap bitmap cx cy dx dy xscale yscale
+                                       angle #:optional (flags 0))
   (%al-draw-scaled-rotated-bitmap (unwrap-allegro-bitmap bitmap)
                                   cx cy dx dy xscale yscale angle flags))
 (define (al-draw-pixel x y color)
@@ -432,6 +546,16 @@
   (wrap-allegro-display (%al-get-current-display)))
 
 ;; TODO: BLENDERS!!!
+(define (al-get-blender)
+  (let ((op  (make-bytevector (sizeof int)))
+        (src (make-bytevector (sizeof int)))
+        (dst (make-bytevector (sizeof int))))
+    (%al-get-blender (bytevector->pointer op)
+                     (bytevector->pointer src)
+                     (bytevector->pointer dst))
+    (values (bytevector->int op)
+            (bytevector->int src)
+            (bytevector->int dst))))
 
 ;; TODO: Clipping
 
