@@ -1,25 +1,25 @@
 * Things to do
 ** TODO Add basic bindings for important allegro modules.
     - [X] Display
-    - [ ] Events
-    - [ ] Filesystem
+    - [X] Events
+    - [-] Filesystem - better to use Guile
     - [ ] Fullscreen modes
     - [X] Graphics
     - [ ] Joystick
-    - [ ] Keyboard
-    - [ ] Monitor
-    - [ ] Mouse
-    - [ ] Path
+    - [X] Keyboard
+    - [X] Monitor
+    - [X] Mouse
+    - [ ] Path - better to use Guile
     - [ ] State
     - [X] System
-    - [ ] Time
+    - [X] Time
     - [X] Timer
-    - [ ] Transformations
+    - [X] Transformations
     - [ ] Miscellaneous
-    - [ ] Platform-specific
+    - [-] Platform-specific - Don't see a point in wrapping these.
     - [ ] Audio addon
     - [ ] Audio codecs
     - [ ] Color addon
     - [ ] Font addons
-    - [ ] Image I/O addon
+    - [X] Image I/O addon
     - [ ] Primitives addon
