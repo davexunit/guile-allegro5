@@ -187,11 +187,21 @@
 (define types-event-display  (build-event-types (list int int int int int)))
 (define types-event-joystick (build-event-types (list '* int int float int)))
 (define types-event-keyboard (build-event-types (list int '*)))
-(define types-event-mouse    (build-event-types (list int int int int
+(define types-event-mouse    (build-event-types (list '* int int int int
                                                       int int int int
                                                       unsigned-int float)))
 (define types-event-timer    (build-event-types (list int64 double)))
+(define types-event-user     (build-event-types (make-list 5 '*)))
 
+;; ALLEGRO_EVENT is a union of all the event structs.
+;; To calculate the size of ALLEGRO_EVENT, we take the max size of the
+;; event types.
+(define allegro-event-size (max (sizeof types-event-display)
+                                (sizeof types-event-joystick)
+                                (sizeof types-event-keyboard)
+                                (sizeof types-event-mouse)
+                                (sizeof types-event-timer)
+                                (sizeof types-event-user)))
 ;; Wrappers
 (define-wrapped-pointer-type <allegro-event-queue>
   allegro-event-queue?
