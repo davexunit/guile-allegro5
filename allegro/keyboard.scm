@@ -269,6 +269,7 @@
 (define allegro-key-scrolllock   224)
 (define allegro-key-numlock      225)
 (define allegro-key-capslock     226)
+(define allegro-key-max          227)
 
 ;; Key modifiers
 (define allegro-keymod-shift      #x00001)
@@ -295,6 +296,15 @@
   (lambda (ks port)
     (format port "#<allegro-keyboard-state ~x>"
             (pointer-address (unwrap-allegro-keyboard-state ks)))))
+
+;; This does the equivalent of what happens in the C source for
+;; determining how large the internal key state array should be.
+(define key-state-internal-length
+  (inexact->exact (round (/ (+ allegro-key-max 31) 32))))
+
+(define types-keyboard-state (append (list '*)
+                                     (make-list key-state-internal-length
+                                                unsigned-int)))
 
 ;; Foreign function bindings
 (define-foreign %al-install-keyboard
@@ -328,8 +338,7 @@
   (number->boolean (%al-is-keyboard-installed?)))
 
 (define (al-get-keyboard-state)
-  ;; sizeof (ALLEGRO_KEYBOARD_STATE) is 40
-  (let* ((ks (make-bytevector 40))
+  (let* ((ks (make-bytevector (sizeof types-keyboard-state)))
          (pointer (bytevector->pointer ks)))
     (%al-get-keyboard-state pointer)
     (wrap-allegro-keyboard-state pointer)))
