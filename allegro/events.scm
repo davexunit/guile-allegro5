@@ -186,7 +186,8 @@
 (define types-event-any      (list int '* double))
 (define types-event-display  (build-event-types (list int int int int int)))
 (define types-event-joystick (build-event-types (list '* int int float int)))
-(define types-event-keyboard (build-event-types (list int '*)))
+(define types-event-keyboard (build-event-types (list '* int int unsigned-int
+                                                      uint8)))
 (define types-event-mouse    (build-event-types (list '* int int int int
                                                       int int int int
                                                       unsigned-int float)))
