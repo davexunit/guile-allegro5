@@ -37,6 +37,42 @@
             al-get-timer-event-timestamp
             al-get-timer-event-count
             al-get-timer-event-error
+            allegro-display-event?
+            al-get-display-event-src
+            al-get-display-event-timestamp
+            al-get-display-event-x
+            al-get-display-event-y
+            al-get-display-event-width
+            al-get-display-event-height
+            allegro-joystick-event?
+            al-get-joystick-event-src
+            al-get-joystick-event-timestamp
+            al-get-joystick-event-id
+            al-get-joystick-event-stick
+            al-get-joystick-event-axis
+            al-get-joystick-event-pos
+            al-get-joystick-event-button
+            allegro-key-event?
+            al-get-key-event-source
+            al-get-key-event-timestamp
+            al-get-key-event-display
+            al-get-key-event-keycode
+            al-get-key-event-unichar
+            al-get-key-event-modifiers
+            al-get-key-event-repeat
+            allegro-mouse-event?
+            al-get-mouse-event-src
+            al-get-mouse-event-timestamp
+            al-get-mouse-event-x
+            al-get-mouse-event-y
+            al-get-mouse-event-z
+            al-get-mouse-event-w
+            al-get-mouse-event-dx
+            al-get-mouse-event-dy
+            al-get-mouse-event-dz
+            al-get-mouse-event-dw
+            al-get-mouse-event-button
+            al-get-mouse-event-pressure
             allegro-event-joystick-axis
             allegro-event-joystick-button-down
             allegro-event-joystick-button-up
