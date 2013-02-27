@@ -475,7 +475,7 @@
   (number->boolean (%al-is-bitmap-locked? (unwrap-allegro-bitmap bitmap))))
 
 (define (al-is-compatible-bitmap? bitmap)
-  (number->boolean (%al-is-compatible-bitmap (unwrap-allegro-bitmap bitmap))))
+  (number->boolean (%al-is-compatible-bitmap? (unwrap-allegro-bitmap bitmap))))
 
 (define (al-is-sub-bitmap? bitmap)
   (number->boolean (%al-is-sub-bitmap? (unwrap-allegro-bitmap bitmap))))
