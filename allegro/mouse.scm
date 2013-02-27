@@ -95,7 +95,7 @@
 
 (define types-mouse-state (list int int int int
                                 int int int int
-                                int float))
+                                int float '*))
 
 (define-foreign %al-install-mouse
   uint8 "al_install_mouse" '())
@@ -170,8 +170,7 @@
   (number->boolean (%al-is-mouse-installed?)))
 
 (define (al-get-mouse-state)
-  ;; sizeof (ALLEGRO_MOUSE_STATE) is 48
-  (let* ((v (make-bytevector 48))
+  (let* ((v (make-bytevector (sizeof types-mouse-state)))
          (pointer (bytevector->pointer v)))
     (%al-get-mouse-state pointer)
     (wrap-allegro-mouse-state pointer)))
