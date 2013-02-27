@@ -27,7 +27,11 @@
             al-get-event-type
             al-get-event-source
             al-get-event-timestamp
+            al-get-display-event
             al-get-timer-event
+            al-get-key-event
+            al-get-mouse-event
+            al-get-joystick-event
             allegro-timer-event?
             al-get-timer-event-src
             al-get-timer-event-timestamp
