@@ -31,7 +31,48 @@
             al-hide-mouse-cursor
             al-show-mouse-cursor
             al-grab-mouse
-            al-ungrab-mouse))
+            al-ungrab-mouse
+            allegro-system-mouse-cursor-none
+            allegro-system-mouse-cursor-default
+            allegro-system-mouse-cursor-arrow
+            allegro-system-mouse-cursor-busy
+            allegro-system-mouse-cursor-question
+            allegro-system-mouse-cursor-edit
+            allegro-system-mouse-cursor-move
+            allegro-system-mouse-cursor-resize-n
+            allegro-system-mouse-cursor-resize-w
+            allegro-system-mouse-cursor-resize-s
+            allegro-system-mouse-cursor-resize-e
+            allegro-system-mouse-cursor-resize-nw
+            allegro-system-mouse-cursor-resize-sw
+            allegro-system-mouse-cursor-resize-se
+            allegro-system-mouse-cursor-resize-ne
+            allegro-system-mouse-cursor-progress
+            allegro-system-mouse-cursor-precision
+            allegro-system-mouse-cursor-link
+            allegro-system-mouse-cursor-alt-select
+            allegro-system-mouse-cursor-unavailable))
+
+(define allegro-system-mouse-cursor-none         0)
+(define allegro-system-mouse-cursor-default      1)
+(define allegro-system-mouse-cursor-arrow        2)
+(define allegro-system-mouse-cursor-busy         3)
+(define allegro-system-mouse-cursor-question     4)
+(define allegro-system-mouse-cursor-edit         5)
+(define allegro-system-mouse-cursor-move         6)
+(define allegro-system-mouse-cursor-resize-n     7)
+(define allegro-system-mouse-cursor-resize-w     8)
+(define allegro-system-mouse-cursor-resize-s     9)
+(define allegro-system-mouse-cursor-resize-e    10)
+(define allegro-system-mouse-cursor-resize-nw   11)
+(define allegro-system-mouse-cursor-resize-sw   12)
+(define allegro-system-mouse-cursor-resize-se   13)
+(define allegro-system-mouse-cursor-resize-ne   14)
+(define allegro-system-mouse-cursor-progress    15)
+(define allegro-system-mouse-cursor-precision   16)
+(define allegro-system-mouse-cursor-link        17)
+(define allegro-system-mouse-cursor-alt-select  18)
+(define allegro-system-mouse-cursor-unavailable 19)
 
 (define allegro-mouse-x 0)
 (define allegro-mouse-y 1)
@@ -45,24 +86,16 @@
     (format port "<allegro-mouse-state ~x>"
             (pointer-address (unwrap-allegro-mouse-state ms)))))
 
+(define-wrapped-pointer-type <allegro-mouse-cursor>
+  allegro-mouse-cursor?
+  wrap-allegro-mouse-cursor unwrap-allegro-mouse-cursor
+  (lambda (mc port)
+    (format port "#<allegro-mouse-cursor ~x>"
+            (pointer-address (unwrap-allegro-mouse-cursor mc)))))
+
 (define types-mouse-state (list int int int int
                                 int int int int
                                 int float))
-
-;; (define-record-type <allegro-mouse-state>
-;;   (make-allegro-mouse-state x y z w extra-1 extra-2 extra-3 extra-4
-;;                             buttons pressure)
-;;   allegro-mouse-state?
-;;   (x al-get-mouse-state-x)
-;;   (y al-get-mouse-state-y)
-;;   (z al-get-mouse-state-z)
-;;   (w al-get-mouse-state-w)
-;;   (extra-1 al-get-mouse-state-extra-1)
-;;   (extra-2 al-get-mouse-state-extra-2)
-;;   (extra-3 al-get-mouse-state-extra-3)
-;;   (extra-4 al-get-mouse-state-extra-4)
-;;   (buttons al-get-mouse-state-buttons)
-;;   (pressure al-get-mouse-state-pressure))
 
 (define-foreign %al-install-mouse
   uint8 "al_install_mouse" '())
@@ -113,7 +146,7 @@
   uint8 "al_set_mouse_cursor" (list '* '*))
 
 (define-foreign %al-set-system-mouse-cursor
-  uint8 "al_set_system_mouse_cursor" (list '* '*))
+  uint8 "al_set_system_mouse_cursor" (list '* int))
 
 (define-foreign %al-get-mouse-cursor-position
   uint8 "al_get_mouse_cursor_position" (list '* '*))
@@ -164,6 +197,36 @@
 
 (define (al-get-mouse-event-source)
   (wrap-allegro-event-source (%al-get-mouse-event-source)))
+
+(define (al-create-mouse-cursor bitmap x-focus y-focus)
+  (wrap-allegro-mouse-cursor (%al-create-mouse-cursor bitmap x-focus y-focus)))
+
+(define (al-destroy-mouse-cursor cursor)
+  (%al-destroy-mouse-cursor (unwrap-allegro-mouse-cursor cursor)))
+
+(define (al-set-mouse-cursor display cursor)
+  (number->boolean
+   (%al-set-mouse-cursor (unwrap-allegro-display display)
+                         (unwrap-allegro-mouse-cursor cursor))))
+
+(define (al-set-system-mouse-cursor display cursor-id)
+  (number->boolean
+   (%al-set-system-mouse-cursor (unwrap-allegro-display display) cursor-id)))
+
+(define (al-get-mouse-cursor-position)
+  (let* ((pos (make-bytevector (* (sizeof int) 2)))
+         (x (bytevector->pointer pos))
+         (y (bytevector->pointer pos (sizeof int)))
+         (ret (%al-get-mouse-cursor-position x y)))
+    (values (number->boolean ret)
+            (bytevector->int pos)
+            (bytevector->int pos (sizeof int)))))
+
+(define (al-hide-mouse-cursor display)
+  (number->boolean (%al-hide-mouse-cursor (unwrap-allegro-display display))))
+
+(define (al-show-mouse-cursor display)
+  (number->boolean (%al-show-mouse-cursor (unwrap-allegro-display display))))
 
 (define (al-grab-mouse display)
   (number->boolean (%al-grab-mouse (unwrap-allegro-display display))))
