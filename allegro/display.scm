@@ -41,7 +41,9 @@
             al-get-monitor-info
             al-get-num-video-adapters
             al-set-target-backbuffer
-            al-get-current-display))
+            al-get-current-display
+            wrap-allegro-display
+            unwrap-allegro-display))
 
 ;; Foreign function bindings
 (define-foreign %al-create-display
