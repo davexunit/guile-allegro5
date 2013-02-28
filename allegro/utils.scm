@@ -5,7 +5,10 @@
   #:export (number->boolean
             boolean->number
             bytevector->int
-            define-foreign))
+            define-foreign
+            allegro-color
+            pointer->color
+            color->pointer))
 
 (define liballegro (dynamic-link "liballegro"))
 
@@ -21,3 +24,13 @@
 
 (define* (bytevector->int bv #:optional (offset 0))
   (bytevector-sint-ref bv offset (native-endianness) (sizeof int)))
+
+;; ALLEGRO_COLOR type
+(define allegro-color (list float float float float))
+
+;; Color
+(define (pointer->color pointer)
+  (parse-c-struct pointer allegro-color))
+
+(define* (color->pointer r g b #:optional (a 1.0))
+  (make-c-struct allegro-color (list r g b a)))

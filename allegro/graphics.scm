@@ -119,9 +119,7 @@
             ;; al-load-bitmap-f
             al-save-bitmap
             ;; al-save-bitmap-f
-            unwrap-allegro-bitmap
-            pointer->color
-            color->pointer))
+            unwrap-allegro-bitmap))
 
 ;; Pixel formats
 (define allegro-pixel-format-any               0)
@@ -182,9 +180,6 @@
 (define allegro-add            0)
 (define allegro-src-minus-dest 1)
 (define allegro-dest-minus-src 2)
-
-;; ALLEGRO_COLOR type
-(define allegro-color (list float float float float))
 
 (define-foreign %al-map-rgb
   allegro-color "al_map_rgb" (list uint8 uint8 uint8))
@@ -392,13 +387,6 @@
 
 (define-foreign %al-save-bitmap-f
   uint8 "al_save_bitmap_f" (list '* '* '*))
-
-;; Color
-(define (pointer->color pointer)
-  (parse-c-struct pointer allegro-color))
-
-(define* (color->pointer r g b #:optional (a 1.0))
-  (make-c-struct allegro-color (list r g b a)))
 
 ;; Why does this always return #000000?
 (define (al-map-rgb r g b)
