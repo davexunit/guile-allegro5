@@ -23,3 +23,7 @@
     - [ ] Font addons
     - [X] Image I/O addon
     - [ ] Primitives addon
+
+** TODO Add additional logic to asset loading procedures
+When an asset (bitmap, font, etc.) fails to load, return #f instead of
+an wrapped null pointer.
