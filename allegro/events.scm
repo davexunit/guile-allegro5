@@ -305,7 +305,7 @@
 
 ;; Mouse event
 (define-record-type <allegro-mouse-event>
-  (%make-allegro-mouse-event source timestamp x y z wdx dy dz dw
+  (%make-allegro-mouse-event source timestamp x y z w dx dy dz dw
                              button pressure)
   allegro-mouse-event?
   (source al-get-mouse-event-src)
