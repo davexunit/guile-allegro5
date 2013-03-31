@@ -57,6 +57,15 @@ Example
 (game-loop)
 ```
 
+Installing
+----------
+```
+./autogen.sh
+./configure --prefix=/usr
+make
+sudo make install
+```
+
 Hacking
 -------
 The bindings are incomplete. Please help fill in the gaps.
