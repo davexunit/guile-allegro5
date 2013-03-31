@@ -1,5 +1,6 @@
 (define-module (allegro timer)
   #:use-module (system foreign)
+  #:use-module (ice-9 format)
   #:use-module (allegro events)
   #:use-module (allegro utils)
   #:export (al-create-timer

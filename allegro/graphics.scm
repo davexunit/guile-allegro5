@@ -1,6 +1,7 @@
 (define-module (allegro graphics)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 format)
   #:use-module (allegro utils)
   #:export (allegro-pixel-format-any
             allegro-pixel-format-any-no-alpha
@@ -435,8 +436,8 @@
 
 (define (al-create-sub-bitmap parent-bitmap x y width height)
   (wrap-allegro-bitmap
-   (al-create-sub-bitmap (unwrap-allegro-bitmap parent-bitmap)
-                         x y width height)))
+   (%al-create-sub-bitmap (unwrap-allegro-bitmap parent-bitmap)
+                          x y width height)))
 
 (define (al-clone-bitmap bitmap)
   (wrap-allegro-bitmap (%al-clone-bitmap (unwrap-allegro-bitmap bitmap))))

@@ -1,6 +1,7 @@
 (define-module (allegro time)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 format)
   #:use-module (allegro utils)
   #:export (al-get-time
             al-create-timeout

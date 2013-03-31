@@ -1,6 +1,7 @@
 (define-module (allegro keyboard)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 format)
   #:use-module (allegro utils)
   #:use-module (allegro events)
   #:export (al-install-keyboard

@@ -1,6 +1,7 @@
 (define-module (allegro mouse)
   #:use-module (system foreign)
   #:use-module (rnrs bytevectors)
+  #:use-module (ice-9 format)
   #:use-module (srfi srfi-9)
   #:use-module (allegro utils)
   #:use-module (allegro display)
